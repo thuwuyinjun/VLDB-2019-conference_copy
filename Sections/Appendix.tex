@@ -1,0 +1,149 @@
+\begin{appendix}
+You can use an appendix for optional proofs or details of your evaluation which are not absolutely necessary to the core understanding of your paper. 
+
+\section{Details of approaches}
+
+In this section, the details of provenance approach is presented step by step and the corresponding pseudo-code is provided. One key step is to derive the valid view mappings, which depends on checking the satisfiability of {\em schema-level approach} and {\em tuple-level approach} for each candidate view mapping. So we present the details of 
+determining view mappings satisfying {\em schema-level approach} in Algorithm \ref{view_mapping_schema_level} and the details of continuing filtering out view mappings violating {\em tuple-level approach} for each individual query tuple in Algorithm \ref{view_mapping_tuple_level}.
+
+\begin{algorithm}[h!] 
+\footnotesize
+ \SetKwInOut{Input}{Input}
+ \SetKwInOut{Output}{Output}
+ \Input{a set of views: $\mathcal{V} = \{V_1, V_2,...,V_k\}$, user query: $Q$, a Database instance $D$}
+
+ \Output{the set of all covering sets for each tuple in $Q(D)$}
+
+{\em Preprocessing step}: Return a set of view mappings $\mathcal{M}$ and the provenance of $Q$ and each $V$
+
+{\em Reasoning valid view mapping step}: For each query tuple $t$, determine valid view mappings by comparing the provenance of  $Q$ and the provenance of $V$
+
+{\em Covering sets calculation step}: Calculate covering sets based on derived valid view mappings for each query tuple, which will be the output of the algorithm.
+%  }
+%  \For{each view mapping $M \in \mathcal{M}$}{
+ 
+%     Derive lambda terms $L(M)$ and the predicates $condition(M)$ under $M$
+    
+%     Add all lambda terms in $L(M)$ to $\bar{X}'$
+    
+%     Add boolean expressions of all the global conditions in $condition(M)$ to $\bar{X}''$
+%  } 
+%  \For{each relation $B_i$ in the body of $Q$}
+%  {
+%     Add the view vectors $Vec(B_i)$ to $\bar{X}'$.
+%  }
+
+%  Construct the extended query $Q_{ext1}$ with the following form:
+
+%  $Q_{ext1}(\bar{X}') :- B_1(\bar{X_1}), B_2(\bar{X_2}), \dots, B_m(\bar{X_m}), condition(Q)$
+
+ \Return $\mathcal{M}$
+
+ \caption{Derive all possible view mappings in the schema level}
+ \label{view_mapping_schema_level}
+ \end{algorithm}
+
+
+\begin{algorithm}[h!] 
+\footnotesize
+ \SetKwInOut{Input}{Input}
+ \SetKwInOut{Output}{Output}
+ \Input{a set of views: $\mathcal{V} = \{V_1, V_2,...,V_k\}$, user query:
+ $Q(\bar{X}, Agg_1(\bar{X'_{1}}), \dots, Agg_s(\bar{X'_{s}})) :- B_1, B_2, \dots, B_m, condition(Q)$, a set of possible view mappings $\mathcal{M}$, a query tuple $t \in Q(D)$}
+
+ \Output{the set of valid view mapping $\mathcal{M}_t$}
+
+ Initialize $\mathcal{M}_t = \{\}$
+ 
+ Suppose the assignment to tuple $t$ is $\Gamma$ and the isomorphism between each subgoal and how-provenance under the assignment $\Gamma$ is $F$.
+
+Suppose the how-provenance polynomial of $t$ is $W = \sum_{i=1}^rW_i$
+
+% Create a multiset $\bar{W}$ to store all the monomials in $W$
+
+
+ \For{each view mapping $M \in \mathcal{M}$ which maps view $V$ to $Q$}
+ {
+
+	\For{each how-provenance monomial $W_i$}
+ 	{
+    	\For{each how-provenance token $w_{ij}$ in $W_i$}
+        {
+        	Subgoal $R=F^{-1}(w_{ij}|\Gamma)$
+            
+            \If{a subgoal $R'$ in the body of $V$ can be mapped to $R$ under $M$}
+            {
+      			Assign the base relation tuple $t'$ which is associated with how-provenance token $w_{ij}$ to $R'$      		
+            }
+        }
+        \If{any predicate of $V$ is evaluated to be false}
+        {
+        	\textbf{break}
+        }
+    }
+    \eIf{$V$ is a conjunctive view}
+    {
+		add $M$ to $\mathcal{M}_t$
+    }
+    {
+
+		Initialize potential valid view tuple sets $\mathcal{T}_v$
+    	
+        Suppose grouping variable set $\bar{Y}$ in the head of $V$ is mapped to $\bar{X}$, i.e. $\phi(\bar{Y}) = \bar{X}$
+        
+        Initialize $W' = 0$
+        
+        
+		\For{every view tuple $t_v \in V(D)$}
+        {
+        
+        	Suppose that the corresponding value assignment in $t_v$ is $\Gamma'$
+            
+			\If{$\Gamma'(\bar{Y}) = \Gamma(\bar{X})$ }
+            {
+            	\tcc{$t_v$ has the same values on attributes $\bar{Y}$ as $t$ has on attributes $\bar{X}$}
+                
+                Suppose the how-provenance polynomial of $t_v$ is $W'$
+                
+                \If{every monomial in $W'$ can be mapped to some monomial in $\bar{W}$}
+                {
+                	$W := W + W'$
+                }
+            }
+        }
+        
+        \If{W == W'}
+        {
+        	add $M$ to $\mathcal{M}_t$
+        }
+        
+%         \While{$\bar{W}$ shrinks}
+%         {
+% 			\For{every view tuple $t_v \in \mathcal{T}_v$}
+%             {
+% 				\If{every monomial in $W'$ can be mapped to some monomial in $\bar{W}$}
+%                 {
+%                 	Remove the monomials in $W'$ from $\bar{W}$
+%                 }
+%             }        
+%         }
+        
+%         \If{$\bar{W}$ is empty}
+%         {
+%         	Add $M$ to $M_t$
+%         }
+    }
+ }
+ \Return $\mathcal{M}$
+ \caption{Derive valid view mappings for each tuple}
+ \label{view_mapping_tuple_level}
+ \end{algorithm}
+
+
+Please use readable font sizes in the figures and graphs. Avoid tempering with the correct border values, and the spacing (and format) of both text and captions of the PVLDB format (e.g. captions are bold).
+
+At the end, please check for an overall pleasant layout, e.g. by ensuring a readable and logical positioning of any floating figures and tables. Please also check for any line overflows, which are only allowed in extraordinary circumstances (such as wide formulas or URLs where a line wrap would be counterintuitive).
+
+Use the \texttt{balance} package together with a \texttt{\char'134 balance} command at the end of your document to ensure that the last page has balanced (i.e. same length) columns.
+
+\end{appendix}

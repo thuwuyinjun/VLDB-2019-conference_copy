@@ -1,0 +1,188 @@
+% THIS IS AN EXAMPLE DOCUMENT FOR VLDB 2012
+% based on ACM SIGPROC-SP.TEX VERSION 2.7
+% Modified by  Gerald Weber <gerald@cs.auckland.ac.nz>
+% Removed the requirement to include *bbl file in here. (AhmetSacan, Sep2012)
+% Fixed the equation on page 3 to prevent line overflow. (AhmetSacan, Sep2012)
+
+\documentclass{vldb}
+\usepackage{graphicx}
+\usepackage{balance}  % for  \balance command ON LAST PAGE  (only there!)
+\usepackage{supertabular,booktabs}
+\usepackage{subcaption}
+\usepackage[justification=centering]{caption}
+\usepackage{hhline}
+\usepackage{makecell}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage[multiple]{footmisc}
+\usepackage{amsmath}
+\usepackage[linesnumbered,ruled]{algorithm2e}
+\usepackage{xcolor,colortbl}
+% \usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{makecell}
+\usepackage[hyphens]{url}
+\newcommand\tab[1][1cm]{\hspace*{#1}}
+\newdef{definition}{Definition}
+\newcommand{\eat}[1]{}
+\newdef{example}{Example}
+% \newcommand{\scream}[1]{}
+\newcommand{\scream}[1]{{\bf * #1 *}{\typeout{#1}}}
+\newcommand{\iuphar}{GtoPdb}
+\newcommand{\rba}{RBM}
+\newcommand{\pba}{PBM}
+\newcommand{\rbafull}{Rewriting-Based Model}
+\newcommand{\pbafull}{Provenance-Based Model}
+\newcommand{\provalg}{Prov\-Cite}
+\definecolor{Gray}{gray}{0.9}
+\definecolor{LightCyan}{rgb}{0.88,1,1}
+\newcolumntype{a}{>{\columncolor{LightCyan}}c}
+\newcolumntype{b}{>{\columncolor{Gray}}c}
+
+
+% Include information below and uncomment for camera ready
+\vldbTitle{ProvCite: Provenance-based Data Citation}
+\vldbAuthors{Yinjun Wu, Abdu Alawini, Daniel Deutch, Tova Milo and Susan B. Davidson}
+\vldbDOI{https://doi.org/TBD}
+\vldbVolume{12}
+\vldbNumber{xxx}
+\vldbYear{2019}
+
+\begin{document}
+
+% ****************** TITLE ****************************************
+
+\title{ProvCite: Provenance-based Data Citation}
+
+
+% possible, but not really needed or used for PVLDB:
+%\subtitle{[Extended Abstract]
+%\titlenote{A full version of this paper is available as\textit{Author's Guide to Preparing ACM SIG Proceedings Using \LaTeX$2_\epsilon$\ and BibTeX} at \texttt{www.acm.org/eaddress.htm}}}
+
+% ****************** AUTHORS **************************************
+
+% You need the command \numberofauthors to handle the 'placement
+% and alignment' of the authors beneath the title.
+%
+% For aesthetic reasons, we recommend 'three authors at a time'
+% i.e. three 'name/affiliation blocks' be placed beneath the title.
+%
+% NOTE: You are NOT restricted in how many 'rows' of
+% "name/affiliations" may appear. We just ask that you restrict
+% the number of 'columns' to three.
+%
+% Because of the available 'opening page real-estate'
+% we ask you to refrain from putting more than six authors
+% (two rows with three columns) beneath the article title.
+% More than six makes the first-page appear very cluttered indeed.
+%
+% Use the \alignauthor commands to handle the names
+% and affiliations for an 'aesthetic maximum' of six authors.
+% Add names, affiliations, addresses for
+% the seventh etc. author(s) as the argument for the
+% \additionalauthors command.
+% These 'additional authors' will be output/set for you
+% without further effort on your part as the last section in
+% the body of your article BEFORE References or any Appendices.
+
+\numberofauthors{5} %  in this sample file, there are a *total*
+% of EIGHT authors. SIX appear on the 'first-page' (for formatting
+% reasons) and the remaining two appear in the \additionalauthors section.
+
+\author{
+% You can go ahead and credit any number of authors here,
+% e.g. one 'row of three' or two rows (consisting of one row of three
+% and a second row of one, two or three).
+%
+% The command \alignauthor (no curly braces needed) should
+% precede each author name, affiliation/snail-mail address and
+% e-mail address. Additionally, tag each line of
+% affiliation/address with \affaddr, and tag the
+% e-mail address with \email.
+%
+% 1st. author
+\alignauthor
+Yinjun Wu\\%\titlenote{Dr.~Trovato insisted his name be first.}\\
+       \affaddr{University of Pennsylvania}\\
+       \email{wuyinjun@seas.upenn.edu}
+% 2nd. author
+\alignauthor Abdussalam Alawini\\
+%       \affaddr{University of Illinois at Urbana-Champaign}\\
+ \affaddr{University of Illinois at Urbana-Champaign}\\
+       \email{alawini@illinois.edu}
+% 3rd. author
+\alignauthor Daniel Deutch\\
+       \affaddr{Tel Aviv University}\\
+       \email{danielde@post.tau.ac.il}
+\and  % use '\and' if you need 'another row' of author names
+% 4th. author
+\alignauthor Tova Milo\\
+       \affaddr{Tel Aviv University}\\
+       \email{milo@cs.tau.ac.il}
+% 5th. author
+\alignauthor
+Susan B. Davidson\\
+       \affaddr{University of Pennsylvania}\\
+       \email{susan@seas.upenn.edu}
+}
+% There's nothing stopping you putting the seventh, eighth, etc.
+% author on the opening page (as the 'third row') but we ask,
+% for aesthetic reasons that you place these 'additional authors'
+% in the \additional authors block, viz.
+% \additionalauthors{Additional authors: John Smith (The Th{\o}rv\"{a}ld Group, {\texttt{jsmith@affiliation.org}}), Julius P.~Kumquat
+% (The \raggedright{Kumquat} Consortium, {\small \texttt{jpkumquat@consortium.net}}), and Ahmet Sacan (Drexel University, {\small \texttt{ahmetdevel@gmail.com}})}
+% \date{30 July 1999}
+% Just remember to make sure that the TOTAL number of authors
+% is the number that will appear on the first page PLUS the
+% number that will appear in the \additionalauthors section.
+
+
+\maketitle
+
+\begin{abstract}
+A computational challenge associated with data citation is how to automatically generate citations to arbitrary queries against a structured dataset.  
+Previous work has explored this problem in the context of \textit{conjunctive} queries and views %by associating citations to frequent queries, and using these citations to construct citations to general queries 
+using a \rbafull\ (\rba).  However, an increasing number of scientific queries are \textit{aggregate}, e.g. showing statistical summaries of the underlying data, for which the \rba\ cannot be easily extended.  In this paper, we show how a \pbafull\ (\pba) can be leveraged to 1) generate citations to conjunctive as well as aggregate queries and views;  2) associate citations with individual result tuples to enable arbitrary subsets of the result set to be cited (\textit{fine-grained citations}); and 3) be optimized to return citations in \textit{acceptable time}.  Our implementation of \pba\ in ProvCite shows that it not only handles a larger class of queries and views than \rba, but can outperform it when restricted to conjunctive views.
+
+\eat{
+Previous work addresses this challenge has been established by us to {\em automatically} construct citations for {\em general} user queries at \textit{various granularity}, which, however, fails to meet the demand of increasing number of aggregate queries with general aggregate functions to extract summary information from large databases. In this paper, we present a provenance-based model (\pba) to solve this problem by leveraging {\em how-provenance}. Despite its challenges to implementing this model at an interactive speed, some optimizations guarantee the feasibility of the implementation which even outperforms the approaches in previous work in some cases and thus indicates its practical use in real world.}
+\end{abstract}
+
+\input{Sections/introduction.tex}
+\input{Sections/related_work.tex}
+\input{Sections/Examples.tex}
+\input{Sections/Preliminaries.tex}
+% \input{Sections/model.tex}
+\input{Sections/implementation.tex}
+\input{Sections/experiments.tex}
+\input{Sections/Conclusion.tex}
+% \input{Sections/Appendix.tex}
+%ACKNOWLEDGMENTS are optional
+\section{Acknowledgments}
+This research was partially funded by NSF IIS 1302212 and NSF ACI 154736. The authors would like to thank Peter Buneman for conceiving the idea that data citation is a computational challenge and recognizing its connection to provenance; to Val Tannen for discussions on query rewriting and provenance; and
+Boris Glavic for his support in understanding details of GProM's source code.
+
+
+% The following two commands are all you need in the
+% initial runs of your .tex file to
+% produce the bibliography for the citations in your paper.
+\newpage
+\bibliographystyle{abbrv}
+\bibliography{vldb_sample}  % vldb_sample.bib is the name of the Bibliography in this case
+% You must have a proper ".bib" file
+%  and remember to run:
+% latex bibtex latex latex
+% to resolve all references
+
+% \subsection{References}
+% Generated by bibtex from your ~.bib file.  Run latex,
+% then bibtex, then latex twice (to resolve references).
+
+%APPENDIX is optional.
+% ****************** APPENDIX **************************************
+% Example of an appendix; typically would start on a new page
+%pagebreak
+
+
+
+\end{document}

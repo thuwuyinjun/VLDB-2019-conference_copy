@@ -1,0 +1,13 @@
+\section{Conclusions}\label{sec: conclusion}
+This paper builds on the connection to {\em data provenance} to develop a model for  data citation which is able to handle aggregate queries and views. The model reasons about citations at the level of tuples in the query result using provenance to enable citations to arbitrary subsets of the query result. 
+
+The \pbafull\ was implemented in \provalg, and extensive experiments conducted under both {\em synthetic} and {\em realistic workloads}.  The results show that \provalg\ can not only handle a larger class of queries than pure Rewriting-based approaches (which assume conjunctive queries and views, e.g. \cite{wu2018data}), but is much faster in some cases.  However, the approach assumes a \textit{provenance-enabled DBMS}.
+Trade-offs between an {\em eager} versus {\em lazy} strategy for generating view provenance was also explored.  The choice involves a trade-off between speed and space.
+
+In future work, we would like to explore how to insert data citation into the  larger citation ecosystem involving bibliometrics. We would also like to explore how to use citation within machine learning pipelines.
+\eat{
+This is the first paper to build a {\em \pbafull} to connect the notion of {\em data citation} and {\em data provenance}, which is able to handle a larger class of queries and views i.e. aggregate queries and views compared to previous work and generate citations for query result at \textit{various granularity}. Efficient implementations for provenance reasoning, \provalg, are challenging but achieved by utilizing various optimization strategies. In \provalg, two different strategies are designed to deal with the provenance of views, which is either precomputed ({\em eager strategy}) or computed on the fly ({\em lazy strategy}). 
+
+Extensive experiments are conducted under both {\em synthetic workloads} and {\em realistic workloads}. The experimental results justify the feasibility of \provalg\ to this model, which is not only powerful but also much faster in some cases compared to the implementations of \rba. Besides, the trade-offs between {\em eager strategy} and {\em lazy strategy} has been explored. The choice depends on users' preferences for speed or less space in practice.
+
+In future work, we would like to explore how to integrate data citation into a larger citation ecosystem, which aims at efficiently and accurately computing and monitoring contributors' bibliometrics. Plus, considering the fact that machine learning algorithms are widely used and cited in {\em data science environment} and machine learning model is a special aggregate function, it will be also an interesting extension to automate citation generation process for machine learning pipeline.}

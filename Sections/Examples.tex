@@ -33,7 +33,7 @@ Exon2tag(EID, annot), EID references Exon
 % MetaData(Type, Value)\\
 %\end{tabular}
 \end{tabbing}
-Relations Gene2tag, transcript2tag and exon2tag capture the annotations ({\em annot}). 
+Relations Gene2tag, Transcript2tag and Exon2tag capture the annotations ({\em annot}). 
 % For example, some genes were given annotation ``overlapping locus'', which indicates that ``exon(s) of the locus overlap exon(s) of a readthrough transcript or a transcript belonging to another locus''\footnote{http://vega.archive.ensembl.org/info/about/annotation\_attributes.html}. 
 The source of the annotation (e.g. a research group or workflow/program) is also stored in GENCODE and can be used for citations.  For simplicity, we omit these relations.
 \eat{
@@ -52,17 +52,16 @@ Below we show several of these views, which are expressed using S-Datalog \cite{
 $\lambda G.$\=$V_1(G, N, Ty) $\hspace{4em}\=$:-$\=$ Gene(G, N, Ty)$\\
 \> $V_2(G, N, Ty) $\>$:-$\>$ Gene(G, N, Ty)$\\
 % \>\>\>$ Exon(E, L, T2), T1=T2$\\
-\> $V_3(T1, N1, E, L)$\>$:-$\>$Transcript(T1, N1, Ty1, G1),$\\
+\> $V_3(T1, N1, G1, L)$\>$:-$\>$Transcript(T1, N1, Ty1, G1),$\\
 % \>\>\>$Gene(G1, N1, Ty1), G1 = G2,$\\
 \>\>\>$Exon(E, L, T2), T1 = T2,$\\
 \>\>\>$E >= 4$\\
-\> $V_4(T1, N1, COUNT(E))$\\
-\>\>$:-Transcript(T1, N1, Ty1, G1),$\\
+\> $V_4(G1, COUNT(T1))$\>$:-$\>$Transcript(T1, N1, Ty1, G1),$\\
 \>\>\>$Exon(E, L, T2), T1 = T2, $\\
 \>\>\>$L <= 2$\\
-\> $V_5(T1, N1, MAX(L))$\\
-\>\>$:-Transcript(T1, N1, Ty1, G1),$\\
-\>\>\>$Exon(E, L, T2), T1 = T2$
+\> $V_5(G1, MAX(L))$\>$:-$\>$Transcript(T1, N1, Ty1, G1),$\\
+\>\>\>$Exon(E, L, T2), T1 = T2$\\
+\> $V_6(G, COUNT(T)) $\>$:-$\>$ Transcript(T, N, Ty, G)$
 \end{tabbing}
 The first three views are simple conjunctive queries. % and %belong to $\mathcal{CV}$ 
 %are simple conjunctive queries.  
@@ -335,8 +334,8 @@ $t_{g2}$&2&FH&rRNA&$g_2$\\ \hhline{~----}
 &TID&Name&Type&GID&prov\\ \hhline{~-----}
 $t_{t1}$&1&MB-203&TEC&1&$r_1$\\ \hhline{~-----}
 $t_{t2}$&2&PC-203&rRNA&2&$r_2$\\ \hhline{~-----}
-$t_{t3}$&4&HP-218&rRNA&2&$r_3$\\ \hhline{~-----}
-$t_{t4}$&5&GK-207&rRNA&2&$r_4$\\ \hhline{~-----}
+$t_{t3}$&4&HP-218&rRNA&3&$r_3$\\ \hhline{~-----}
+$t_{t4}$&5&GK-207&rRNA&3&$r_4$\\ \hhline{~-----}
 \end{tabular}
 \bigskip
 \caption{Instance of view $V_{\ref{eg: illustrative_eg3}}'$ with provenance and citation}\label{Table: Sample instance of V with provenance}

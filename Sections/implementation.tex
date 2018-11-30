@@ -228,7 +228,6 @@ Finally, valid view mappings and derived covering sets are shown in Table \ref{I
 other combinations of view mappings either {redundantly} or {non-maximally} cover the query's aggregate terms, and therefore are not valid.
 %. Note that, $t_{q_11}$ and $t_{q_12}$ share the same set of valid view mappings and thus covering sets can be simply computed once for the two tuples. 
 
-Three strategies are applied to speed up the covering sets calculation: 1) representing coverings sets using bit arrays; 2) applying clustering algorithms to avoid an explosion of intermediate results; and 3) query tuples associated with the same set of valid view mappings form a {\em reasoning group} to avoid repetitive computations of covering sets. For example, $t_{q1}$ and $t_{q2}$ have the same set of valid view mappings, $\{M_5\}$, which should end up with the same covering sets. So those two tuples are grouped together to compute covering sets once. These optimizations can result in orders of magnitude speed-up. %However, due to the space limit, the details are not provided here. 
 \end{example}
 
 

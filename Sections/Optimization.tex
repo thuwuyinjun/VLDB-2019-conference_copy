@@ -1,0 +1,80 @@
+\section{Optimizations in detail}
+\subsection{Optimization on determining valid view mappings}
+\subsubsection{Building indexes for query provenance}
+
+Recall that the validity of view mapping $M$ for each query tuple $t_q$ depends on the mapping from a (or multiple) how-provenance monomial(s) of the view tuples to those of query tuple $t_q$. A naive solution is simply to scan the entire query provenance (at least once) for {\em every view mapping} to attempt to map every view provenance to the query provenance, which is expensive especially when $N_{pv}$ and $N_{pq}$ are large. Hashmap (mapping from the grouping attribute values to the how-provenance monomials in the query) seems to be helpful to speed up the searching, which, however, still needs to scan the entire query provenance for every view mapping. This issue is presented as below.
+
+\begin{example}
+Consider the following query:
+\begin{tabbing}
+$Q(G, COUNT(T), MAX(L)):-Exon(E, L, T'), E <= 6$\\
+\tab\tab\tab\tab$Transcript(T, N, Ty, G), T = T'$
+% \tab\tab\tab$$
+\end{tabbing}
+
+Its instance along with the how-provenance polynomials are presented in Table \ref{Instance of Q}. By referencing the views defined in \ref{}, $V4-V6$ can potentially provide view mappings for $Q$. So their instance and how-provenance expressions are shown in Table \ref{Instance of V4'} to Table \ref{Instance of V6'}.
+
+\begin{table}[htp]
+\centering
+\small
+\caption{$Q(D)$ with how-provenance polynomials}\label{Instance of Q}
+\begin{tabular}[t]{c|c|c|c||b|} \hhline{~----}
+&G&COUNT(T)&MAX(L)&prov\\ \hhline{~----}
+$t_{q1}$&1&1&1&$e_1*r_1$\\ \hhline{~----}
+$t_{q2}$&2&2&3&$e_2*r_2 + e_3*r_2$\\ \hhline{~----}
+$t_{q3}$&3&3&3&$e_4*r_3 + e_5*r_4 + e_6*r_4$\\ \hhline{~----}
+\end{tabular}
+\bigskip
+\caption{$V_4(D)$ with how-provenance polynomials}\label{Instance of V4'}
+\begin{tabular}[t]{c|c|c||b|} \hhline{~---}
+&G1&COUNT(T1)&prov\\ \hhline{~---}
+$t_{v_41}$&1&1&$e_1*r_1$\\ \hhline{~---}
+$t_{v_42}$&3&3&$e_4*r_3 + e_6*r_4 + e_7*r_4$\\ \hhline{~---}
+\end{tabular}
+\bigskip
+\caption{$V_5(D)$ with how-provenance polynomials}\label{Instance of V5'}
+\begin{tabular}[t]{c|c|c||b|} \hhline{~---}
+&G1&MAX(L)&prov\\ \hhline{~---}
+$t_{v_51}$&1&1&$e_1*r_1$\\ \hhline{~---}
+$t_{v_52}$&2&3&$e_2*r_2 + e_3*r_2$\\ \hhline{~---}
+$t_{v_53}$&3&3&$e_4*r_3 + e_5*r_4 + e_6*r_4 + e_7*r_4$\\ \hhline{~---}
+\end{tabular}
+\bigskip
+\caption{Instance of relation $V6(D)$ with provenance}\label{Instance of V6'}
+\begin{tabular}[t]{c|c|c||b|} \hhline{~---}
+&G&COUNT(T)&prov\\ \hhline{~---}
+$t_{v_61}$&1&1&$r_1$\\ \hhline{~---}
+$t_{v_62}$&2&1&$r_2$\\ \hhline{~---}
+$t_{v_63}$&3&2&$r_3 + r_4$\\ \hhline{~---}
+\end{tabular}
+
+
+\end{table}
+
+There is an obvious view mapping from each view $V4-V6$ to $Q$, denoted as $M4-M6$, which should satisfy the {\em schema-level conditions} by comparing the grouping variables and aggregate variables between the views and the query. Then the {\em tuple-level conditions} are checked by comparing the how-provenance of each view tuple and that of each query tuples, As claimed earlier, a hashmap $HM$ is built to store the provenance information, in which the key-value pair stores the grouping attribute value and the set of how-provenance monomials respectively for each query tuple. For example, for query tuple $t_{q2}$ in the query $Q$, the entry in $HM$ corresponding to this tuple will be $\{2\rightarrow \{e_2*r_2, e_3*r_2\}\}$ (denoted by $En$) where $2$ is the value for grouping attribute $G$ while $\{e_2*r_2, e_3*r_2\}$ is the how-provenance monomial set for $t_{q2}$. For a view tuple (e.g. $t_{v_52}$), in order to build the potential monomail mappings for its how-provenance monomial, we firstly retrieve the {\em candidate entry} (e.g. $En$ for $t_{v_52}$) from $HM$ with the value of the grouping attributes (that are mapped to the grouping attributes under the view mapping). Then for every monomial of this view tuple (e.g. $e_2*r_2$), we can check its existence in the candidate entry (with $O(1)$ time for every monomial) and thus determine whether the provenance monomial mappings satisfy the validity conditions
+
+However, it is worth noting that $HM$ is not helpful for determining the validity of $M6$ since the how-provenance monomials in $V6(D)$ only include one provenance token (e.g. see tuple $t_{v_62}$, it includes on provenance monomial $r_2$), for which we cannot determine their existence in some entry in $HW$ in $O(1)$ time. For example, the {\em candidate entry} for $t_{v_62}$ is still $En$, but $r_2$ is not the same as either of the two monomials in the monomial set ($e_2*r_2$ and $e_3*r_2$), which, however can be mapped to either $e_2*r_2$ or $e_3*r_2$ under view mapping $M6$ according to the validity conditions. So we either need to consume more time for search in $HW$ or have to reconstruct another hashmap $HW'$ which simply includes the portion of how-provenance monomials involved in $M6$ (such that the search takes only $O(1)$), either of which case can result in another full scan of the entire query provenance.
+
+In order to avoid multiple scans over query provenance, we built an index $I$ for each single provenance token to indicate which query tuples (represented by grouping attribute values) and which provenance monomials it lies in. For example, for token $r_4$ in the query provenance, since it is in the second and third monomial in the query tuple $t_{q3}$, such {\em coordinate information} is thus stored in the index $I$ taking $r_4$ as the key. For a how-provenance monomial in the view, e.g. $e_4*r_3$ in $t_{v_42}$, to determine whether it can be mapped to some query provenance monomial, we can retrieve the {\em coordinate information} for $e_4$ and $r_3$ respectively (if any) and then perform intersection over the {\em coordinate information} of the two tokens to check whether they coexist in some how-provenance monomial in the query provenance. For instance, after taking the intersection operations, the common position for $e_4$ and $r_3$ is the first monomial in the tuple $t_{q3}$. We can further optimize the intersection operations by representing the monomial coordinate with bit array and applying bit AND operations for speed-ups. It turns out that this strategy only requires full scan over the query provenance for all the view mappings.
+
+\subsubsection{Parallelly determine valid view mappings}
+We also observe that the validity of one view mapping is independent from others, which thus drives us to parallelize the computation. One straightforward way is to create one thread for each view mapping, which, however can degrade the performance due to the overhead to retrieve the view provenance from the database and the memory consumption in each thread. After trial and errors, we find that batch processing 5 view mappings each time can lead to best performance. Note that the system is built on single machine, it is worth trying to migrate it to distributed systems for further performance gains in the future.
+
+
+
+\subsection{Optimization on computing covering sets}
+As we observed in \cite{wu2018data}, it is a time-consuming step to compute {\em all} covering sets after the validity of view mappings are determined. Compared to \cite{wu2018data}, two strategies are applied to speed up the covering sets calculation, i.e. 1) representing coverings sets using bit arrays; 2) applying clustering algorithms to avoid an explosion of intermediate results. 
+
+\subsubsection{Introducing bit arrays}
+The computation of covering sets involves merging valid view mappings by each every aggregate term incrementally and removing duplicated view mapping combinations by comparing the aggregate terms and subgoals that are jointly covered by the view mapping combinations. For example, for $Q$, the aggregate term $COUNT(T)$ is covered by $\{M_3, M_4, M_6\}$ (denoted by $S_1$) while $MAX(L)$ is covered by $\{M_5, M_6\}$ (denoted by $S_2$). By considering all the view mapping combinations in the cross product of $S_1$ and $S_2$, 
+
+
+\subsubsection{Applying clustering algorithms}
+
+
+
+\eat{; and 3) query tuples associated with the same set of valid view mappings form a {\em reasoning group} to avoid repetitive computations of covering sets. For example, $t_{q1}$ and $t_{q2}$ have the same set of valid view mappings, $\{M_5\}$, which should end up with the same covering sets. So those two tuples are grouped together to compute covering sets once. These optimizations can result in orders of magnitude speed-up.} %However, due to the space limit, the details are not provided here. 
+
+
+
+\end{example}

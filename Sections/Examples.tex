@@ -52,14 +52,15 @@ Below we show several of these views, which are expressed using S-Datalog \cite{
 $\lambda G.$\=$V_1(G, N, Ty) $\hspace{4em}\=$:-$\=$ Gene(G, N, Ty)$\\
 \> $V_2(G, N, Ty) $\>$:-$\>$ Gene(G, N, Ty)$\\
 % \>\>\>$ Exon(E, L, T2), T1=T2$\\
-\> $V_3(T1, N1, G1, L)$\>$:-$\>$Transcript(T1, N1, Ty1, G1),$\\
+\> $V_3(T1, E, G1, L)$\>$:-$\>$Transcript(T1, N1, Ty1, G1),$\\
 % \>\>\>$Gene(G1, N1, Ty1), G1 = G2,$\\
 \>\>\>$Exon(E, L, T2), T1 = T2,$\\
-\>\>\>$E >= 4$\\
+\>\>\>$E <= 2$\\
 \> $V_4(G1, COUNT(T1))$\>$:-$\>$Transcript(T1, N1, Ty1, G1),$\\
 \>\>\>$Exon(E, L, T2), T1 = T2, $\\
 \>\>\>$L <= 2$\\
-\> $V_5(G1, MAX(L))$\>$:-$\>$Transcript(T1, N1, Ty1, G1),$\\
+\>$V_5(G1, MAX(L), COUNT(E))$\\
+\>\>$:-$\>$Transcript(T1, N1, Ty1, G1),$\\
 \>\>\>$Exon(E, L, T2), T1 = T2$\\
 \> $V_6(G, COUNT(T)) $\>$:-$\>$ Transcript(T, N, Ty, G)$
 \end{tabbing}

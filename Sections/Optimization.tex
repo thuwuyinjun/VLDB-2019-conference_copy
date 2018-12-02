@@ -7,8 +7,8 @@ Recall that the validity of view mapping $M$ for each query tuple $t_q$ depends 
 \begin{example}
 Consider the following query:
 \begin{tabbing}
-$Q(G, COUNT(T), MAX(L)):-Exon(E, L, T'), E <= 6$\\
-\tab\tab\tab\tab$Transcript(T, N, Ty, G), T = T'$
+$Q(G, COUNT(T), MAX(L), COUNT(E)):-Exon(E, L, T')$\\
+\tab\tab$,Transcript(T, N, Ty, G), T = T', E <= 6$
 % \tab\tab\tab$$
 \end{tabbing}
 
@@ -18,11 +18,11 @@ Its instance along with the how-provenance polynomials are presented in Table \r
 \centering
 \small
 \caption{$Q(D)$ with how-provenance polynomials}\label{Instance of Q}
-\begin{tabular}[t]{c|c|c|c||b|} \hhline{~----}
-&G&COUNT(T)&MAX(L)&prov\\ \hhline{~----}
-$t_{q1}$&1&1&1&$e_1*r_1$\\ \hhline{~----}
-$t_{q2}$&2&2&3&$e_2*r_2 + e_3*r_2$\\ \hhline{~----}
-$t_{q3}$&3&3&3&$e_4*r_3 + e_5*r_4 + e_6*r_4$\\ \hhline{~----}
+\begin{tabular}[t]{c|c|c|c|c||b|} \hhline{~-----}
+&G&COUNT(T)&MAX(L)&COUNT(E)&prov\\ \hhline{~-----}
+$t_{q1}$&1&1&1&1&$e_1*r_1$\\ \hhline{~-----}
+$t_{q2}$&2&2&3&2&$e_2*r_2 + e_3*r_2$\\ \hhline{~-----}
+$t_{q3}$&3&3&3&3&$e_4*r_3 + e_5*r_4 + e_6*r_4$\\ \hhline{~-----}
 \end{tabular}
 \bigskip
 \caption{$V_4(D)$ with how-provenance polynomials}\label{Instance of V4'}
@@ -33,11 +33,11 @@ $t_{v_42}$&3&3&$e_4*r_3 + e_6*r_4 + e_7*r_4$\\ \hhline{~---}
 \end{tabular}
 \bigskip
 \caption{$V_5(D)$ with how-provenance polynomials}\label{Instance of V5'}
-\begin{tabular}[t]{c|c|c||b|} \hhline{~---}
-&G1&MAX(L)&prov\\ \hhline{~---}
-$t_{v_51}$&1&1&$e_1*r_1$\\ \hhline{~---}
-$t_{v_52}$&2&3&$e_2*r_2 + e_3*r_2$\\ \hhline{~---}
-$t_{v_53}$&3&3&$e_4*r_3 + e_5*r_4 + e_6*r_4 + e_7*r_4$\\ \hhline{~---}
+\begin{tabular}[t]{c|c|c|c||b|} \hhline{~----}
+&G1&MAX(L)&COUNT(E)&prov\\ \hhline{~----}
+$t_{v_51}$&1&1&1&$e_1*r_1$\\ \hhline{~----}
+$t_{v_52}$&2&3&2&$e_2*r_2 + e_3*r_2$\\ \hhline{~----}
+$t_{v_53}$&3&3&4&$e_4*r_3 + e_5*r_4 + e_6*r_4 + e_7*r_4$\\ \hhline{~----}
 \end{tabular}
 \bigskip
 \caption{Instance of relation $V6(D)$ with provenance}\label{Instance of V6'}
@@ -60,16 +60,22 @@ In order to avoid multiple scans over query provenance, we built an index $I$ fo
 \subsubsection{Parallelly determine valid view mappings}
 We also observe that the validity of one view mapping is independent from others, which thus drives us to parallelize the computation. One straightforward way is to create one thread for each view mapping, which, however can degrade the performance due to the overhead to retrieve the view provenance from the database and the memory consumption in each thread. After trial and errors, we find that batch processing 5 view mappings each time can lead to best performance. Note that the system is built on single machine, it is worth trying to migrate it to distributed systems for further performance gains in the future.
 
+\subsubsection{Materializing the view content along with provenance}
 
 
 \subsection{Optimization on computing covering sets}
 As we observed in \cite{wu2018data}, it is a time-consuming step to compute {\em all} covering sets after the validity of view mappings are determined. Compared to \cite{wu2018data}, two strategies are applied to speed up the covering sets calculation, i.e. 1) representing coverings sets using bit arrays; 2) applying clustering algorithms to avoid an explosion of intermediate results. 
 
 \subsubsection{Introducing bit arrays}
-The computation of covering sets involves merging valid view mappings by each every aggregate term incrementally and removing duplicated view mapping combinations by comparing the aggregate terms and subgoals that are jointly covered by the view mapping combinations. For example, for $Q$, the aggregate term $COUNT(T)$ is covered by $\{M_3, M_4, M_6\}$ (denoted by $S_1$) while $MAX(L)$ is covered by $\{M_5, M_6\}$ (denoted by $S_2$). By considering all the view mapping combinations in the cross product of $S_1$ and $S_2$, 
+The computation of covering sets involves merging valid view mappings by each covered aggregate term incrementally and removing duplicates. For example, for $Q$, the aggregate term $COUNT(T)$, $MAX(L)$ and $COUNT(E)$ are covered by $\{M_3, M_4, M_6\}$ (denoted by $S_1$), $\{M_5, M_6\}$ (denoted by $S_2$) and $\{M_3, M_4\}$ (denoted by $S_3$) respectively. To compute covering sets, the cross product of $S_1$ and $S_2$ are computed first, which leads to some view mapping combinations (called {\em sub-covering sets thereafter}) that can cover both the aggregate terms. For instance, $\{M_3, M_5\}$ is one such sub-covering set. The construction of sub-covering sets (and covering sets ultimately) involves merging the view mappings and the aggregate terms and relational subgoals covered by them, which facilitate the following redundancy removal step. For example, $\{M_3,M_6\}$ (picked from $S_1$ and $S_2$ respectively) can jointly cover both the aggregate terms and relational subgoals of $Q$, which, however, is redundant with respect to $\{M_6\}$ (picked from $S_1$ and $S_2$ and one copy is retained) since $\{M_6\}$ is a {\em subset} of $\{M_3,M_6\}$ but still covers the same aggregate terms and relational subgoals as $\{M_3,M_6\}$. So it is safe to remove $\{M_3, M_6\}$ at this point. Then the resulting sub-covering sets are combined with the view mapping set in $S_3$ to compute the final covering sets.
+
+Note that two key operations are essential in this step, i.e. 1) merging view mappings and the terms covered by them; 2) removing redundancy by subset checking, which can be optimized by applying bit operations. For example, we can encode the view mapping $M_3-M_6$ as $\{0,1,2,3\}$, the aggregate terms ($COUNT(T)$ and $MAX(L)$) as $\{0, 1\}$ and the relational subgoals ($Exon$ and $Transcript$) as $\{0, 1\}$. Three bit arrays are introduced for view mapping combinations, aggregate terms and relational subgoals, in which $i_th$ bit is 0 or 1 if $i_th$ view mapping/aggregate term/relational subgoal is included or missing in the sub-covering set. For example, for sub-covering set $\{M_3, M_6\}$, we use bit array 1001 to represent the view mapping in it (the leftmost 1 is in the 0th bit, which indicates the existence of $M_3$). Similarly, since they cover both the aggregate terms and relational subgoals, the other two bit arrays will be both 11. So when merging sub-covering set (or view mappings) with other sub-covering set (or view mappings), we can apply bit OR operations over the three bit arrays. Similarly, for subset checking operation, bit AND operation is applicable.
+
 
 
 \subsubsection{Applying clustering algorithms}
+The order of merging view mapping sets (e.g. merging $S_1$, $S_2$ first or $S_1$, $S_3$ first) have no effect on the final result but can bring about significant performance differences. For example, if $S_1$ and $S_3$ are merged first, after removing duplicates, the intermediate result will be $\{\{M_3\}, \{M_4\}\}$, which is smaller than the result of the other option (merging $S_1$ and $S_2$ first), i.e. $\{\{M_3, M_5\}, \{M_4, M_5\}, \{M_6\}\}$. For the purpose of better merging strategy, clustering algorithms are applied such that the view mapping sets that are similar to each other can be clustered and thus merged first (e.g. $S_1$ and $S_3$). In ProCite, affinity propagation clustering algorithm \cite{dueck2007non} is used since it does not require pre-defined cluster number.
+
 
 
 

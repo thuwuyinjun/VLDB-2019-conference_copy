@@ -54,23 +54,25 @@ Furthermore, we say the how-provenance monomial $W'$ of $t_v$ is  {\em mapped} t
 \end{definition}}
 
 \begin{example}\label{eg: conditions_conjunctive}
-Suppose $Q_{\ref{eg: illustrative_eg3}}'$ and $V_{\ref{eg: illustrative_eg3}}'$ in Example \ref{eg: illustrative_eg3} are modified as follows by throwing away aggregate functions, and adding one predicate to $V_{\ref{eg: illustrative_eg3}}'$:
-\begin{tabbing}
-$\lambda T. V_{\ref{eg: illustrative_eg3}}''(T, L)$\hspace{2em}\=$:-$\=$ Exon(E, L, T), E <= 3$\\
-%$Q_{\ref{eg: illustrative_eg3}}(Tid, AVG(Level)) $\>$:-$\>$ Exon(Eid, Level, Tid), Tid = 2$
-$Q_{\ref{eg: illustrative_eg3}}''(Level) $\>$:- Exon(Eid, Level, Tid), Tid <= 4$
-% \>$COUNT(*) > 1$
-\end{tabbing}
-
+% Suppose $Q_{\ref{eg: illustrative_eg3}}'$ and in Example \ref{eg: illustrative_eg3} are modified as follows by throwing away the aggregate function:
+Let us revisit Example \ref{eg: conjunctive_case}. The instance of $Q_{\ref{eg: conjunctive_case}}'$ is shown in Table \ref{Table: Instance of Q1}. 
+\eat{We can build an obvious view mapping $M_{1\ref{eg: conjunctive_case}'} = (h_{1\ref{eg: conjunctive_case}'}, \phi_{1\ref{eg: conjunctive_case}'})$ from $V_1$ to $Q_{\ref{eg: conjunctive_case}}'$, which is the same as $M_{1\ref{eg: illustrative_eg3}'}$}
+% \begin{tabbing}
+% $Q_{\ref{eg: illustrative_eg3}}''(T, Gid) :- Gene(Gid, Name, T), Gid <= 3$
+% % $\lambda T. V_{\ref{eg: illustrative_eg3}}''(T, L)$\hspace{2em}\=$:-$\=$ Exon(E, L, T), E <= 3$\\
+% %$Q_{\ref{eg: illustrative_eg3}}(Tid, AVG(Level)) $\>$:-$\>$ Exon(Eid, Level, Tid), Tid = 2$
+% % $Q_{\ref{eg: illustrative_eg3}}''(Level) $\>$:- Exon(Eid, Level, Tid), Tid <= 4$
+% % \>$COUNT(*) > 1$
+% \end{tabbing}
 % \begin{tabbing}
 % $\lambda G. V_{\ref{eg: conditions_conjunctive}}'(T, Ty, G) $\hspace{1em}\=$:-$\=$ Transcript(T, N, Ty, G), T <= 4$\\
 % $Q_{\ref{eg: conditions_conjunctive}}'(Tid, Type) $\>$:-$\>$ Transcript(Tid, name, Type, Gid)$\\
 % \>$Type = `TEC$'
 % \end{tabbing}
+\eat{We can build the obvious view mapping $M_{\ref{eg: illustrative_eg3}}'' = (h_{\ref{eg: illustrative_eg3}}'', \phi_{\ref{eg: illustrative_eg3}}'')$ from $V_{\ref{eg: illustrative_eg3}}''$ to $Q_{\ref{eg: illustrative_eg3}}''$. Using the instance of Exon in Table \ref{Instance of Exon}, the instances of $V_{\ref{eg: illustrative_eg3}}''$ and $Q_{\ref{eg: illustrative_eg3}}''$ can be constructed as in Tables \ref{Table: Instance of v9}-\ref{Table: Instance of q9}.}
 
-\eat{We can build the obvious view mapping $M_{\ref{eg: conditions_conjunctive}}'$ from $V_{\ref{eg: conditions_conjunctive}}'$ to $Q_{\ref{eg: conditions_conjunctive}}'$. Using the instance of  Transcript  in Table \ref{Instance of Transcript}, the instance of $V_{\ref{eg: conditions_conjunctive}}'$ and $Q_{\ref{eg: conditions_conjunctive}}'$ can be constructed as in Tables \ref{Table: Instance of v9} and \ref{Table: Instance of q9}.}
 
-We can build the obvious view mapping $M_{\ref{eg: illustrative_eg3}}'' = (h_{\ref{eg: illustrative_eg3}}'', \phi_{\ref{eg: illustrative_eg3}}'')$ from $V_{\ref{eg: illustrative_eg3}}''$ to $Q_{\ref{eg: illustrative_eg3}}''$. Using the instance of Exon in Table \ref{Instance of Exon}, the instances of $V_{\ref{eg: illustrative_eg3}}''$ and $Q_{\ref{eg: illustrative_eg3}}''$ can be constructed as in Tables \ref{Table: Instance of v9}-\ref{Table: Instance of q9}. 
+
 % Note that the duplicates in both $V_{\ref{eg: illustrative_eg3}}''(D)$ and $Q_{\ref{eg: illustrative_eg3}}''(D)$ are not removed for ease of reasoning.
 
 \eat{\begin{table}[htp]
@@ -114,39 +116,39 @@ $t_{q_{\ref{eg: conditions_conjunctive}}'1}$&1&TEC&$r_1$\\ \hhline{~-----}
 \end{table}
 }
 
-\begin{table}[htp]
-\centering
-\small
-\caption{$V_{\ref{eg: illustrative_eg3}}''(D)$ with how-provenance}\label{Table: Instance of v9}
-\begin{tabular}[t]{c|c|c||a|b|} \hhline{~----}
-&T&L&citation&prov\\ \hhline{~----}
-$t_{v_{\ref{eg: illustrative_eg3}}''1}$&1&1&\{Group: [`Lee']\}&$e_1$\\ \hhline{~----}
-$t_{v_{\ref{eg: illustrative_eg3}}''2}$&2&3&\{Group: [`Joe']\}&$e_2 + e_3$\\ \hhline{~----}
-% $t_{v_{\ref{eg: illustrative_eg3}}''3}$&2&3&$e_4$\\ 
-% \hhline{~---}
-% $t_{v_{\ref{eg: illustrative_eg3}}''4}$&4&2&$e_4$\\ 
-% \hhline{~---}
-% $t_{v_{\ref{eg: conditions_conjunctive}}4}$&4&$a_4$&TEC&$c_4$&2&$d_4$&$T_4$\\ \hhline{~-------}
-\end{tabular}
-\small
-\caption{$Q_{\ref{eg: illustrative_eg3}}''(D)$ with how-provenance}\label{Table: Instance of q9}
-\begin{tabular}[t]{c|c||b|} \hhline{~--}
-&Level&prov\\ \hhline{~--}
-$t_{q_{\ref{eg: illustrative_eg3}}''1}$&1&$e_1$\\ \hhline{~--}
-$t_{q_{\ref{eg: illustrative_eg3}}''2}$&3&$e_2 + e_3$\\ \hhline{~--}
-$t_{q_{\ref{eg: illustrative_eg3}}''3}$&2&$e_4$\\ \hhline{~--}
-% $t_{q_{\ref{eg: conditions_conjunctive}}2}$&4&$a_4$&TEC&$c_4$&$T_4$\\ \hhline{~-------}
-\end{tabular}
-\end{table}
+% \begin{table}[htp]
+% \centering
+% \small
+% % \caption{$V_{\ref{eg: illustrative_eg3}}''(D)$ with how-provenance}\label{Table: Instance of v9}
+% % \begin{tabular}[t]{c|c|c||a|b|} \hhline{~----}
+% % &T&L&citation&prov\\ \hhline{~----}
+% % $t_{v_{\ref{eg: illustrative_eg3}}''1}$&1&1&\{Group: [`Lee']\}&$e_1$\\ \hhline{~----}
+% % $t_{v_{\ref{eg: illustrative_eg3}}''2}$&2&3&\{Group: [`Joe']\}&$e_2 + e_3$\\ \hhline{~----}
+% % % $t_{v_{\ref{eg: illustrative_eg3}}''3}$&2&3&$e_4$\\ 
+% % % \hhline{~---}
+% % % $t_{v_{\ref{eg: illustrative_eg3}}''4}$&4&2&$e_4$\\ 
+% % % \hhline{~---}
+% % % $t_{v_{\ref{eg: conditions_conjunctive}}4}$&4&$a_4$&TEC&$c_4$&2&$d_4$&$T_4$\\ \hhline{~-------}
+% % \end{tabular}
+% % \small
+% \caption{$Q_{\ref{eg: conjunctive_case}}'(D)$ with how-provenance}\label{Table: Instance of q9}
+% \begin{tabular}[t]{c|c|c||b|} \hhline{~---}
+% &T&Gid&prov\\ \hhline{~---}
+% $t_{q_{\ref{eg: conjunctive_case}}'1}$&TEC&1&$g_1$\\ \hhline{~---}
+% $t_{q_{\ref{eg: conjunctive_case}}'2}$&rRNA&2&$g_2$\\ \hhline{~---}
+% $t_{q_{\ref{eg: conjunctive_case}}'3}$&rRNA&3&$g_3$\\ \hhline{~---}
+% % $t_{q_{\ref{eg: conditions_conjunctive}}2}$&4&$a_4$&TEC&$c_4$&$T_4$\\ \hhline{~-------}
+% \end{tabular}
+% \end{table}
 
-\eat{daniel: Need all output tuples to satisfy the tuple-level condition? Or are we now always talking about validity for a given tuple $t$? Still require also schema-level? Yinjun: For a given tuple}
+We can show that $M_{1\ref{eg: conjunctive_case}'}$ is a valid view mapping for the query tuple $t_{q_{\ref{eg: conjunctive_case}}'1}$ and $t_{q_{\ref{eg: conjunctive_case}}'2}$, as follows: The {\em schema-level conditions} are satisfied because 1) the head variable $Ty$ and $G$ in $V_1$ are mapped to the head variable $T$ and $Gid$ in $Q_{\ref{eg: conjunctive_case}}'$ respectively; % under $M_{\ref{eg: conditions_conjunctive}}'$; 
+and 2) the lambda variable $G$ in $V_1$ is mapped to $Gid$ in the body of $Q_{\ref{eg: conjunctive_case}}'$.
 
+\eat{We can show that $M_{\ref{eg: illustrative_eg3}}''$ is a valid view mapping for the query tuple, $t_{q_{\ref{eg: illustrative_eg3}}''1}$ and $t_{q_{\ref{eg: illustrative_eg3}}''2}$, as follows: The {\em schema-level conditions} are satisfied because 1) the head variable $L$ in $V_{\ref{eg: illustrative_eg3}}''$ are mapped to the head variable $Level$ in $Q_{\ref{eg: illustrative_eg3}}''$; % under $M_{\ref{eg: conditions_conjunctive}}'$; 
+and 2) the lambda variable $T$ in $V_{\ref{eg: illustrative_eg3}}''$ is mapped to $Tid$ in the body of $Q_{\ref{eg: illustrative_eg3}}''$.}
 
-We can show that $M_{\ref{eg: illustrative_eg3}}''$ is a valid view mapping for the query tuple, $t_{q_{\ref{eg: illustrative_eg3}}''1}$ and $t_{q_{\ref{eg: illustrative_eg3}}''2}$, as follows: The {\em schema-level conditions} are satisfied because 1) the head variable $L$ in $V_{\ref{eg: illustrative_eg3}}''$ are mapped to the head variable $Level$ in $Q_{\ref{eg: illustrative_eg3}}''$; % under $M_{\ref{eg: conditions_conjunctive}}'$; 
-and 2) the lambda variable $T$ in $V_{\ref{eg: illustrative_eg3}}''$ is mapped to $Tid$ in the body of $Q_{\ref{eg: illustrative_eg3}}''$.
-
-The {\em tuple-level condition} also holds for the two result tuples. For example, for query tuple $t_{q_{\ref{eg: illustrative_eg3}}''2}$ (and view tuple $t_{v_{\ref{eg: illustrative_eg3}}''2}$), for its first monomials, the assignment and isomorphism under the assignment are $\gamma$ ($\gamma'$) and $F$ ($F'$) respectively. Since under the view mapping $M_{\ref{eg: illustrative_eg3}}''=(h_{\ref{eg: illustrative_eg3}}'', \phi_{\ref{eg: illustrative_eg3}}'')$, $h_{\ref{eg: illustrative_eg3}}''(Exon(E, L, T)) = Exon(Eid, Level, Tid)$, \\
-$F'(Exon(E, L, T)|\gamma')$ = $e_2$ = $F(Exon(Eid, Level, Tid)| \gamma)$. So we say that $M_{\ref{eg: illustrative_eg3}}''$ is a valid view mapping for the how-provenance monomial $e_2$ for query tuple $t_{q_{\ref{eg: illustrative_eg3}}''2}$. We can also prove that $M_{\ref{eg: illustrative_eg3}}''$ is a valid view mapping for how-provenance monomial $e_3$ in tuple $t_{q_{\ref{eg: illustrative_eg3}}''2}$ and for $e_1$ in tuple $t_{q_{\ref{eg: illustrative_eg3}}''1}$.
+The {\em tuple-level condition} also holds for the two result tuples. For example, for query tuple $t_{q_{\ref{eg: conjunctive_case}}'2}$ (and view tuple $t_{v_12}$), for its single monomial, the assignment and isomorphism under the assignment are $\gamma$ ($\gamma'$) and $F$ ($F'$) respectively. Since under the view mapping $M_{1\ref{eg: conjunctive_case}'}=(h_{1\ref{eg: conjunctive_case}'}, \phi_{1\ref{eg: conjunctive_case}'})$, $h_{1\ref{eg: conjunctive_case}'}(Gene(G, N, Ty)) = Gene(Gid, Name, T)$, \\
+$F'(Gene(G, N, Ty)|\gamma')$ = $g_2$ = $F(Gene(Gid, Name, T)| \gamma)$. So we say that $M_{1\ref{eg: conjunctive_case}'}$ is a valid view mapping for the how-provenance monomial $g_2$ for query tuple $t_{q_{\ref{eg: conjunctive_case}}'2}$. We can also prove that $M_{1\ref{eg: conjunctive_case}'}$ is a valid view mapping for how-provenance monomial $g_1$ in tuple $t_{q_{\ref{eg: conjunctive_case}}'1}$.
 
 
 % Suppose the assignment and isomorphism for tuple $t_{q_{\ref{eg: illustrative_eg3}}''1}$ is $\gamma$ and $F$. Then we can find a view tuple $t_{v_{\ref{eg: illustrative_eg3}}''1}$ with assignment $\gamma'$ and isomorphism $F'$ such that 
@@ -240,23 +242,24 @@ Invertibility is important for determining the validity of view mappings when th
 % property is essential for determining whether an aggregate view can be used for rewriting an aggregate query, as exemplified below.
 
 \begin{example} \label{eg: invertible property}
-Consider the following query and view:
+Consider the following query:
 % Suppose we have one view $v_{\ref{eg: invertible property}}$ and one query $q_{\ref{eg: invertible property}}$ defined over relation $Exon$
 \begin{tabbing}
-$V_{\ref{eg: invertible property}}'(E, T, SUM(L)) :- Exon(E, L, T)$\\
-$Q_{\ref{eg: invertible property}}'(E, SUM(L)) :- Exon(E, L, T)$
+% $V_{\ref{eg: invertible property}}'(E, T, SUM(L)) :- Exon(E, L, T)$\\
+$Q_{\ref{eg: invertible property}}'(COUNT(G)):- Gene(G, N, Ty), Ty = `rRNA$'
+% $Q_{\ref{eg: invertible property}}'(E, SUM(L)) :- Exon(E, L, T)$
 \end{tabbing}
 
-$V_{\ref{eg: invertible property}}'$ computes a coarser-grained aggregation result than $Q_{\ref{eg: invertible property}}'$ does. Both %$V_{\ref{eg: invertible property}}'$ and $Q_{\ref{eg: invertible property}}'$ 
-share the same aggregate function $SUM$, which is invertible. % since the terminating function is the identity function. 
-This means that we can take the sum of the aggregation results in $V_{\ref{eg: invertible property}}'$ to get the result of $Q_{\ref{eg: invertible property}}'$ under the obvious view mapping $M_{\ref{eg: invertible property}}'.$%, which maps the Exon relation in $V_{\ref{eg: invertible property}}'$ to that in $Q_{\ref{eg: invertible property}}'$. 
+By referencing Section \ref{subsec:running example}, $V_2$ computes a coarser-grained aggregation result than $Q_{\ref{eg: invertible property}}'$ does. Both %$V_{\ref{eg: invertible property}}'$ and $Q_{\ref{eg: invertible property}}'$ 
+share the same aggregate function $COUNT$, which is invertible. % since the terminating function is the identity function. 
+This means that we can take the sum of the aggregation results in $V_2$ to get the result of $Q_{\ref{eg: invertible property}}'$ under the obvious view mapping $M_{\ref{eg: invertible property}}'.$%, which maps the Exon relation in $V_{\ref{eg: invertible property}}'$ to that in $Q_{\ref{eg: invertible property}}'$. 
 
-However, if we replace $SUM$ with $AVG$,
+However, if we replace $COUNT$ with $AVG$ for both $Q_{\ref{eg: invertible property}}'$ and $V_2$,
 % \begin{tabbing}
 % $v_{\ref{eg: invertible property}}'(E, T, AVG(L)) :- Exon(E, L, T)$\\
 % $q_{\ref{eg: invertible property}}'(E, AVG(L)) :- Exon(E, L, T)$\\
 % \end{tabbing}
-the aggregation result in $V_{\ref{eg: invertible property}}'$ will not be useful to compute the aggregation result in $Q_{\ref{eg: invertible property}}'$ under $M_{\ref{eg: invertible property}}'$;  the intermediate sum and count from $V_{\ref{eg: invertible property}}'$ that were used in the terminating function (divide) cannot be regained to use in the further aggregation for $Q_{\ref{eg: invertible property}}'$, since divide is not invertible.
+the aggregation result in $V_2$ will not be useful to compute the aggregation result in $Q_{\ref{eg: invertible property}}'$ under $M_{\ref{eg: invertible property}}'$;  the intermediate sum and count from $V_2$ that were used in the terminating function (divide) cannot be regained to use in the further aggregation for $Q_{\ref{eg: invertible property}}'$, since divide is not invertible.
 \end{example}
 
 \textbf{Computation rules.}  
@@ -291,6 +294,7 @@ also has an aggregate function $\alpha$ with arguments $Y$, and $\phi(Y) = X$
 In this case, we say that the aggregate term $\alpha(X)$ in $Q$ is {\em covered} under view mapping $M$.
 \end{definition}
 
+\scream{Maybe we can remove the rest of this subsection below since they are not important (just an explanations for a special case) Or we can provide an example to illustrate the Def. 5}
 Note that there is a special case in which the grouping variables of a view can be used to compute an aggregate term of a query under some view mapping, and in this case the view mapping is also potentially valid. In order to deal with this case, we assume that those grouping variables are associated with the  identity  function (a special aggregate function mapping its arguments to themselves), by which the rules in Definition \ref{Def: conditions_for_agg_functions} are then applicable.
 
 % Although the conditions proposed by Definition \ref{Def: conditions_for_agg_functions} originate from \cite{cohen2006user}, they are much more concise than the original version. For example, in \cite{cohen2006user} and \cite{cohen2006rewriting}, $COUNT$ function is considered as a special function, in which case a view $v$ is defined as {\em pure candidate} to a certain query $q$ if $COUNT$ is the only aggregate function in $v$ and $v$ can be used to rewrite $q$. Typical example is:
@@ -413,19 +417,12 @@ as a one-to-one function under $M$.
 \end{definition}
 
 \begin{example}
-Recall $Q_{\ref{eg: illustrative_eg3}}'$, $V_{\ref{eg: illustrative_eg3}}'$, and view mapping $M_{\ref{eg: illustrative_eg3}}'=(h_{\ref{eg: illustrative_eg3}}',\phi_{\ref{eg: illustrative_eg3}}')$ from Example \ref{eg: illustrative_eg3}.
-$M_{\ref{eg: illustrative_eg3}}'$
-%from $V_{\ref{eg: illustrative_eg3}}'$ to $Q_{\ref{eg: illustrative_eg3}}'$ 
-is valid for query tuple $t_{q_{\ref{eg: illustrative_eg3}}'1}$. The reasons are as follows.
+Recall $Q_{\ref{eg: illustrative_eg3}}'$, $V_2$, and view mapping $M_{2\ref{eg: illustrative_eg3}'}=(h_{2\ref{eg: illustrative_eg3}'},\phi_{2\ref{eg: illustrative_eg3}'})$ from Example \ref{eg: illustrative_eg3}. In terms of {\em schema-level conditions}, $M_{2\ref{eg: illustrative_eg3}'}$ is satisfied for all query tuples because 1) $V_2$ has the {\em same granularity} as $Q_{\ref{eg: illustrative_eg3}}'$ under $M_{2\ref{eg: illustrative_eg3}'}$; and 2) the arguments in the aggregate terms of $V_2$, $COUNT(G)$, can be mapped to the aggregate term of $Q_{\ref{eg: illustrative_eg3}}'$, $COUNT(Gid)$.
 
-In terms of {\em schema-level conditions}, $M_{\ref{eg: illustrative_eg3}}'$ is satisfied because 1) $V_{\ref{eg: illustrative_eg3}}'$ has {\em finer granularity} than $Q_{\ref{eg: illustrative_eg3}}'$ under $M_{\ref{eg: illustrative_eg3}}'$; and 2) the arguments in the aggregate terms of $V_{\ref{eg: illustrative_eg3}}'$, $COUNT(L)$ and $SUM(L)$, can be mapped to the aggregate term of $Q_{\ref{eg: illustrative_eg3}}'$, $AVG(Level)$, and there exists a {\em computation rule}: \\
-$COUNT, SUM \rightarrow AVG$.
-
-The {\em tuple-level condition} also holds for the query tuple $t_{q_{\ref{eg: illustrative_eg3}}'1}$ if we compare its provenance to the sum of the provenance polynomials of the view tuple set $\{t_{v_{\ref{eg: illustrative_eg3}}'1}, t_{v_{\ref{eg: illustrative_eg3}}'2}, t_{v_{\ref{eg: illustrative_eg3}}'3}\}$, i.e. 
+However, the {\em tuple-level condition} does not hold for the query tuple $t_{q_{\ref{eg: illustrative_eg3}}'2}$ if we compare its provenance (i.e. $W = g_2 + g_3$) to the provenance polynomial of the view tuple $\{t_{v_21}, $, i.e.
 % For where-provenance, since $\phi(T) = Tid$, the where-provenance of $T$ in view tuple $t_{v_{\ref{eg: illustrative_eg3}}'2}$ is same as the one of attribute $Tid$ in the query tuple $t_{q_{\ref{eg: illustrative_eg3}}'1}$. In terms of how-provenance, t
 % The how-provenance polynomial of $t_{v_{\ref{eg: illustrative_eg3}}'2}$ is 
-$W' = e_1 + e_2 + e_3 + e_4$, and the monomial mapping between $W'$ and the how-provenance polynomial of $t_{q_{\ref{eg: illustrative_eg3}}'1}$ (i.e. $e_1 + e_2 + e_3 + e_4$) is a one-to-one function.  
-This reasoning is more complicated than that in Example \ref{eg: conditions_conjunctive}, since the validity of view mappings is determined by comparing entire how-provenance polynomials between the query tuple and view tuples instead of single how-provenance monomials.
+$W' = g_2 + g_3 + g_4$, and the monomial mapping between $W'$ and $W$ is not a one-to-one function since $g_4$ is missing from the mapping. If the predicate in $Q_{\ref{eg: illustrative_eg3}}'$, $Gid \leq 3$ is relaxed to $Gid \leq 4$ such that the token $g_4$ can appear in $W$, then the monomial mapping between $W'$ and $W$ satisfies one-to-one function. As we can see, this reasoning is more complicated than that in Example \ref{eg: conditions_conjunctive}, since the validity of view mappings is determined by comparing entire how-provenance polynomials between the query tuple and view tuples instead of single how-provenance monomials.
 
 \eat{The {\em tuple-level conditions} also hold for the query tuple $t_{q_{\ref{eg: illustrative_eg3}}1}$ if we compare its provenance to the provenance of the first two view tuples ($t_{v_{\ref{eg: illustrative_eg3}}1}$ and $t_{v_{\ref{eg: illustrative_eg3}}2}$). For where-provenance, since $\phi(Type) = Ty$, the union of the where-provenance of attribute $Type$ in  $t_{v\ref{eg: illustrative_eg3}1}$ and $t_{v_{\ref{eg: illustrative_eg3}}2}$ is $\{c_1, c_4\}$, which is same as the where-provenance of attribute $Ty$ in tuple $t_{q_{\ref{eg: illustrative_eg3}}1}$. For how-provenance, the sum of the how-provenance expression in the two view tuples is $W' = T_1 + T_4$ and the monomial mappings between $W'$ and the how-provenance polynomial of $t_{q_{\ref{eg: illustrative_eg3}}1}$ (i.e. $T_1 + T_4$) satisfy one-to-one function.}
 
@@ -457,7 +454,8 @@ Finally, as in~\cite{wu2018data}, {\em covering sets} are computed %by combining
 which cover as many {\em aggregate terms} in the query as possible using the fewest view mappings, i.e. that are \textit{maximal and non-redundant}.
 
 \begin{example}\label{eg: covering_sets}
-Consider the following three views and query:
+Let's revisit Example \ref{eg: illustrative_eg3}, suppose we remove the predicates of $V_1$ and $V_2$ temporarily, then $M_{1\ref{eg: illustrative_eg3}'}$ and $M_{2\ref{eg: illustrative_eg3}'}$ should be valid for both $t_{q_{\ref{eg: illustrative_eg3}}'1}$ and $t_{q_{\ref{eg: illustrative_eg3}}'2}$, which should have two covering sets $\{M_{1\ref{eg: illustrative_eg3}'}\}$ and $\{M_{2\ref{eg: illustrative_eg3}'}\}$ since both $M_{1\ref{eg: illustrative_eg3}'}$ and $M_{2\ref{eg: illustrative_eg3}'}$ cover the aggregate term $(COUNT(Gid))$ of $Q_{\ref{eg: illustrative_eg3}}'$. Other view mapping combination like $\{M_{1\ref{eg: illustrative_eg3}'}, M_{2\ref{eg: illustrative_eg3}'}\}$ is redundant since it covers the same terms of $Q_{\ref{eg: illustrative_eg3}}'$ as its subset $\{M_{1\ref{eg: illustrative_eg3}'}\}$ and $\{M_{2\ref{eg: illustrative_eg3}'}\}$.
+\eat{Consider the following three views and query:
 \begin{tabbing}
 $V_{\ref{eg: covering_sets}}'(E, MAX(L)) :- Exon(E, L, T)$\\
 $V_{\ref{eg: covering_sets}}''(E, MAX(T)) :- Exon(E, L, T)$\\
@@ -467,7 +465,7 @@ $Q_{\ref{eg: covering_sets}}'(E, MAX(L), MAX(T)) :- Exon(E, L, T)$
 There is a valid view mapping from each individual view to $Q_{\ref{eg: covering_sets}}'$ for all query tuples, denoted $M_{\ref{eg: covering_sets}}', M_{\ref{eg: covering_sets}}''$ and $M_{\ref{eg: covering_sets}}'''$ respectively, which form two {\em covering sets}. The first one is \{$M_{\ref{eg: covering_sets}}'$, $M_{\ref{eg: covering_sets}}''$\}, which {\em jointly} cover the two aggregate terms in $Q_{\ref{eg: covering_sets}}'$.
 % (denoted $M_{\ref{eg: covering_sets}}'*M_{\ref{eg: covering_sets}}''$)
 The other covering set is \{$M_{\ref{eg: covering_sets}}'''$\}, which covers the same terms as \{$M_{\ref{eg: covering_sets}}', M_{\ref{eg: covering_sets}}''\}$ does. The two covering sets provide two {\em alternative} ways to generate citations and are denoted $\{\{M_{\ref{eg: covering_sets}}', M_{\ref{eg: covering_sets}}''\},\{M_{\ref{eg: covering_sets}}'''\}\}$.
-
+}
 \end{example}
 
 

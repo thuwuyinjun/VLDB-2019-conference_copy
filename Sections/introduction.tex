@@ -23,7 +23,7 @@ The majority of queries against this database involve aggregation to retrieve st
 
 %why aggregate views
 Another example, which requires both aggregate queries and aggregate views, is GENCODE~\cite{harrow2012gencode}, an encyclopedia of genes and gene variants whose goal is to identify all functional elements in the human genome using annotations. The gene annotation process involves a combination of automatic annotation, manual annotation, and experimental validation. For genes that are manually annotated, information is maintained about the responsible research groups. Statistics are also provided for every gene -- an {\em aggregate view} over the genes -- which has another type of citation giving credit to the creators of the aggregate view.
-Common queries over GENCODE also involve aggregation. For instance, one query computes statistics for every \textit{type} of genes.
+Common queries over GENCODE also involve aggregation. For instance, one query computes statistics for every \textit{type} of gene.
 
 %why query rewriting using views is not enough since we need fine-grained reasoning
 In this paper, we address the problem of automatically generating fine-grained citations when both the queries and views may involve aggregates.    Although at first glance it would appear that rewriting techniques for aggregate queries \cite{zaharioudakis2000answering, srivastava1996answering, galindo2001orthogonal,cohen2006rewriting,cohen2006user} could be used, these techniques reason at the schema level for the \textit{entire query result} rather than at the level of individual tuples, which is required for fine-grained citations.  
@@ -80,8 +80,10 @@ Following the same ideas in \cite{wu2018data}, a set of such {\em view mappings}
 \begin{enumerate}
 \item A framework formalizing the connection between data provenance and data citation.
 \item %\scream{claim general agg function is supported} 
-A semantics for generating citations to the results of aggregate queries with {\em general aggregate functions} given a set of either aggregate or conjunctive views using provenance in the view and query instances.
-\item An implementation of the \pba\ called ProvCite, which  automatically generates fine-grained citations for the results of general queries, where both the queries and views may involve aggregates. Two strategies are tested for the provenance of views: In the first, provenance is generated on the fly ({\em lazy strategy}), whereas in the second provenance is pre-computed ({\em eager strategy}).
+A semantics for generating citations to the results of aggregate queries with {\em general aggregate functions} given a set of either aggregate or conjunctive views using provenance in the view and query instances. 
+\item An implementation of the \pba\ called ProvCite, which automatically generates fine-grained citations for the results of general queries, where both the queries and views may involve aggregates. Some optimization strategies were used, which are also applicable in other scenarios, such as fine-grained access control \cite{goyal2006attribute} and linked brushing in data visualization \cite{psallidas2018smoke}.
+
+\eat{Two strategies are tested for the provenance of views: In the first, provenance is generated on the fly ({\em lazy strategy}), whereas in the second provenance is pre-computed ({\em eager strategy}).}
 \item 
 Experiments using both {\em synthetic}  and {\em realistic} workloads, comparing 
 \provalg\ against \rba\ approaches~\cite{wu2018data} in the case of aggregate queries and conjunctive views, and comparing the lazy versus eager strategies for \provalg\ when queries and views involve aggregates.  

@@ -117,7 +117,7 @@ To determine the validity of view mappings, it is necessary to understand the re
 
 \textbf{Granularity of queries and views.} An essential step in determining the validity of a view mapping $M=(h,\phi)$ is to compare the schemas of $Q$ and $V$, and detect whether $V$ keeps all necessary variables in its head. In particular, 
 % for every grouping variable of $Q$, $x$, there should exist a grouping variable of $V$, $y$ such that $\phi(y) = x$. which implies that 
-if $V$ has the set of grouping variables $\{Y_1, Y_2,\dots, Y_m\}$, then $\{\phi(Y_1), \phi(Y_2), \dots, \phi(Y_m)\}$ should be a superset of the set of grouping variables of $Q$, $\{X_1, X_2,\dots, X_k\}$. If $\{\phi(Y_1), \phi(Y_2), \dots,$ $\phi(Y_m)\} = \{X_1, X_2,\dots, X_k\}$, we say $Q$ has the {\em same granularity} as $V$. Otherwise, if $\{\phi(Y_1), \phi(Y_2), \dots, \phi(Y_m)\} \supsetneq \{X_1, X_2,\dots, X_k\}$, we say $V$ has {\em finer granularity} than $Q$.
+if the aggregate view $V$ has the set of grouping variables $\{Y_1, Y_2,\dots, Y_m\}$, then $\{\phi(Y_1), \phi(Y_2), \dots, \phi(Y_m)\}$ should be a superset of the set of grouping variables of $Q$, $\{X_1, X_2,\dots, X_k\}$. If $\{\phi(Y_1), \phi(Y_2), \dots,$ $\phi(Y_m)\} = \{X_1, X_2,\dots, X_k\}$, we say $Q$ has the {\em same granularity} as $V$. Otherwise, if $\{\phi(Y_1), \phi(Y_2), \dots, \phi(Y_m)\} \supsetneq \{X_1, X_2,\dots, X_k\}$, we say $V$ has {\em finer granularity} than $Q$.
 
 \eat{If both have aggregation, %similar to query rewriting using views algorithms,
 then $V$ should not project out any necessary columns for $Q$ under a potentially valid view mapping $M$, which implies that for any grouping variable of $Q$, $M$ should map a grouping variable of $V$ to it. In such case, if every grouping variables of $V$ are mapped to grouping variables of $Q$, we say that $Q$ has the {\em same granularity} as $V$. Otherwise, $M$ should map at least one grouping variables of $V$ to non-grouping variables in $Q$, for which we claim that $V$ has {\em finer granularity} than $Q$.}
@@ -139,15 +139,21 @@ then $V$ should not project out any necessary columns for $Q$ under a potentiall
 
 % \end{definition}
 
+
 \begin{example}
 Consider $Q_{\ref{eg: illustrative_eg3}}'$ and $V_{\ref{eg: illustrative_eg3}}'$ from Example~\ref{eg: illustrative_eg3} of Section~\ref{ssec:need-provenance}.
-$V_{\ref{eg: illustrative_eg3}}'$ has {\em finer granularity} than $Q_{\ref{eg: illustrative_eg3}}'$ since $V_{\ref{eg: illustrative_eg3}}'$ has one grouping variable $T$ while $Q_{\ref{eg: illustrative_eg3}}'$ does not have any grouping attribute. If we add variable $Tid$ into the head of $Q_{\ref{eg: illustrative_eg3}}'$, then $V_{\ref{eg: illustrative_eg3}}'$ has the {\em same granularity} as $Q_{\ref{eg: illustrative_eg3}}'$ since $\phi_{\ref{eg: illustrative_eg3}}'(T) = Tid$.
+$V_2$ has the {\em same granularity} as $Q_{\ref{eg: illustrative_eg3}}'$ since both $V_2$ and $Q_{\ref{eg: illustrative_eg3}}'$ have one grouping attribute ($Ty$ and $T$ resp.) and $\phi_{\ref{eg: illustrative_eg3}}'(Ty) = T$. If we remove variable $T$ from the head of $Q_{\ref{eg: illustrative_eg3}}'$, then $V_2$ has {\em finer granularity} than $Q_{\ref{eg: illustrative_eg3}}'$.
 \end{example}
 
+\eat{\begin{example}
+Consider $Q_{\ref{eg: illustrative_eg3}}'$ and $V_{\ref{eg: illustrative_eg3}}'$ from Example~\ref{eg: illustrative_eg3} of Section~\ref{ssec:need-provenance}.
+$V_{\ref{eg: illustrative_eg3}}'$ has {\em finer granularity} than $Q_{\ref{eg: illustrative_eg3}}'$ since $V_{\ref{eg: illustrative_eg3}}'$ has one grouping variable $T$ while $Q_{\ref{eg: illustrative_eg3}}'$ does not have any grouping attribute. If we add variable $Tid$ into the head of $Q_{\ref{eg: illustrative_eg3}}'$, then $V_{\ref{eg: illustrative_eg3}}'$ has the {\em same granularity} as $Q_{\ref{eg: illustrative_eg3}}'$ since $\phi_{\ref{eg: illustrative_eg3}}'(T) = Tid$.
+\end{example}}
+
 \eat{Introduce how-provenance monomials.  Refer to Tables 2-5}
-\textbf{How-provenance.} We use the notion of {\em how-provenance} introduced in~\cite{green2007provenance}. It starts by annotating each base relation tuple with a unique {\em provenance token}, and propagates those tokens along with the tuples to the query result.  Each tuple in the query result then has a {\em how-provenance polynomial} expressed using $+$ (alternate use) and $*$ (joint use) to indicate {\em how} base relation tuples contribute to the query result. Each {\em how-provenance polynomial} is composed of multiple {\em how-provenance monomials} which are joint-use terms expressed with $*$. For example, the provenance polynomial for tuple $t_{q_{\ref{eg: illustrative_eg3}}'1}$ in $Q_{\ref{eg: illustrative_eg3}}'(D)$ (see Table \ref{Table: Sample instance of Q with provenance}) is $e_1 + e_2 + e_3 + e_4$, which has four \textit{how-provenance monomials}. It means that four tuples from base relation Exon with how-provenance tokens $e_1 - e_4$, respectively
+\textbf{How-provenance.} We use the notion of {\em how-provenance} introduced in~\cite{green2007provenance}. It starts by annotating each base relation tuple with a unique {\em provenance token}, and propagates those tokens along with the tuples to the query result.  Each tuple in the query result then has a {\em how-provenance polynomial} expressed using $+$ (alternate use) and $*$ (joint use) to indicate {\em how} base relation tuples contribute to the query result. Each {\em how-provenance polynomial} is composed of multiple {\em how-provenance monomials} which are joint-use terms expressed with $*$. For example, the provenance polynomial for tuple $t_{q_{\ref{eg: illustrative_eg3}}'2}$ in $Q_{\ref{eg: illustrative_eg3}}'(D)$ (see Table \ref{Table: Sample instance of Q with provenance}) is $g_2 + g_3$, which has two \textit{how-provenance monomials}. It means that two tuples from base relation Gene with how-provenance tokens $g_2 - g_3$, respectively
 % , share the same $Tid$ value and 
-were used to create $t_{q_{\ref{eg: illustrative_eg3}}'1}$.  The $*$ operator is used  if there are multiple relational subgoals in the query body, in which case base tuples are {\em jointly used} to create the result.
+were used to create $t_{q_{\ref{eg: illustrative_eg3}}'2}$.  The $*$ operator is used if there are multiple relational subgoals in the query body, in which case base tuples are {\em jointly used} to create the result.
 % \subsection{How-provenance and where-provenance}\label{Sec: provenance intro}
 
 

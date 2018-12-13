@@ -81,12 +81,12 @@ Following the same ideas in \cite{wu2018data}, a set of such {\em view mappings}
 \item A framework formalizing the connection between data provenance and data citation.
 \item %\scream{claim general agg function is supported} 
 A semantics for generating citations to the results of aggregate queries with {\em general aggregate functions} given a set of either aggregate or conjunctive views using provenance in the view and query instances. 
-\item An implementation of the \pba\ called ProvCite, which automatically generates fine-grained citations for the results of general queries, where both the queries and views may involve aggregates. Some optimization strategies were used, which are also applicable in other scenarios, such as fine-grained access control \cite{goyal2006attribute} and linked brushing in data visualization \cite{psallidas2018smoke}.
+\item An implementation of the \pba\ called ProvCite, which automatically generates fine-grained citations for the results of general queries, where both the queries and views may involve aggregates. Some optimization strategies were used, which are also applicable in other scenarios wherever the provenance from different queries or views needs to be compared, such as fine-grained access control \cite{goyal2006attribute} and linked brushing in data visualization \cite{psallidas2018smoke}.
 
 \eat{Two strategies are tested for the provenance of views: In the first, provenance is generated on the fly ({\em lazy strategy}), whereas in the second provenance is pre-computed ({\em eager strategy}).}
 \item 
 Experiments using both {\em synthetic}  and {\em realistic} workloads, comparing 
-\provalg\ against \rba\ approaches~\cite{wu2018data} in the case of aggregate queries and conjunctive views, and comparing the lazy versus eager strategies for \provalg\ when queries and views involve aggregates.  
+\provalg\ against \rba\ approaches~\cite{wu2018data} in the case of aggregate queries and conjunctive views, and measuring the effect of the optimization strategies for \provalg\ when queries and views involve aggregates.  
 \eat{ In {\em synthetic workloads}, the new approach is compared to prior approaches (TLA and SSLA) in the case where all views are $\mathcal{CV}$ while ({\em virtualization strategy}) and ({\em materialization strategy}) are compared to each other in the case where all views are $\mathcal{CAV}$ (which cannot be handled by TLA or SSLA).}
 The results show that \provalg\ has acceptable time performance even when the queries and views have large instances, and can in some cases significantly outperform \rba\ approaches.
 \eat{feasible in time performance no matter whether the provenance of views are materialized or virtual even when queries and views have large instances; 2) compared to TLA and SSLA, the provenance approach is even about 2x faster than TLA and SSLA in some cases. }

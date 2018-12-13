@@ -141,8 +141,8 @@ then $V$ should not project out any necessary columns for $Q$ under a potentiall
 
 
 \begin{example}
-Consider $Q_{\ref{eg: illustrative_eg3}}'$ and $V_{\ref{eg: illustrative_eg3}}'$ from Example~\ref{eg: illustrative_eg3} of Section~\ref{ssec:need-provenance}.
-$V_2$ has the {\em same granularity} as $Q_{\ref{eg: illustrative_eg3}}'$ since both $V_2$ and $Q_{\ref{eg: illustrative_eg3}}'$ have one grouping attribute ($Ty$ and $T$ resp.) and $\phi_{\ref{eg: illustrative_eg3}}'(Ty) = T$. If we remove variable $T$ from the head of $Q_{\ref{eg: illustrative_eg3}}'$, then $V_2$ has {\em finer granularity} than $Q_{\ref{eg: illustrative_eg3}}'$.
+Consider $Q_{\ref{eg: illustrative_eg3}}$ and $V_{\ref{eg: illustrative_eg3}}$ from Example~\ref{eg: illustrative_eg3} of Section~\ref{ssec:need-provenance}.
+$V_2$ has the {\em same granularity} as $Q_{\ref{eg: illustrative_eg3}}$ since both $V_2$ and $Q_{\ref{eg: illustrative_eg3}}$ have one grouping attribute ($Ty$ and $T$ resp.) and $\phi_{\ref{eg: illustrative_eg3}}(Ty) = T$. If we remove variable $T$ from the head of $Q_{\ref{eg: illustrative_eg3}}$, then $V_2$ has {\em finer granularity} than $Q_{\ref{eg: illustrative_eg3}}$.
 \end{example}
 
 \eat{\begin{example}
@@ -151,9 +151,9 @@ $V_{\ref{eg: illustrative_eg3}}'$ has {\em finer granularity} than $Q_{\ref{eg: 
 \end{example}}
 
 \eat{Introduce how-provenance monomials.  Refer to Tables 2-5}
-\textbf{How-provenance.} We use the notion of {\em how-provenance} introduced in~\cite{green2007provenance}. It starts by annotating each base relation tuple with a unique {\em provenance token}, and propagates those tokens along with the tuples to the query result.  Each tuple in the query result then has a {\em how-provenance polynomial} expressed using $+$ (alternate use) and $*$ (joint use) to indicate {\em how} base relation tuples contribute to the query result. Each {\em how-provenance polynomial} is composed of multiple {\em how-provenance monomials} which are joint-use terms expressed with $*$. For example, the provenance polynomial for tuple $t_{q_{\ref{eg: illustrative_eg3}}'2}$ in $Q_{\ref{eg: illustrative_eg3}}'(D)$ (see Table \ref{Table: Sample instance of Q with provenance}) is $g_2 + g_3$, which has two \textit{how-provenance monomials}. It means that two tuples from base relation Gene with how-provenance tokens $g_2 - g_3$, respectively
+\textbf{How-provenance.} We use the notion of {\em how-provenance} introduced in~\cite{green2007provenance}. It starts by annotating each base relation tuple with a unique {\em provenance token}, and propagates those tokens along with the tuples to the query result.  Each tuple in the query result then has a {\em how-provenance polynomial} expressed using $+$ (alternate use) and $*$ (joint use) to indicate {\em how} base relation tuples contribute to the query result. Each {\em how-provenance polynomial} is composed of multiple {\em how-provenance monomials} which are joint-use terms expressed with $*$. For example, the provenance polynomial for tuple $t_{q_{\ref{eg: illustrative_eg3}}2}$ in $Q_{\ref{eg: illustrative_eg3}}(D)$ (see Table \ref{Table: Sample instance of Q with provenance}) is $g_2 + g_3$, which has two \textit{how-provenance monomials}. It means that two tuples from base relation Gene with how-provenance tokens $g_2$ and $g_3$, respectively
 % , share the same $Tid$ value and 
-were used to create $t_{q_{\ref{eg: illustrative_eg3}}'2}$.  The $*$ operator is used if there are multiple relational subgoals in the query body, in which case base tuples are {\em jointly used} to create the result.
+were used to create $t_{q_{\ref{eg: illustrative_eg3}}2}$.  The $*$ operator is used if there are multiple relational subgoals in the query body, in which case base tuples are {\em jointly used} to create the result.
 % \subsection{How-provenance and where-provenance}\label{Sec: provenance intro}
 
 
@@ -198,13 +198,13 @@ A tuple $t$ in $Q(D)$ may have multiple {\em assignments}, (denoted as $\Gamma =
 \begin{example} \label{eg: assignment}
 Suppose we have a query which is a self join on relation Transcript, and retrieves some pairs of gene ids of the same type:
 \begin{tabbing}
-$Q_{\ref{eg: assignment}}'(G, G') :- $\=$Transcript(T, N, Ty, G), T >= 4, Ty = Ty',$\\
+$Q_{\ref{eg: assignment}}(G, G') :- $\=$Transcript(T, N, Ty, G), T >= 4, Ty = Ty',$\\
 \>$Transcript(T', N', Ty', G'), T' >= 4$
 \end{tabbing}
 
-The query result along with the how-provenance expression is shown in Table \ref{Table:Q7(D)} using the instance of Transcript in Table \ref{Instance of Transcript}. Note that the second and the third how-provenance monomial of the tuple $t_{q_{\ref{eg: assignment}}'1}$ is written differently i.e. $r_3*r_4$ vs $r_4*r_3$ (although they are equivalent to each other), which represent different {\em assignments}. The former monomial $r_3*r_4$ represents one {\em assignment} $\gamma$ in which tuples $t_{t3}$=(4, HP-218, rRNA, 2) (with token $r_3$) and $t_{t4}$=(5, GK-207, rRNA, 2) (with token $r_4$) from Transcript are assigned to subgoals $Transcript(T, N, Ty, G)$ and $Transcript(T', N',$ $ Ty', G')$ respectively (denoted as $\gamma(T, N, Ty, G)$=(4, HP-218, rRNA, 2) and $\gamma(T', N', Ty', G')$=(5, GK-207, rRNA, 2)) while the latter one reverses the order of the assignment $\gamma$. 
+The query result along with the how-provenance expression is shown in Table \ref{Table:Q7(D)} using the instance of Transcript in Table \ref{Instance of Transcript}. Note that the second and the third how-provenance monomial of the tuple $t_{q_{\ref{eg: assignment}}1}$ is written differently i.e. $r_3*r_4$ vs $r_4*r_3$ (although they are equivalent to each other), which represent different {\em assignments}. The former monomial $r_3*r_4$ represents one {\em assignment} $\gamma$ in which tuples $t_{t3}$=(4, HP-218, rRNA, 2) (with token $r_3$) and $t_{t4}$=(5, GK-207, rRNA, 2) (with token $r_4$) from Transcript are assigned to subgoals $Transcript(T, N, Ty, G)$ and $Transcript(T', N',$ $ Ty', G')$ respectively (denoted as $\gamma(T, N, Ty, G)$=(4, HP-218, rRNA, 2) and $\gamma(T', N', Ty', G')$=(5, GK-207, rRNA, 2)) while the latter one reverses the order of the assignment $\gamma$. 
 
-Besides, the first how-provenance monomial of $t_{q_{\ref{eg: assignment}}'1}$ is written as $r_3*r_3$ instead of the compact form ($r_3^2$).  Furthermore, the coefficient of all the monomials in the how-provenance polynomial of $t_{q_{\ref{eg: assignment}}'1}$ is 1 (although in a more compact form, $r_3*r_4$ and $r_4*r_3$ can be combined into $2*r_3*r_4$ or $2*r_4*r_3$)
+Besides, the first how-provenance monomial of $t_{q_{\ref{eg: assignment}}1}$ is written as $r_3*r_3$ instead of the compact form ($r_3^2$).  Furthermore, the coefficient of all the monomials in the how-provenance polynomial of $t_{q_{\ref{eg: assignment}}1}$ is 1 (although in a more compact form, $r_3*r_4$ and $r_4*r_3$ can be combined into $2*r_3*r_4$ or $2*r_4*r_3$)
 
 % \end{example}
 
@@ -249,11 +249,11 @@ $t_{q_{\ref{eg: assignment}}4}$&2&$t_{16}$&2&$t_{16}$&$T_4*T_4$\\ \hhline{~-----
 
 \begin{table}
 \centering
-\caption{$Q_{\ref{eg: assignment}}'(D)$ along with how-provenance}
+\caption{$Q_{\ref{eg: assignment}}(D)$ along with how-provenance}
 \footnotesize
 \begin{tabular}[!h]{>{\centering\arraybackslash}p{0.5cm}|>{\centering\arraybackslash}p{0.5cm}|>{\centering\arraybackslash}p{0.5cm}||b|} \hhline{~---}
 &G&G'&prov\\ \hhline{~---}
-$t_{q_{\ref{eg: assignment}}'1}$&2&2&\makecell{$r_3*r_3 + r_3*r_4$\\$+ r_4*r_3 + r_4*r_4$}\\ \hhline{~---}
+$t_{q_{\ref{eg: assignment}}1}$&2&2&\makecell{$r_3*r_3 + r_3*r_4$\\$+ r_4*r_3 + r_4*r_4$}\\ \hhline{~---}
 % $t_{q_{\ref{eg: assignment}}'2}$&2&2&$r_3*r_4$\\ \hhline{~---}
 % $t_{q_{\ref{eg: assignment}}'3}$&2&2&$r_4*r_3$\\ \hhline{~---}
 % $t_{q_{\ref{eg: assignment}}'4}$&2&2&$r_4*r_4$\\ \hhline{~---}

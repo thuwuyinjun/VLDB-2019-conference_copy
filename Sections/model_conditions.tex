@@ -1,9 +1,10 @@
 \subsection{Validity conditions without aggregation}\label{valid_condition_no_agg}
 
-We now discuss how to apply {\em provenance} to determine the validity of view mappings for conjunctive queries.
-Note that aggregate views have previously been shown to be \textit{invalid} for rewriting conjunctive queries~\cite{srivastava1996answering}. We therefore only consider view mappings of conjunctive views.
+%We now discuss how to apply {\em provenance} to determine the validity of view mappings for conjunctive queries.
+%Note that aggregate views have previously been shown to be \textit{invalid} for rewriting conjunctive queries~\cite{srivastava1996answering}. We therefore only consider view mappings of conjunctive views.
 
-The validity conditions of view mappings can be divided into {\em schema-level conditions} and a {\em tuple-level condition}. A view mapping $M$ is valid for a given query tuple iff $M$ satisfies both {\em schema-level} and {\em tuple-level} conditions,
+The validity conditions of view mappings include {\em schema-level conditions} and a {\em tuple-level condition}, which should be satisfied by a view mapping $M$ iff it is valid for a given query tuple. 
+The validity conditions here can guarantee the same result as the conditions in \cite{wu2018data} (proof omitted).% iff $M$ satisfies both {\em schema-level} and {\em tuple-level} conditions,
 
 \begin{definition}\label{definition:token mapping}
 %{\bf Validity of View Mappings - Schema-level conditions}
@@ -55,7 +56,7 @@ Furthermore, we say the how-provenance monomial $W'$ of $t_v$ is  {\em mapped} t
 
 \begin{example}\label{eg: conditions_conjunctive}
 % Suppose $Q_{\ref{eg: illustrative_eg3}}'$ and in Example \ref{eg: illustrative_eg3} are modified as follows by throwing away the aggregate function:
-Let us revisit Example \ref{eg: conjunctive_case}. The instance of $Q_{\ref{eg: conjunctive_case}}'$ is shown in Table \ref{Table: Instance of Q1}. We can show that $M_{1\ref{eg: conjunctive_case}}$ is a valid view mapping for the query tuple $t_{q_{\ref{eg: conjunctive_case}}1}$ and $t_{q_{\ref{eg: conjunctive_case}}2}$: The {\em schema-level conditions} are satisfied because the head variable $Ty$ and $G$ (which is also the only lambda variable) in $V_1$ are mapped to the head variable $T$ and $Gid$ in $Q_{\ref{eg: conjunctive_case}}$ respectively. % under $M_{\ref{eg: conditions_conjunctive}}'$; 
+Let us revisit Example \ref{eg: conjunctive_case}. The instance of $Q_{\ref{eg: conjunctive_case}}$ is shown in Table \ref{Table: Instance of Q1}. We can show that $M_{1\ref{eg: conjunctive_case}}$ is a valid view mapping for the query tuple $t_{q_{\ref{eg: conjunctive_case}}1}$ and $t_{q_{\ref{eg: conjunctive_case}}2}$: The {\em schema-level conditions} are satisfied because the head variable $Ty$ and $G$ (which is also the only lambda variable) in $V_1$ are mapped to the head variable $T$ and $Gid$ in $Q_{\ref{eg: conjunctive_case}}$ respectively. % under $M_{\ref{eg: conditions_conjunctive}}'$; 
 
 \eat{We can build an obvious view mapping $M_{1\ref{eg: conjunctive_case}'} = (h_{1\ref{eg: conjunctive_case}'}, \phi_{1\ref{eg: conjunctive_case}'})$ from $V_1$ to $Q_{\ref{eg: conjunctive_case}}'$, which is the same as $M_{1\ref{eg: illustrative_eg3}'}$}
 % \begin{tabbing}
@@ -157,18 +158,17 @@ The validity conditions for view mappings are next extended to handle aggregate 
 
 
 We start by introducing requirements on the %{\em general} 
-aggregate function before formalizing this intuition.
+aggregate functions before formalizing this intuition.
 
 %\subsubsection{Intuition}
 
 \subsubsection{Aggregate function requirements} \label{Sec: aggregate functions}
-A view mapping $M$, which maps an aggregate view $V$ to an aggregate query $Q$, is valid for a query tuple only if the aggregate functions of $V$ and $Q$ satisfy certain requirements;  this has been explored in previous work \cite{cohen2006user, cohen2006rewriting} in the context of query rewriting using views with aggregation. 
+A view mapping $M$, which maps an aggregate view $V$ to an aggregate query $Q$, is valid for a query tuple only if the aggregate functions of $V$ and $Q$ satisfy certain requirements in particular, \cite{cohen2006user}  formalizes the notion of a \textit{well-formed aggregate function}. Loosely speaking, a well-formed aggregate function can be characterized by some initial ``mapper" function, followed by a ``reduce" function, followed by a ``finalize" function, which we will call a \textit{terminating function}.
+It is easy to see that some common aggregate functions such as SUM,MIN, MAX, COUNT and AVG are well formed.
 
-In particular, \cite{cohen2006user}  formalizes the notion of a \textit{well-formed aggregate function}. Loosely speaking, a well-formed aggregate function can be characterized by some initial ``mapper" function, followed by a ``reduce" function, followed by a ``finalize" function, which we will call a \textit{terminating function}.
-
-It  is easy to see that some common aggregate functions are {\em well-formed}. For example, 
+For example, 
 % $SUM$ is {\em well formed}, in which $D_s = D_i = D_t = \mathbb{Q}$, $F$ and $T$ are identity function and $\bigoplus$ is arithmetic addition.
-the ``mapper" function for $AVG$ takes a set of rational numbers, $\{d_1, d_2, \dots, d_k\}$, and maps each number $d_i$ to a pair $(d_i, 1)$.  The reduce function is pair-wise addition, whose result is a pair whose first element represents the sum of the $d_i$'s and second element represents the count ($k$).  The ``finalize" function divides the first element by the second element. Similarly, $SUM$ maps each $d_i$ to itself and takes the sum of all $d_i$'s in the reduce step; ``finalize" is the identity function.
+the ``mapper" function for $AVG$ takes a set of values, $\{d_1,\dots, d_k\}$, and maps each number $d_i$ to a pair $(d_i, 1)$.  The result of the reduce function is still a pair whose first element represents the sum of the $d_i$'s and second element represents the count ($k$).  The ``finalize" function divides the first element by the second element. Similarly, $SUM$ maps each $d_i$ to itself and takes the sum of all $d_i$'s in the reduce step; ``finalize" is the identity function.
 
 
 % For a given \textit{well-formed aggregate function} $\alpha$ which maps a set of values, $\bar{x} = \{x_1, x_2, \dots, x_k\}$ ($x_j$ is from a source domain $D_s$) to a value $y$ in domain $D_t$ (denoted $\alpha(\bar{x}) = y$), we say that $\alpha$ is defined over a triple $(F, \bigoplus, T)$ where $F$ (translating function) maps each $x_j$ to an intermediate element $z_j$ in an intermediate domain $D_i$, then a commutative and associative operator $\bigoplus$ is applied over $\{z_1,z_2,\dots,z_k\}$ resulting in a value $z$ (also in $D_i$) and finally $T$ (terminating function) maps $z$ to $y$ (See more details in \cite{cohen2006user}).
@@ -202,20 +202,15 @@ For a given \textit{well-formed aggregate function} $\alpha$ which maps a set of
 % The aggregate function {\em VAR} is also well-formed. In this case, $D_s, D_t$ are the same as those for $AVG$. For other abstract symbols, $F$ maps a rational number $d$ to a pair $(d^2, d, 1)$, $D_i = \mathbb{Q} \times \mathbb{Q} \times \mathbb{N}$, $\bigoplus$ is defined as addition operator over $\mathbb{Q} \times \mathbb{Q} \times \mathbb{N}$ and $T$ maps an element $(d1, d2, n) \in \mathbb{Q} \times \mathbb{Q} \times \mathbb{N}$ to $\frac{d1}{n} - (\frac{d2}{n})^2 \in \mathbb{Q}$, which represents the formula $VAR(X) = EX^2 - (EX)^2$ where $X \in \mathcal{M}(\mathbb{Q})$.
 
 \textbf{Invertibility.} 
-One of the most important properties of some well-formed aggregate functions is {\em invertibility}~\cite{cohen2006user}. An aggregate function is invertible iff its terminating function is invertible.  For example, $SUM$ is invertible whereas $AVG$ is not.
-
-Invertibility is important for determining the validity of view mappings when the view has a finer granularity than the query, as illustrated below.
+A well-formed function is invertible iff its terminating function is invertible.  For example, $SUM$ is invertible whereas $AVG$ is not. Invertibility is important for determining the validity of view mappings when the view has a finer granularity than the query, as illustrated below.
 %, which is closely related to the validity of view mappings for a query.
 % For example, $SUM$ is an invertible function since the corresponding $T$ function is the identity function (which is invertible), while $AVG$ is not an invertible function since the corresponding $T$ function (division over $\mathbb{Q}\times \mathbb{N}$) has no inverse. This %aggregate functions of this 
 % property is essential for determining whether an aggregate view can be used for rewriting an aggregate query, as exemplified below.
 
 \begin{example} \label{eg: invertible property}
 Consider the following query:
-% Suppose we have one view $v_{\ref{eg: invertible property}}$ and one query $q_{\ref{eg: invertible property}}$ defined over relation $Exon$
 \begin{tabbing}
-% $V_{\ref{eg: invertible property}}'(E, T, SUM(L)) :- Exon(E, L, T)$\\
 $Q_{\ref{eg: invertible property}}(COUNT(G)):- Gene(G, N, Ty), Ty = `rRNA$'
-% $Q_{\ref{eg: invertible property}}'(E, SUM(L)) :- Exon(E, L, T)$
 \end{tabbing}
 
 By referencing Section \ref{subsec:running example}, $V_2$ computes a coarser-grained aggregation result than $Q_{\ref{eg: invertible property}}$ does. Both %$V_{\ref{eg: invertible property}}'$ and $Q_{\ref{eg: invertible property}}'$ 
@@ -231,13 +226,13 @@ the aggregation result in $V_2$ will not be useful to compute the aggregation re
 \end{example}
 
 \textbf{Computation rules.}  
-A view may also be usable to compute the aggregation results in the query without sharing the same aggregate function with the query~\cite{cohen2006user}. For example, the result of an $AVG$ function in the query can be computed by dividing the result of $SUM$ by the result of $COUNT$ from the view. In~\cite{cohen2006rewriting}, an aggregate function $\beta$ is said to be {\em computed} from a set of aggregate functions $\alpha_1, \alpha_2, \dots, \alpha_n$ if there is a function $g$ such that for any multiset of values $M$: $\beta(M) = g(\alpha_1(M), \alpha_2(M), \dots, \alpha_n(M))$. It can be also written as a {\em computation rule}: $\alpha_1, \alpha_2, \dots, \alpha_n \rightarrow \beta$. For instance, as Example \ref{eg: illustrative_eg3} shows, there is a computation rule from $SUM$ and $COUNT$ to $AVG$, i.e. $SUM, COUNT \rightarrow AVG$. Such computation rules can be predefined by the DBAs.
+A view may also be usable to compute the aggregation results in the query without sharing the same aggregate function with the query~\cite{cohen2006user}. For example, the result of an $AVG$ function in the query can be computed by dividing the result of $SUM$ by the result of $COUNT$ from the view. In~\cite{cohen2006rewriting}, an aggregate function $\beta$ is said to be {\em computed} from a set of aggregate functions $\alpha_1, \alpha_2, \dots, \alpha_n$ if there is a function $g$ such that for any multiset of values $M$: $\beta(M) = g(\alpha_1(M), \alpha_2(M), \dots, \alpha_n(M))$. It can be also written as a {\em computation rule}: $\alpha_1, \alpha_2, \dots, \alpha_n \rightarrow \beta$. For instance, as Example \ref{eg: illustrative_eg3} shows, there is a computation rule from $SUM$ and $COUNT$ to $AVG$, i.e. $SUM, COUNT \rightarrow AVG$. \eat{Such computation rules can be predefined and verified by the DBAs.}
 
-The authors in \cite{cohen2006user} and \cite{cohen2006rewriting} consider aggregate function requirements for potentially valid views to rewrite a query by combining the aggregate function properties mentioned above, which are adapted below for data citation:
+The authors in \cite{cohen2006user} and \cite{cohen2006rewriting} consider aggregate function requirements for potentially valid views to rewrite a query by combining the properties mentioned above, which are adapted below for data citation:
 
 \begin{definition}\label{Def: conditions_for_agg_functions}
 {\bf Aggregate function requirements}
-Suppose a query $Q$ has an aggregate function $\alpha$, which takes a set of variables $X$ as arguments, if $M$ is {\em valid} for some query tuples, the aggregate functions in $V$ should satisfy the following conditions under view mapping $M = (h, \phi)$ mapping $V$ to $Q$:
+Suppose a query $Q$ has an aggregate function $\alpha$, which takes a set of variables $X$ as arguments, if $M$ is {\em valid} for some query tuples, the aggregate functions in $V$ should satisfy the following conditions under view mapping $M = (h, \phi)$:
 \eat{it satisfies the following conditions for aggregate terms:
 % \begin{enumerate}
 % \item If $Q$ and $V$ have the same granularity, then either (a) or (b) must hold:
@@ -255,7 +250,7 @@ Suppose a query $Q$ has an aggregate function $\alpha$, which takes a set of var
 }
 \begin{enumerate}
 \item $V$ %is an $\alpha$-view  
-also has an aggregate function $\alpha$ with arguments $Y$, and $\phi(Y) = X$ OR there exists some {\em computation rule} $\beta_1, \beta_2, \dots, \beta_m \rightarrow \alpha$ and $\beta_1, \beta_2, \dots, \beta_m$ also appear (or can be derived by other computation rules) in the schema of $V$, all of which take same set of variables $Y$ as arguments and $\phi(Y) = X$.
+also has an aggregate function $\alpha$ with arguments $Y$, and $\phi(Y) = X$ OR there exists some {\em computation rule} $\beta_1, \beta_2, \dots, \beta_m \rightarrow \alpha$ and $\beta_1, \beta_2, \dots, \beta_m$ also appear \eat{(or can be derived by other computation rules) }in the schema of $V$, all of which take same set of variables $Y$ as arguments and $\phi(Y) = X$.
 \item If $Q$ has coarser granularity than $V$, then the functions $\alpha$ or $\beta_1, \beta_2, \dots, \beta_m$ must also be invertible.
 \end{enumerate}
 In this case, we say that the aggregate term $\alpha(X)$ in $Q$ is {\em covered} under view mapping $M$.
@@ -324,9 +319,9 @@ Given an aggregate query $Q$ and % {\tt $V(Y_1, Y_2,\dots, Y_k, Agg_1(Y'_{1}), \
 % \tab \tab \tab :- B_1, B_2, \dots, B_m, condition(Q)$}
  a view mapping $M = (h, \phi)$ from view $V$ to $Q$. The {\em schema-level conditions} are as follows:
 \begin{enumerate}
-\item For \textit{grouping attributes} of $Q$, the following must hold:
+\item For \textit{grouping variables} of $Q$, the following must hold:
 \begin{enumerate}
-\item If $V$ is a \textit{conjunctive} view, then for every grouping attribute $X$ of $Q$ there is an attribute $Y$ in the head of $V$ such that $\phi(Y) = X$.
+\item If $V$ is a \textit{conjunctive} view, then for every grouping variable $X$ of $Q$ there is a head variable $Y$ in $V$ such that $\phi(Y) = X$.
 \item If $V$ is an \textit{aggregate} view, then $Q$ must have the same or coarser granularity than $V$ under $M$.
 \end{enumerate}
 \item There exists at least one \textit{aggregate term }with aggregate function $\alpha$ taking a set of variables $X'$ as arguments in the head of $Q$ such that:
@@ -372,7 +367,7 @@ Furthermore, given a multiset $\{t_1, t_2,\dots, t_p\} \in V(D)$, let $t_i (i=1,
 % and where provenance set $H_{ij}$ for grouping variable $Y_j$. 
 If for $\{t_1, t_2,\dots, t_p\}$ and $t$, the following condition holds, then we say that $M$ is valid for $t$ (not for a single how-provenance monomial):
 % \item Since $\phi(Y_i) = X_i$, $\bigcup_{i=1}^v H_{ij} = H_j$
-Every monomial $W_{i_j}'$ in $\sum_{i=1}^pW_i'$ ($\sum_{i=1}^pW_i'$ again follows the normal form mentioned in Section \ref{Sec: prelim}) can be {\em mapped} to some monomial in $W$ %and such monomial mappings between $W$ and $\sum_{i=1}^v{W_i'}$ should be 
+Every monomial $W_{i_j}'$ in $\sum_{i=1}^pW_i'$ can be {\em mapped} to some monomial in $W$ %and such monomial mappings between $W$ and $\sum_{i=1}^v{W_i'}$ should be 
 as a one-to-one function under $M$.
 
 %\scream{daniel:The tuple-level part is the same as without aggregation, no? If so can simplify}
@@ -385,7 +380,7 @@ as a one-to-one function under $M$.
 \end{definition}
 
 \begin{example}
-Recall $Q_{\ref{eg: illustrative_eg3}}$, $V_2$, and view mapping $M_{2\ref{eg: illustrative_eg3}}=(h_{2\ref{eg: illustrative_eg3}},\phi_{2\ref{eg: illustrative_eg3}})$ from Example \ref{eg: illustrative_eg3}. In terms of {\em schema-level conditions}, $M_{2\ref{eg: illustrative_eg3}}$ is satisfied for all query tuples because 1) $V_2$ has the {\em same granularity} as $Q_{\ref{eg: illustrative_eg3}}$ under $M_{2\ref{eg: illustrative_eg3}}$; and 2) the arguments in the aggregate terms of $V_2$, $COUNT(G)$, can be mapped to the aggregate term of $Q_{\ref{eg: illustrative_eg3}}$, $COUNT(Gid)$, which satisfies the aggregate function requirements in Def. \ref{Def: conditions_for_agg_functions}.
+Recall $Q_{\ref{eg: illustrative_eg3}}$, $V_2$, and view mapping $M_{2\ref{eg: illustrative_eg3}}=(h_{2\ref{eg: illustrative_eg3}},\phi_{2\ref{eg: illustrative_eg3}})$ from Example \ref{eg: illustrative_eg3}. In terms of {\em schema-level conditions}, $M_{2\ref{eg: illustrative_eg3}}$ is satisfied for all query tuples because 1) $V_2$ has the {\em same granularity} as $Q_{\ref{eg: illustrative_eg3}}$ under $M_{2\ref{eg: illustrative_eg3}}$; and 2) the aggregate term of $V_2$, $G$, can be mapped to the aggregate variable of $Q_{\ref{eg: illustrative_eg3}}$, $Gid$, which also share the same aggregate function $COUNT$ and thus satisfy the requirement in Def. \ref{Def: conditions_for_agg_functions}.
 
 However, the {\em tuple-level condition} does not hold for the query tuple $t_{q_{\ref{eg: illustrative_eg3}}2}$ if we compare its provenance (i.e. $W = g_2 + g_3$) to the provenance polynomial of the view tuple $t_{v_21}$, i.e.
 % For where-provenance, since $\phi(T) = Tid$, the where-provenance of $T$ in view tuple $t_{v_{\ref{eg: illustrative_eg3}}'2}$ is same as the one of attribute $Tid$ in the query tuple $t_{q_{\ref{eg: illustrative_eg3}}'1}$. In terms of how-provenance, t
@@ -419,10 +414,10 @@ $W' = g_2 + g_3 + g_4$, and the monomial mapping between $W'$ and $W$ is not a o
 
 \eat{Check rewording.}
 Finally, as in~\cite{wu2018data}, {\em covering sets} are computed %by combining a set of valid {\em view mappings} using joint and alternate use operators, 
-which cover as many {\em aggregate terms} in the query as possible using the fewest view mappings, i.e. that are \textit{maximal and non-redundant}.
+which cover as many {\em aggregate terms} and {\em relational subgoals} in the query as possible using the fewest view mappings, i.e. that are \textit{maximal and non-redundant}.
 
 \begin{example}\label{eg: covering_sets}
-Let's revisit Example \ref{eg: illustrative_eg3}, suppose we remove the predicates of $V_1$ and $V_2$ temporarily, then $M_{1\ref{eg: illustrative_eg3}}$ and $M_{2\ref{eg: illustrative_eg3}}$ should be valid for both $t_{q_{\ref{eg: illustrative_eg3}}1}$ and $t_{q_{\ref{eg: illustrative_eg3}}2}$, which should have two covering sets $\{M_{1\ref{eg: illustrative_eg3}}\}$ and $\{M_{2\ref{eg: illustrative_eg3}}\}$ since both $M_{1\ref{eg: illustrative_eg3}}$ and $M_{2\ref{eg: illustrative_eg3}}$ cover the aggregate term $(COUNT(Gid))$ of $Q_{\ref{eg: illustrative_eg3}}$. Other view mapping combination like $\{M_{1\ref{eg: illustrative_eg3}}, M_{2\ref{eg: illustrative_eg3}}\}$ is redundant since it covers the same terms of $Q_{\ref{eg: illustrative_eg3}}$ as its subset $\{M_{1\ref{eg: illustrative_eg3}}\}$ and $\{M_{2\ref{eg: illustrative_eg3}}\}$.
+Let us revisit Example \ref{eg: illustrative_eg3}. If we would omit the predicates of $V_1$ and $V_2$ then $M_{1\ref{eg: illustrative_eg3}}$ and $M_{2\ref{eg: illustrative_eg3}}$ should be valid for both $t_{q_{\ref{eg: illustrative_eg3}}1}$ and $t_{q_{\ref{eg: illustrative_eg3}}2}$, which should have two covering sets $\{M_{1\ref{eg: illustrative_eg3}}\}$ and $\{M_{2\ref{eg: illustrative_eg3}}\}$ since both $M_{1\ref{eg: illustrative_eg3}}$ and $M_{2\ref{eg: illustrative_eg3}}$ cover the aggregate term $(COUNT(Gid))$ and the subgoal $Gene(Gid, Name, T)$ of $Q_{\ref{eg: illustrative_eg3}}$. Other view mapping combination like $\{M_{1\ref{eg: illustrative_eg3}}, M_{2\ref{eg: illustrative_eg3}}\}$ is redundant since it covers the same terms of $Q_{\ref{eg: illustrative_eg3}}$ as its subset $\{M_{1\ref{eg: illustrative_eg3}}\}$ and $\{M_{2\ref{eg: illustrative_eg3}}\}$.
 \eat{Consider the following three views and query:
 \begin{tabbing}
 $V_{\ref{eg: covering_sets}}'(E, MAX(L)) :- Exon(E, L, T)$\\

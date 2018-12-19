@@ -10,7 +10,7 @@ Several computational challenges must be addressed in developing a data citation
 %our prior work
 
 In prior work, we proposed a general framework to {\em automatically generate fine-grained citations for general queries} \cite{alawini2017automating,wu2018data}.
-The approach is based on a model of {\em citation views}~\cite{BunemanEtAl2016,davidson2017model,DBLP:conf/pods/DavidsonBDMS17}: Frequent queries  are defined as views with associated citations. A query against the database is rewritten in terms of these views, and the associated citations used to construct a citation for \textit{each tuple in the query result}. Since a query may be rewritten by \textit{jointly} using more than one view, or there may be several \textit{alternate} ways to rewrite a query, the database owner may specify how citations are jointly or alternatively combined through \textit{policies} (see Figure~\ref{fig:DataCitationFW} for an overview).  The framework also allows for fine-grained citations: the citations for each tuple in the query result are then \textit{combined} to create a final citation for the specified subset of the result, which is given as another policy.  Policies give an interpretation for the joint, alternate and combined use operators, for example, taking the union, intersection or join of the citations.  In the remainder of the paper, we will call the model used in~\cite{wu2018data} the {\em {\rbafull} (\rba)} since it  extends query rewriting using views algorithms to work at the tuple level.
+The approach is based on a model of {\em citation views}~\cite{BunemanEtAl2016,davidson2017model,DBLP:conf/pods/DavidsonBDMS17}: Frequently posed queries  are defined as views with associated citations. A query against the database is rewritten in terms of these views, and the associated citations used to construct a citation for \textit{each tuple in the query result}. Since a query may be rewritten by \textit{jointly} using more than one view, or there may be several \textit{alternate} ways to rewrite a query, the database owner may specify how citations are jointly or alternatively combined through \textit{policies}.  The framework also allows for fine-grained citations: the citations for each tuple in the query result are then \textit{combined} to create a final citation for the specified subset of the result, which is given as another policy.  Policies give an interpretation for the joint, alternate and combined use operators, for example, taking the union, intersection or join of the citations.  In the remainder of the paper, we will call the model used in~\cite{wu2018data} the {\em {\rbafull} (\rba)} since it  extends query rewriting using views algorithms to work at the tuple level.
 
 %why aggregate queries
 A shortcoming of {\rba}, however, is that it addresses a limited class of queries -- (non-recursive) conjunctive queries and conjunctive views -- and cannot be used in applications in which the queries and views involve aggregate (such as SUM, MIN, AVG) or user-defined functions.  However, there is a growing number of biomedical applications which extract \textit{summaries} from data\-bases by issuing aggregate queries, in which views possibly involve aggregation. So the techniques of \cite{wu2018data} cannot be used.
@@ -31,10 +31,11 @@ Extending the implementation in \cite{wu2018data} to use ideas from query rewrit
 
 Instead, to support aggregation, we use the observation pointed out in~\cite{BunemanEtAl2016,alawini2018data} that there is a strong connection between data provenance and data citation -- and the provenance of aggregate queries is well understood.
 We therefore adopt a \textit{\pbafull\ (\pba)} that captures the connections between a result tuple and tuple(s) in views.
-We illustrate how provenance helps in the example below.
+%We illustrate how provenance helps in the example below.
 
-\textbf{Example.} (See Figure~\ref{fig:DataCitationFW})  Recall that GENCODE is an encyclopedia of information about genes and gene variants.  Suppose that one of the views defined by the DBA  is $V_{gene}$, which counts the number of genes for each gene type, but only retains the gene types (groups) with more than 10 genes.  This corresponds to an aggregate query with a HA\-VING-clause in SQL.  $V_{gene}$ has an associated citation query which pulls snippets of information from the database and is formatted by the citation function as 
-{\tt \{Group: `Jones Group', Source: `HAVANA Project', ...\}}.
+%\scream{can be simplified}
+\textbf{Example.}  Recall that GENCODE is an encyclopedia of information about genes and gene variants.  Suppose that one of the views defined by the DBA  is $V_{gene}$, which counts the number of genes for each gene type, but only retains the gene types (groups) with more than 10 genes.  This corresponds to an aggregate query with a HA\-VING-clause in SQL.  $V_{gene}$ has an associated citation query which pulls snippets of information from the database and is formatted by the citation function as 
+%{\tt \{Group: `Jones Group', Source: `HAVANA Project', ...\}}.
 
 % \begin{tabbing}
 % $\lambda G.$\=$V(G, Ty, count(T)) $\hspace{1em}$:-$\=$ Transcript(T, N, Ty', G'), $\\
@@ -47,16 +48,16 @@ We illustrate how provenance helps in the example below.
 % $Q(G, Ty, count(T)) $\hspace{1em}\=$:-$\=$ Transcript(T, N, Ty', G'), $\\
 % \>$Gene(G, N, Ty), G = G', Ty = `TEC$'
 % \end{tabbing}
-Now suppose that a query $Q$ counts the number of genes \textit{whose gene ids are smaller than 50} for every gene type. Then some tuples in the query result will appear in $V_{gene}$, and therefore carry the associated citation.  This is true for the first result tuple in Figure~\ref{fig:DataCitationFW},  where we assume that gene type TEC only includes genes whose ids are smaller than 50 and has at least 10 such genes.  Other tuples in the query result may not appear in $V_{gene}$, i.e. gene types which include some genes with ids 50 or greater (which we assume for the second result tuple rRNA)  or which include fewer than 10 genes.  In this case, the tuple would not carry the citation associated with $V_{gene}$.
+Now suppose that a query $Q$ counts the number of genes \textit{whose gene ids are smaller than 50} for every gene type. Then some tuples in the query result will appear in $V_{gene}$, and therefore carry the associated citation;  other tuples in the query result may not appear in $V_{gene}$, i.e. gene types which include some genes with ids 50 or greater (which we assume for the second result tuple rRNA)  or which include fewer than 10 genes.  In this case, the tuple would not carry the citation associated with $V_{gene}$.
 
 Traditional query rewriting using views techniques would conclude that $V_{gene}$ is {\em not useful} for $Q$.  Furthermore, the \rba\ tuple-level techniques proposed in~\cite{wu2018data} could not detect whether $V_{gene}$ is useful for a given tuple in the result of $Q$.
-However reasoning over the {\em provenance} of result  and view tuples could detect that TEC exists in the view instance (by comparing provenance polynomials) and that all tuples in the group have ids smaller than 50 (by finding the gene ids associated with the provenance tokens).  Thus, if the user in Figure~\ref{fig:DataCitationFW} selects TEC as the subset of interest in the query result, the citation for $V_{gene}$ ({\tt \{Group: "Jones Group", Source: "HAVANA Project", ...\}}) would be returned.
+However reasoning over the {\em provenance} of result  and view tuples could detect that TEC exists in the view instance (by comparing provenance polynomials) and that all tuples in the group have ids smaller than 50 (by finding the gene ids associated with the provenance tokens).  Thus, if TEC is the subset of interest in the query result, the citation for $V_{gene}$ ({\tt \{Group: "Jones Group", Source: "HAVANA Project", ...\}}) would be returned.
 
 % whether current view instance $V(D)$ retains enough tuples to compute $t_q$ can be determined by {\em provenance}. If there exists one view tuple $t_v$ sharing the same provenance with $t_q$, then it implies that both $t_q$ and $t_v$ originate from the same set of base relation tuples and thus the citations of $t_q$ can be constructed by the citations of $t_v$.
 %apply provenance
 % Some researchers from digital library domain attempt to enable {\em provenance} property in data citation. For example, Dataverse proposes the use of provenance in data citation in their latest project ``Citation++''\footnote{https://dataverse.org/presentations/citation-data-citation-provenance-and-documentation}. However, Dataverse only generate citations for the entire dataset without providing finer-grained citations. Moreover, it cannot handle automatic citation generation for general queries. 
 
-\textbf{Approach.} Using provenance, we develop a citation system called ProvCite, whose architecture is shown in Figure \ref{fig:DataCitationFW}; the key differences between ProvCite and the \rba\ implementation in~\cite{wu2018data} are indicated by red stars. The system executes over a provenance-enabled relational database system; here we are using GProM~\cite{arab2018gprom}.
+\textbf{Approach.} Using provenance, we develop a citation system called ProvCite. The system executes over a provenance-enabled relational database system; here we are using GProM~\cite{arab2018gprom}.
 As in \cite{wu2018data}, the DBA defines the citation views and policies to be used.  When a query is submitted, all potential {\em view mappings} are computed, which represent how views can potentially rewrite this query.  The decision of which views are valid, however, depends on the particular result tuple (as illustrated above), and for this the provenance of the result tuple is compared with the provenance of view tuples. While the user is presented with the query result and examines it to determine the subset of interest, \textit{covering sets} are calculated from the valid views for every result tuple, representing alternate rewritings in which sets of views are jointly used. So when the result subset is selected, the citation for the selected query subset can be immediately generated.   
 
 Our initial fear in developing ProvCite was that, although the approach is interesting since it develops a novel connection between citation and provenance, it would be unacceptably slow.
@@ -68,12 +69,12 @@ However, since in the worst case the number of possible covering sets may be exp
 \eat{
 Following the same ideas in \cite{wu2018data}, a set of such {\em view mappings} construct {\em covering sets}, each of which represents one single citation. Eventually, Formatted citations, such as JOSN-format citations are generated by applying {\em policies} defined by DBAs, i.e. \{Contributors: Jones Group, Gene Type: `TEC', Query\_id: 101, Source: HAVANA project\}. How {\em covering sets} are constructed from {\em view mappings} and how {formated citations} are produced have been explored in \cite{wu2018data} and will not be repeated here. Instead, how to reason about valid view mappings for each individual tuple level in the context of aggregate queries and  aggregate views becomes our major concerns in this paper.}
 
-\begin{figure}[t!]
-    \centering
-    \includegraphics[width=0.48\textwidth,height=0.25\textwidth]{Figures/general_citaiton_framework.pdf}
-    \caption{System overview of ProvCite}
-    \small \label{fig:DataCitationFW}
-\end{figure}
+%\begin{figure}[t!]
+%    \centering
+%    \includegraphics[width=0.48\textwidth,height=0.25\textwidth]{Figures/general_citaiton_framework.pdf}
+%    \caption{System overview of ProvCite}
+%    \small \label{fig:DataCitationFW}
+%\end{figure}
 
 %contributions
 {\textbf{Contributions}} of this paper include:

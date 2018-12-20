@@ -226,7 +226,7 @@ the aggregation result in $V_2$ will not be useful to compute the aggregation re
 \end{example}
 
 \textbf{Computation rules.}  
-A view may also be usable to compute the aggregation results in the query without sharing the same aggregate function with the query~\cite{cohen2006user}. For example, the result of an $AVG$ function in the query can be computed by dividing the result of $SUM$ by the result of $COUNT$ from the view. In~\cite{cohen2006rewriting}, an aggregate function $\beta$ is said to be {\em computed} from a set of aggregate functions $\alpha_1, \alpha_2, \dots, \alpha_n$ if there is a function $g$ such that for any multiset of values $M$: $\beta(M) = g(\alpha_1(M), \alpha_2(M), \dots, \alpha_n(M))$. It can be also written as a {\em computation rule}: $\alpha_1, \alpha_2, \dots, \alpha_n \rightarrow \beta$. For instance, as Example \ref{eg: illustrative_eg3} shows, there is a computation rule from $SUM$ and $COUNT$ to $AVG$, i.e. $SUM, COUNT \rightarrow AVG$. \eat{Such computation rules can be predefined and verified by the DBAs.}
+A view may also be usable to compute the aggregation results in the query without sharing the same aggregate function with the query~\cite{cohen2006user}. For example, the result of an $AVG$ function in the query can be computed by dividing the result of $SUM$ by the result of $COUNT$ from the view. In~\cite{cohen2006rewriting}, an aggregate function $\beta$ is said to be {\em computed} from a set of aggregate functions $\alpha_1, \alpha_2, \dots, \alpha_n$ if there is a function $g$ such that for any multiset of values $M$: $\beta(M) = g(\alpha_1(M), \alpha_2(M), \dots, \alpha_n(M))$. It can be also written as a {\em computation rule}: $\alpha_1, \alpha_2, \dots, \alpha_n \rightarrow \beta$. For instance, there is a computation rule from $SUM$ and $COUNT$ to $AVG$, i.e. $SUM, COUNT \rightarrow AVG$. \eat{Such computation rules can be predefined and verified by the DBAs.}
 
 The authors in \cite{cohen2006user} and \cite{cohen2006rewriting} consider aggregate function requirements for potentially valid views to rewrite a query by combining the properties mentioned above, which are adapted below for data citation:
 
@@ -250,8 +250,8 @@ Suppose a query $Q$ has an aggregate function $\alpha$, which takes a set of var
 }
 \begin{enumerate}
 \item $V$ %is an $\alpha$-view  
-also has an aggregate function $\alpha$ with arguments $Y$, and $\phi(Y) = X$ OR there exists some {\em computation rule} $\beta_1, \beta_2, \dots, \beta_m \rightarrow \alpha$ and $\beta_1, \beta_2, \dots, \beta_m$ also appear \eat{(or can be derived by other computation rules) }in the schema of $V$, all of which take same set of variables $Y$ as arguments and $\phi(Y) = X$.
-\item If $Q$ has coarser granularity than $V$, then the functions $\alpha$ or $\beta_1, \beta_2, \dots, \beta_m$ must also be invertible.
+also has an aggregate function $\alpha$ with arguments $Y$, and $\phi(Y) = X$ OR there exists some {\em computation rule} $\beta_1, \beta_2, \dots, \beta_m \rightarrow \alpha$ and $\beta_1, \beta_2, \dots, \beta_m$ also appear \eat{(or can be derived by other computation rules) }in the head of $V$, all of which take same set of variables $Y$ as arguments and $\phi(Y) = X$.
+\item If $V$ has finer granularity than $Q$, then the functions $\alpha$ or $\beta_1, \beta_2, \dots, \beta_m$ must also be invertible.
 \end{enumerate}
 In this case, we say that the aggregate term $\alpha(X)$ in $Q$ is {\em covered} under view mapping $M$.
 \end{definition}
@@ -322,7 +322,7 @@ Given an aggregate query $Q$ and % {\tt $V(Y_1, Y_2,\dots, Y_k, Agg_1(Y'_{1}), \
 \item For \textit{grouping variables} of $Q$, the following must hold:
 \begin{enumerate}
 \item If $V$ is a \textit{conjunctive} view, then for every grouping variable $X$ of $Q$ there is a head variable $Y$ in $V$ such that $\phi(Y) = X$.
-\item If $V$ is an \textit{aggregate} view, then $Q$ must have the same or coarser granularity than $V$ under $M$.
+\item If $V$ is an \textit{aggregate} view, then $V$ must have the same or finer granularity than $Q$ under $M$.
 \end{enumerate}
 \item There exists at least one \textit{aggregate term }with aggregate function $\alpha$ taking a set of variables $X'$ as arguments in the head of $Q$ such that:
 \begin{enumerate}
@@ -386,6 +386,7 @@ However, the {\em tuple-level condition} does not hold for the query tuple $t_{q
 % For where-provenance, since $\phi(T) = Tid$, the where-provenance of $T$ in view tuple $t_{v_{\ref{eg: illustrative_eg3}}'2}$ is same as the one of attribute $Tid$ in the query tuple $t_{q_{\ref{eg: illustrative_eg3}}'1}$. In terms of how-provenance, t
 % The how-provenance polynomial of $t_{v_{\ref{eg: illustrative_eg3}}'2}$ is 
 $W' = g_2 + g_3 + g_4$, and the monomial mapping between $W'$ and $W$ is not a one-to-one function since $g_4$ is missing from the mapping. If the predicate in $Q_{\ref{eg: illustrative_eg3}}$, $Gid \leq 3$ is relaxed to $Gid \leq 4$ such that the token $g_4$ can appear in $W$, then the monomial mapping between $W'$ and $W$ satisfies one-to-one function. But if we further modify the predicate to $Gid \leq 5$, $g_5$ will be included in $W$, which, however, is missing from $W'$ and thus results in violation of the tuple-level condition. As we can see, this reasoning is more complicated than that in Example \ref{eg: conditions_conjunctive}, since the validity of view mappings is determined by comparing entire how-provenance polynomials between the query tuple and view tuples instead of single how-provenance monomials.
+% \qed
 
 \eat{The {\em tuple-level conditions} also hold for the query tuple $t_{q_{\ref{eg: illustrative_eg3}}1}$ if we compare its provenance to the provenance of the first two view tuples ($t_{v_{\ref{eg: illustrative_eg3}}1}$ and $t_{v_{\ref{eg: illustrative_eg3}}2}$). For where-provenance, since $\phi(Type) = Ty$, the union of the where-provenance of attribute $Type$ in  $t_{v\ref{eg: illustrative_eg3}1}$ and $t_{v_{\ref{eg: illustrative_eg3}}2}$ is $\{c_1, c_4\}$, which is same as the where-provenance of attribute $Ty$ in tuple $t_{q_{\ref{eg: illustrative_eg3}}1}$. For how-provenance, the sum of the how-provenance expression in the two view tuples is $W' = T_1 + T_4$ and the monomial mappings between $W'$ and the how-provenance polynomial of $t_{q_{\ref{eg: illustrative_eg3}}1}$ (i.e. $T_1 + T_4$) satisfy one-to-one function.}
 
@@ -413,11 +414,12 @@ $W' = g_2 + g_3 + g_4$, and the monomial mapping between $W'$ and $W$ is not a o
 % We can prove that by combining how-provenance and view mappings, where-provenance is not necessary for reasoning but still introduced above for clarity.
 
 \eat{Check rewording.}
+\vspace*{-0.1cm}
 Finally, as in~\cite{wu2018data}, {\em covering sets} are computed %by combining a set of valid {\em view mappings} using joint and alternate use operators, 
 which cover as many {\em aggregate terms} and {\em relational subgoals} in the query as possible using the fewest view mappings, i.e. that are \textit{maximal and non-redundant}.
 
 \begin{example}\label{eg: covering_sets}
-Let us revisit Example \ref{eg: illustrative_eg3}. If we would omit the predicates of $V_1$ and $V_2$ then $M_{1\ref{eg: illustrative_eg3}}$ and $M_{2\ref{eg: illustrative_eg3}}$ should be valid for both $t_{q_{\ref{eg: illustrative_eg3}}1}$ and $t_{q_{\ref{eg: illustrative_eg3}}2}$, which should have two covering sets $\{M_{1\ref{eg: illustrative_eg3}}\}$ and $\{M_{2\ref{eg: illustrative_eg3}}\}$ since both $M_{1\ref{eg: illustrative_eg3}}$ and $M_{2\ref{eg: illustrative_eg3}}$ cover the aggregate term $(COUNT(Gid))$ and the subgoal $Gene(Gid, Name, T)$ of $Q_{\ref{eg: illustrative_eg3}}$. Other view mapping combination like $\{M_{1\ref{eg: illustrative_eg3}}, M_{2\ref{eg: illustrative_eg3}}\}$ is redundant since it covers the same terms of $Q_{\ref{eg: illustrative_eg3}}$ as its subset $\{M_{1\ref{eg: illustrative_eg3}}\}$ and $\{M_{2\ref{eg: illustrative_eg3}}\}$.
+Let us revisit Example \ref{eg: illustrative_eg3}. If we would omit the predicates of $V_1$ and $V_2$ then $M_{1\ref{eg: illustrative_eg3}}$ and $M_{2\ref{eg: illustrative_eg3}}$ should be valid for both $t_{q_{\ref{eg: illustrative_eg3}}1}$ and $t_{q_{\ref{eg: illustrative_eg3}}2}$, which should have two covering sets $\{M_{1\ref{eg: illustrative_eg3}}\}$ and $\{M_{2\ref{eg: illustrative_eg3}}\}$ since both $M_{1\ref{eg: illustrative_eg3}}$ and $M_{2\ref{eg: illustrative_eg3}}$ cover the aggregate term $(COUNT(Gid))$ and the subgoal $Gene(Gid, $ $Name, T)$ of $Q_{\ref{eg: illustrative_eg3}}$. Other view mapping combination like $\{M_{1\ref{eg: illustrative_eg3}}, M_{2\ref{eg: illustrative_eg3}}\}$ is redundant since it covers the same terms of $Q_{\ref{eg: illustrative_eg3}}$ as its subset $\{M_{1\ref{eg: illustrative_eg3}}\}$ and $\{M_{2\ref{eg: illustrative_eg3}}\}$.
 \eat{Consider the following three views and query:
 \begin{tabbing}
 $V_{\ref{eg: covering_sets}}'(E, MAX(L)) :- Exon(E, L, T)$\\

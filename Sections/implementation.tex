@@ -1,26 +1,19 @@
 %\section{Implementation}\label{Sec: implementation}
-\section{From Theory into Practice}\label{Sec: implementation}
-Generating provenance-based citations for aggregate queries and views relies on ideas from query rewriting using views as well as provenance. However, bringing those ideas from theory into practice raises several engineering challenges, which must be overcome to provide a solution with acceptable time performance. We discuss those challenges in this section, starting with analyzing the algorithmic complexity of \provalg \eat{I'd say: starting with analyzing the algorithmic complexity of \provalg}. Then, we discuss, with an example, the implementation details and optimizations used in our system.
+\section{Implementation}\label{Sec: implementation}
+Generating provenance-based citations for aggregate queries and views relies on ideas from query rewriting using views as well as provenance. However, bringing those ideas from theory into practice raises several engineering challenges.\eat{ which must be overcome\eat{to provide a solution with} to achieve acceptable time performance.} We now discuss those challenges, starting by analyzing the algorithmic complexity of \provalg\ before moving to
+\eat{ We then discuss, with an example,} implementation details and optimizations used in our system.
 \eat{then discussing the optimizations used, and ending with an example illustrating the implementation and several of the optimizations.}
+In what follows, we assume that the underlying database system is \textit{provenance-enabled}.
 
 
 \subsection{Algorithmic complexity}
-In what follows, we assume that the underlying database system is \textit{provenance-enabled}. \eat{i.e. we do not consider the cost of carrying provenance through queries and generating the how-provenance of final results.  Rather, we focus on the cost of \textit{using} provenance to generate fine-grained citations.}An overview of our implementation is shown in Algorithm \ref{covering_sets_calculation}.  The algorithm consists of three steps: 1) {\em Preprocessing}, 2) {\em Reasoning about valid view mappings} (called {\em reasoning step} for short thereafter), and 3) {\em Covering sets calculation} (called {\em covering set step} for short thereafter). 
+ \eat{i.e. we do not consider the cost of carrying provenance through queries and generating the how-provenance of final results.  Rather, we focus on the cost of \textit{using} provenance to generate fine-grained citations.}
+ An overview of our implementation is shown in Algorithm \ref{covering_sets_calculation}.  \eat{The algorithm consists of three steps: 1) {\em Preprocessing}, 2) {\em Reasoning} about valid view mappings,
+ %(called {\em Reasoning step} for short thereafter), 
+ and 3) {\em Covering sets} calculation.}
+ %(called {\em covering set step} for short thereafter). 
 %\scream{maybe better to remove the following sentence} The complexity of generating fine-grained citations is dominated by the cost of calculating the covering sets for each tuple. 
-
-The major overhead of the {\em Preprocessing} step is loading the query provenance into memory, which is determined by the underlying provenance-enabled database. \eat{proportional to the total number of how-provenance monomials in the query instance (denoted as $N_{pq}$).}
-
-In the {\em Reasoning } step\eat{ the name of this step is too long. Can't we come up with a shorter name.}, 
-%suppose there are $m$ view mappings from a set of views $\mathcal{V}$ to query $Q$, 
-the time to check the validity of a view mapping includes: 1) the time to retrieve the view provenance from the database, which is also determined by the database and proportional to the total number of how-provenance monomials in the view instance on average (denoted as $N_{pv}$); and 2) the time to compare the view provenance and query provenance in memory, which is proportional to the total number of how-provenance monomials in the query ($N_{pq}$). Intuitively, both $N_{pq}$ and $N_{pv}$ also represent the tuple number before aggregation. As a consequence, if there are $m$ view mappings the time complexity for this step is $O(m*N_{pq}) + O(m*N_{pv})$, which, however, can be optimized to $O(N_{pq}) + O(m*N_{pv})$ by constructing index over the query provenance (described later). Suppose $k$ is the upper bound for the number of relational subgoals in the query or view body and the largest relation in the database has $n$ tuples, then $O(N_{pq}) = O(N_{pv}) = O(n^k)$ and thus the time complexity becomes $O(m*n^k)$.  Our experiments with realistic queries in Section \ref{sec:experiments}\eat{~\ref{ssec: realistic}}, however, show that in practice the performance is still acceptable since both $N_{pq}$ and $N_{pv}$ are not very large (usually no more than 1 million).\eat{$n$ and $k$ are both relatively small: $n$ is on the order of 10k tuples and $k$ less than 4.}
-
-
-The time for the {\em Covering sets} step depends on the {\em policies} defined by DBAs on how to convert {\em covering sets} into formatted citations
-% used for joint ($*$), alternate ($+^R$) and aggregated use ($Agg$) 
--- see~\cite{wu2018data}.  
-Since in the worst case the number of possible coverings sets may be exponential in $m$, if $m$ is large and all covering sets are used in a policy this can be very costly.  
-However, in practice the number of view mappings ($m$) is small (e.g. 1 or 2) since views associate \textit{different parts} of the database with citations and queries have a small number of subgoals, which means that the content that the user queries touch is only associated with a small number of views\eat{the previous sentence is not very clear}. Performance is therefore acceptable even when all covering sets are used in a policy, as shown in Section~\ref{sec:experiments}.  Furthermore, in practice we believe that a ``minimal cost'' policy will be used to generate concise citations, in which case covering sets are pruned,  resulting in a cost which is linear in $m$.
-
+We discuss the cost of each of these three steps in turn.
 
 \begin{algorithm}[h!] 
 % \small
@@ -33,13 +26,34 @@ However, in practice the number of view mappings ($m$) is small (e.g. 1 or 2) si
 
 {\em Preprocessing step}: Return a set of all possible view mappings $\mathcal{M}$ and the provenance of $Q$
 
-{\em Reasoning step}: Retrieve provenance of every view. For each query tuple $t$, determine valid view mappings by comparing the provenance of $Q$ and the provenance of $V$
+{\em Reasoning step}: Under a view mapping $M$ from $V$ to $Q$, determine the validity of $M$ for each query tuple by comparing the provenance between $Q$ and $V$
 
 {\em Covering sets step}: Calculate covering sets by combining valid view mappings for each query tuple.
 %  \Return $\mathcal{M}$
  \caption{Overview of PBA}
  \label{covering_sets_calculation}
  \end{algorithm}
+
+
+{\em Preprocessing step}.  The major overhead is retrieving the query provenance, which is determined by the underlying provenance-enabled database. \eat{proportional to the total number of how-provenance monomials in the query instance (denoted as $N_{pq}$).}
+
+{\em Reasoning step}. 
+%suppose there are $m$ view mappings from a set of views $\mathcal{V}$ to query $Q$, 
+\eat{the time to check the validity of a view mapping includes: 1) the time to retrieve the view provenance from the database, which is also determined by the database and proportional to the total number of how-provenance monomials in the view instance on average (denoted as $N_{pv}$); and 2) the time to compare the view provenance and query provenance, which is proportional to the total number of how-provenance monomials in the query ($N_{pq}$). Intuitively, both $N_{pq}$ and $N_{pv}$ also represent the tuple number before aggregation.}
+Let $N_{pv}$ be the number of how-provenance monomials in the view instance and $N_{pq}$ be the number of how-provenance monomials in the query instance (this is also the number of tuples before aggregation).  Then the time to check the validity of a view mapping is $O(N_{pq} + N_{pv})$ since every how-provenance monomial in the view instance is compared to some how-provenance monomial in the query instance. 
+If there are $m$ view mappings, then the overall time complexity for this step is $O(m*N_{pq}) + O(m*N_{pv})$.
+%, which, however, can be optimized to $O(N_{pq}) + O(m*N_{pv})$ (described later). 
+Suppose $k$ is an upper bound on the number of relational subgoals in the query or view body, and the largest relation in the database has $n$ tuples.
+Then the time complexity becomes $O(m*n^k)$.  Our experiments with realistic queries in Section \ref{sec:experiments}\eat{~\ref{ssec: realistic}}, however, show that in practice the performance is still acceptable since both $N_{pq}$ and $N_{pv}$ are typically not very large (less than 1 million).\eat{$n$ and $k$ are both relatively small: $n$ is on the order of 10k tuples and $k$ less than 4.}
+
+
+{\em Covering set step}.  The time for this step depends on the {\em policies} defined by the DBA on how to convert {\em covering sets} into formatted citations
+% used for joint ($*$), alternate ($+^R$) and aggregated use ($Agg$) 
+(see~\cite{wu2018data}).  
+In the worst case, the number of coverings sets may be exponential in $m$ and all covering sets are used in a rewriting. However, an order of magnitude speed-up can be achieved using the optimization strategies described  next (see experimental results in Section \ref{sec:experiments}).
+In practice, we also believe that a ``minimal cost'' policy will be used to generate concise citations rather than an expensive ``use all" policy, in which case the covering sets are pruned, resulting in cost which is linear in $m$.
+
+
 
 \eat{\subsection{Optimizations}
 Our worst case complexity analysis shows that it is potentially quite expensive to generate fine-grained citations, and therefore challenging to do with acceptable performance.  We therefore use a number of optimizations for the second and third steps, since the time in the first step is determined by the query time to the underlying provenance-enabled database and out of our control.}
@@ -101,8 +115,10 @@ Three strategies are applied to speed up the covering sets calculation: 1) repre
 % % \end{tabular}
 % \end{table}
 
-\subsection{Optimization and implementation (via an example)}
-Our worst case complexity analysis shows that, if naively implemented, it can be challenging to generate fine-grained citations with acceptable performance. We therefore use a number of optimizations in the {\em Reasoning} and {\em Covering sets} steps. In the {\em Reasoning} step, the query provenance is indexed and the view provenance is materialized. In the {\em Covering sets} step, covering sets are represented as bit arrays and the order in which view mapping sets are combined is optimized using a clustering algorithm called {\em Affinity propagation}~\cite{dueck2007non}. We discuss the details of these optimizations below, after introducing an example that illustrates how \provalg\ is implemented. 
+\subsection{Optimization and implementation}
+Our worst case complexity analysis shows that it is challenging to generate fine-grained citations with acceptable performance if implemented naively. We therefore use a number of optimizations in the last two steps.
+%{\em Reasoning} and {\em Covering sets} steps. 
+In the {\em Reasoning} step, the query provenance is indexed and the view provenance is materialized. In the {\em Covering sets} step, covering sets are represented as bit arrays and the order in which view mapping sets are combined is optimized using a clustering algorithm called {\em Affinity propagation}~\cite{dueck2007non}. We discuss the details of these optimizations below, after introducing an example to illustrate how \provalg\ is implemented. 
 \begin{example}
 Given the views $V_1-V_6$ defined in Section \ref{subsec:running example}, suppose the query is as follows:
 % \begin{tabbing}
@@ -116,7 +132,7 @@ $Exon(E, L, T'),Transcript(T, N, Ty, G), T = T', E <= 3$
 % \tab\tab\tab$$
 \end{tabbing}
 %How to do pre-processing step
-In the {\em pre-processing} step,  the provenance of the query is retrieved. \eat{The query time is determined by the underlying provenance-enabled database, which is out of our control and thus not optimized.}Using the instances of Exon, Gene and Transcript shown in Tables \ref{Instance of Exon}-\ref{Instance of Transcript}, the instance of $Q$ along with the how-provenance polynomials is shown in Table \ref{Instance of Q1}. 
+In the {\em pre-processing} step,  the provenance of the query is retrieved. \eat{The query time is determined by the underlying provenance-enabled database, which is out of our control and thus not optimized.}Using the instances of {\em Exon}, {\em Gene} and {\em Transcript} shown in Tables \ref{Instance of Exon}-\ref{Instance of Transcript}, the instance of $Q$ along with the how-provenance polynomials is shown in Table \ref{Instance of Q1}. 
 % Note that the where-provenance is not computed since it is not needed. 
 
 \begin{table}[htp]
@@ -138,7 +154,7 @@ $t_{q1}$&1&1&1&1&$e_1*r_1$\\ \hhline{~-----}
 $t_{q2}$&2&2&3&2&$e_2*r_2 + e_3*r_2$\\ \hhline{~-----}
 % $t_{q3}$&3&2&3&2&$e_4*r_3$ \\\hhline{~-----}
 \end{tabular}
-\bigskip
+\medskip
 \caption{View mappings from $V_3-V_6$ to $Q$}\label{Table: view mapping}\label{Table: view mapping coverage}
 \vspace*{-0.2cm}
 \begin{tabular}[t]{|c|c|c|} \hline
@@ -150,12 +166,15 @@ $t_{q2}$&2&2&3&2&$e_2*r_2 + e_3*r_2$\\ \hhline{~-----}
 \end{tabular}
 \end{table}
 
-Next, all possible view mappings are constructed. We can find four view mappings, $M_3=(h_3,\phi_3)$, $M_4=(h_4, \phi_4)$, $M_5=(h_5, \phi_5)$ and $M_6=(h_6, \phi_6)$, under which $V_3-V_6$ are mapped to $Q$ respectively. $M_3-M_5$ have the same form, where $h_3-h_5$ is $\{Transcript(T1, N1, Ty1, G1) \rightarrow Transcript(T, N, Ty, G), Exon(E, L, T2)\rightarrow Exon(E, L, T)\}$ and $\phi_3-\phi_5$ are the induced variable mappings. In contrast, $M_6$ only maps the subgoal $Transcript(T, N, Ty, G)$ from $V_6$ to $Transcript(T, N, Ty, G)$ from $Q$. Note that all the {\em schema-level conditions} are independent of the individual query tuples, and can be applied to remove invalid view mappings early. \scream{Not sure what this means.} In this example, $M_3-M_6$ all satisfy the {\em schema-level conditions}, since under each mapping all the grouping variables and at least one aggregate term of $Q$ are {\em covered}. Table \ref{Table: view mapping coverage} shows how each view mapping covers the aggregate terms and relational subgoals of $Q$ (ignore the bit arrays for now).
+Next, all possible {\em view mappings} are constructed. We can find four view mappings, $M_3=(h_3,\phi_3)$, $M_4=(h_4, \phi_4)$, $M_5=(h_5, \phi_5)$ and $M_6=(h_6, \phi_6)$, under which $V_3-V_6$ are mapped to $Q$ respectively. $M_3-M_5$ have the same form, where $h_3-h_5$ is $\{Transcript(T1, N1, Ty1, G1) \rightarrow Transcript(T, N, Ty, G), Exon(E, L, T2)\rightarrow Exon(E, L, T)\}$ and $\phi_3-\phi_5$ are the induced variable mappings. In contrast, $M_6$ only maps the subgoal $Transcript(T, N, Ty, G)$ from $V_6$ to $Transcript(T, N, Ty, G)$ from $Q$. Note that all the {schema-level conditions} are independent of the individual query tuples, and can be used to remove invalid view mappings early. In this example, $M_3-M_6$ all satisfy the schema-level conditions}, since under each mapping all the grouping variables and at least one aggregate term of $Q$ are {covered}. Table \ref{Table: view mapping coverage} shows how each view mapping covers the aggregate terms and relational subgoals of $Q$ (ignore the bit arrays for now).
 % early. since $V4$ and $V5$ are almost the same as $Q$ (except the differences in one local predicate).
 %while other views either miss grouping attributes (such as $V3$ and $V1$) or cannot provide necessary attributes to compute the statistics that are needed for $Q_1$ (such as $V2$).
 
 %view mapping validity checking for conjunctive views and point out its difference to RBA
-In the {\em Reasoning} step, since $V_3$ is a \textit{conjunctive view}, the validity of $M_3$ for a query tuple $t_q$ only depends on the {\em existence} of $t_q$ in $V_3(D)$ under mapping $M_3$ (Section \ref{Sec: prelim}). So we can simply retrieve the base relation tuple for each provenance token appearing in the query to evaluate the view {predicates}. For example, the validity of $M_3$ can be checked simply by examining the predicates of $V_3$. Since the first predicate in $V_3$, $T = T'$, is also in $Q$, every tuple in the query instance must satisfy it. The second predicate, $E \leq 2$, which can have effect on the {\em existence} of query tuples in $V_3$. Looking at Table \ref{Instance of Exon} (since $E$ is from Table $Exon$), only the tuples with how-provenance token $e_1$ and $e_2$ satisfy $E \leq 2$. Thus $M_3$ is only valid for $t_{{q}1}$, whose how-provenance polynomials only include $e_1$ without any other how-provenance tokens from Exon. Note that, the implementation here is different from \rba\ since evaluating view predicates is achieved by referencing the base relation tuples with the query provenance rather than computed along with the query evaluation, which can lead to different performance (discussed in Section \ref{sec:experiments}).
+In the {\em Reasoning} step, since $V_3$ is a {conjunctive view}, the validity of $M_3$ for a query tuple $t_q$ only depends on the {existence} of $t_q$ in $V_3(D)$ under mapping $M_3$ (Section \ref{Sec: prelim}). So we can simply retrieve the base relation tuple for each provenance token appearing in the query to evaluate the view {predicates}. For example, the validity of $M_3$ can be checked simply by examining the predicates of $V_3$. Since the first predicate in $V_3$, $T = T'$, is also in $Q$, every tuple in the query instance must satisfy it. However, the second predicate, $E \leq 2$, can affect the {existence} of query tuples in $V_3$. Table \ref{Instance of Exon} shows that only the tuples with how-provenance tokens $e_1$ and $e_2$ satisfy $E \leq 2$. Thus $M_3$ is only valid for $t_{{q}1}$, whose how-provenance polynomial only includes $e_1$.
+%without any other how-provenance tokens from Exon. 
+{ Note that the implementation used here is different from \rba\ since evaluating view predicates is achieved by {referencing the base relation tuples with the query provenance} rather than computing extra predicates in the query evaluation.}  
+%This difference in performance will be discussed in Section \ref{sec:experiments}.
 
 \begin{table}
 \centering
@@ -172,7 +191,7 @@ In the {\em Reasoning} step, since $V_3$ is a \textit{conjunctive view}, the val
 $t_{v_41}$&1&1&$e_1*r_1$\\ \hhline{~---}
 $t_{v_42}$&3&1&\makecell{$e_3*r_2 + e_4*r_2$}\\ \hhline{~---}
 \end{tabular}
-\bigskip
+\medskip
 \caption{$V_5(D)$ with how-provenance polynomials}\label{Instance of V5}
 \vspace*{-0.2cm}
 % \begin{tabular}[t]{c|c|c|c||b|} \hhline{~----}
@@ -188,7 +207,7 @@ $t_{v_51}$&1&1&1&$e_1*r_1$\\ \hhline{~----}
 $t_{v_52}$&2&3&2&$e_2*r_2 + e_3*r_2 + e_4*r_2$\\ \hhline{~----}
 % $t_{v_53}$&3&3&2&\makecell{$e_4*r_3 + e_5*r_4$}\\ \hhline{~----}
 \end{tabular}
-\bigskip
+\medskip
 \caption{$V_6(D)$ with how-provenance polynomials}\label{Instance of V6}
 \vspace*{-0.2cm}
 \begin{tabular}[t]{c|c|c||b|} \hhline{~---}
@@ -197,13 +216,21 @@ $t_{v_61}$&1&1&$r_1$\\ \hhline{~---}
 $t_{v_62}$&2&1&$r_2$\\ \hhline{~---}
 % $t_{v_63}$&3&2&$r_3 + r_4$\\ \hhline{~---}
 \end{tabular}
+\medskip
+\caption{$Q(D)$ with valid view mappings and covering sets (aggregate terms omitted)}\label{Instance of Q1 with view mappings}
+\vspace*{-0.2cm}
+\begin{tabular}[t]{c|c||c|c|} \hhline{~---}
+&G&valid view mappings&covering sets\\ \hhline{~---}
+$t_{q1}$&1&$M_3, M_4, M_5, M_6$&\makecell{$\{\{M_3\}, \{M_4, M_5\}, \{M_5, M_6\}\}$}\\ \hhline{~---}
+$t_{q2}$&2&$M_4, M_6$&$\{\{M_4\}, \{M_6\}\}$\\ \hhline{~---}
+% $t_{q3}$&3&$M_6$&$\{\{M_6\}\}$\\ \hhline{~---}
+\end{tabular}
 \end{table}
 
-
-\begin{figure}[t!]
+\begin{figure}[t]
     \centering
     \includegraphics[width=0.4\textwidth,height=0.2\textwidth]{Figures/intersection.jpg}
-    \caption{query provenance index for $Q$ and computing coordinate information for $e_3*r_2$ from $V_4(D)$}
+    \caption{Query provenance index for $Q$, and how to compute coordinate information for $e_3*r_2$ from $V_4(D)$}
     \small \label{fig:query prov index}
 \end{figure}
 % \begin{figure}
@@ -259,11 +286,15 @@ $t_{v_62}$&2&1&$r_2$\\ \hhline{~---}
 
 % \end{table}
 
-\textbf{Query provenance index optimization.} In contrast, since $V_4$, $V_5$ and $V_6$ are aggregate views, we need to compare their how-provenance expressions with the how-provenance of the query to check the \textit{tuple-level conditions}. That can be naively implemented by scanning the entire query provenance (at least once) for {\em every view mapping} to build satisfiable provenance mappings in Def. \ref{Def: conditions_for_agg_functions}, which is expensive especially when $N_{pv}$, $N_{pq}$ and the number of view mappings $m$ are large.
+In contrast, since $V_4$, $V_5$ and $V_6$ are aggregate views, we need to compare their how-provenance expressions with the how-provenance of the query to check the {tuple-level conditions}. That can be naively implemented by scanning the entire query provenance for {\em every view mapping} to build satisfiable provenance mappings (Def. \ref{Def: conditions_for_agg_functions}), which is expensive when $N_{pv}$, $N_{pq}$ and the number of view mappings $m$ are large.  To reduce this cost, we index the query provenance.
+
+\textbf{Query provenance index optimization.} 
 % \scream{very long sentence. Please simplify}. 
 \eat{Hashmap (mapping the grouping attribute values to the how-provenance monomial set for each query tuple) seems to be helpful to speed up the searching, which, however, still needs to scan the entire query provenance for every view mapping for initialization since the portion of how-provenance monomials in the query {\em involved} in the view mappings may be varied across different view mappings. For example, the view mapping $M_6$ only covers the subgoal $Transcript$ in the query body and thus only the provenance token $r_x (x=1,2,...)$ should be {\em involved} in $M_6$. However, both the token $r_x$ and $e_y$ are {\em involved} in $M_4$ and $M_5$. Such difference can lead to totally different HashMaps and thus inevitable repetitive scans over the entire query provenance for every view mapping in the worst case.}
+In order to avoid multiple scans over query provenance, we build an index $I$ for each token in the query provenance to indicate which query tuples (represented by grouping variable values) and which provenance monomials the token is in. The provenance index for $Q$ is shown in Figure \ref{fig:query prov index}. For example, referencing Table \ref{Instance of Q1}, note that token $r_2$ is in the $0^{th}$ and $1^{st}$ monomial in the query tuple $t_{q2}$, which has value $2$ for the grouping variable $G$. So the index for $r_2$ is $r_2:\{(2):\{0,1\}\}$, where $(2)$ represents the tuple id while $\{0,1\}$ is the monomial id set. For a how-provenance monomial in the view, e.g. $e_3*r_2$ in $t_{v_42}$ (with grouping variable value 2), to determine whether it can be mapped to some query provenance monomial, we can retrieve the index for $e_3$ and $r_2$ with grouping variable value $2$ respectively, i.e. $\{1\}$ and $\{0,1\}$, and take the intersection, i.e. $\{1\}$. This indicates that $e_3$ and $r_2$ coexist in the $1^{st}$ monomial of the query tuple with grouping variable value 2 (i.e. $t_{q2}$). 
+This derivation process is highlighted in Figure \ref{fig:query prov index}.
 
-In order to avoid multiple scans over query provenance, we built an index $I$ for each single token in the query provenance to indicate which query tuples (represented by grouping variable values) and which provenance monomials it lies in. The provenance index for $Q$ is shown in Figure \ref{fig:query prov index}. For example, by referencing Table \ref{Instance of Q1}, since token $r_2$ is in the $0_{th}$ and $1_{st}$ monomial (numbering from 0) in the query tuple $t_{q2}$, which has value $2$ for the grouping variable $G$. So the index for $r_2$ is $r_2:\{(2):\{0,1\}\}$ where $(2)$ represents tuple id while $\{0,1\}$ is the monomial id set. For a how-provenance monomial in the view, e.g. $e_3*r_2$ in $t_{v_42}$ (with grouping variable value 2), to determine whether it can be mapped to some query provenance monomial, we can retrieve the index for $e_3$ and $r_2$ with grouping variable value $2$ respectively, i.e. $\{1\}$ and $\{0,1\}$, over which intersection operation is then conducted. The derivation process is also highlighted in Figure \ref{fig:query prov index}, the result of which is $\{1\}$, indicating that $e_3$ and $r_2$ coexist in the $1_{st}$ monomial of the query tuple with grouping variable value 2 (i.e. $t_{q2}$). We can further optimize the intersection operations by representing the monomial ids with bit array where $i_{th}$ bit is 0/1 iff a token is/isn't in the $i_{th}$ monomial and applying bit AND operations for speed-ups. It turns out that this strategy only requires one full scan over the query provenance to build index for all the view mappings. By leveraging the index, the details on how to determine whether provenance mappings from view tuples to query tuple satisfies Def. \ref{Def: validity condition agg} are presented in Algorithm \ref{reasoning_valid_view_mappings}.
+We can further optimize the intersection operation by representing the monomial ids with bit arrays, where the $i^{th}$ bit is 0/1 iff a token is/isn't in the $i^{th}$ monomial, and applying bit AND operations. This strategy only requires one full scan over the query provenance to build an index for all view mappings. Details on how to use the index to determine whether provenance mappings from view tuples to query tuple satisfy Def. \ref{Def: validity condition agg} are presented in Algorithm \ref{reasoning_valid_view_mappings}.
 
 \begin{algorithm}[h!] 
 \footnotesize
@@ -361,13 +392,15 @@ In order to avoid multiple scans over query provenance, we built an index $I$ fo
 
 
 
-\textbf{Materialization and parallelism optimization.} To further gain performance, the provenance of the aggregate views along with the view content can be materialized in the database before the query comes. The strategy with (without resp.) materialized view provenance is called {\em eager strategy} ({\em lazy strategy} resp.). The {\em eager strategy} and {\em lazy strategy} are compared in Section \ref{sec:experiments}.  \eat{rewrite the previous sentence. It's not clear}We also observe that it is highly parallelizable for {\em Reasoning valid view mapping} step. But considering the fact that fully parallel computation in a single machine can incur large memory consumption, ProvCite only batch-processes five view mappings at a time. It worth exploring developing our system in a distributed environment, this is outside the scope of this paper.
+\textbf{Materialization and parallelism optimization.} To further improve performance, the provenance of the aggregate views along with the view content can be materialized before the query arrives. The strategy with  materialized view provenance is called {\em eager}, whereas that without is called {\em lazy}. The {\em eager} and {\em lazy} strategies are compared in Section \ref{sec:experiments}. We observe that it is highly parallelizable for the {\em Reasoning} step. \scream{What is "it"? This bit is not clear.}
+However, since fully parallel computation in a single machine can incur large memory consumption, ProvCite only batch-processes five view mappings at a time. Exploring how to fully develop our system in a distributed environment is left for future work.
 
 % and which can be dealt with by two alternative strategies. One is to pre-compute their how-provenance ({\em eager strategy}) while the other one is to retrieve their how-provenance on the fly ({\em lazy strategy}). Their trade-offs will be discussed in Section~\ref{sec:experiments}.
 
-Given the instances and provenance expressions of $V_4-V_6$ (presented in Tables \ref{Instance of V4}-\ref{Instance of V6}), after applying the optimization strategies above, valid view mappings for every query tuple are presented in Table \ref{Instance of Q1 with view mappings}. Note that for tuple $t_{q2}$, although all of its how-provenance monomials exist in the view tuple $t_{v_52}$, it does not include
+Using the instances and provenance expressions of $V_4-V_6$ presented in Tables \ref{Instance of V4}-\ref{Instance of V6}, the valid view mappings for every query tuple are presented in Table \ref{Instance of Q1 with view mappings} .
+\scream{I removed "after applying the optimization strategies above" since it doesn't affect what you see} Note that for tuple $t_{q2}$, although all of its how-provenance monomials exist in the view tuple $t_{v_52}$, it does not include
 %base relation tuple with how-provenance monomial 
-$e_4*r_2$ which is used to construct $t_{v_52}$, violating the {\em Tuple-level condition}.  Intuitively, since the value of aggregate term may come from this component of the monomial ($e_4*r_2$), $t_{v_52}$ should not provide citation information for $t_{q2}$.
+$e_4*r_2$ which is used to construct $t_{v_52}$, violating the {tuple-level condition}.  Intuitively, since the value of the aggregate term may come from this component of the monomial ($e_4*r_2$), $t_{v_52}$ should not provide citation information for $t_{q2}$.
 
 
 Finally, valid view mappings are shown in Table \ref{Instance of Q1 with view mappings} along with the query instance, which are then used to compute covering sets for each query tuple in the {\em Covering sets step}. 
@@ -378,10 +411,11 @@ other combinations of view mappings either {redundantly} or {non-maximally} cove
 
 \end{example}
 
-As we observed in \cite{wu2018data}, it is time-consuming to compute {\em all} covering sets. Compared to \cite{wu2018data}, two strategies are utilized for speed-ups, i.e. 1) representing coverings sets using bit arrays; 2) applying clustering algorithms to avoid an explosion of intermediate results, which can lead to order of magnitude performance gains (see Section \ref{sec:experiments}).
+As we observed in \cite{wu2018data}, it is time-consuming to compute {\em all} covering sets. We therefore use two new strategies to achieve speed-up: 1) representing coverings sets using bit arrays; and 2) applying clustering algorithms to avoid an explosion of intermediate results.  These lead to an order of magnitude performance gain (see Section \ref{sec:experiments}).
 
 % \subsubsection{Introducing bit arrays}
-\textbf{Bit array optimization.} The computation of covering sets involves merging valid view mappings and removing duplicates, which can be optimized with bit operations. For example, for $Q$, the aggregate term $COUNT(T)$, $MAX(L)$ and $COUNT(E)$ are covered by $\{M_3, M_4, M_6\}$ (denoted by $S_1$), $\{M_3, M_5\}$ (denoted by $S_2$) and $\{M_3, M_5\}$ (denoted by $S_3$) respectively (derived from Table \ref{Table: view mapping coverage}). We can encode the $0_{th}-3_{rd}$ view mapping $M_3-M_6$ as $\{0,1,2,3\}$, the $0_{th}-2_{nd}$ aggregate term ($COUNT(T)$, $MAX(L)$ and $COUNT(E)$) as $\{0, 1, 2\}$ and the $0_{th}-1_{st}$ relational subgoal ($Exon$ and $Transcript$) as $\{0, 1\}$ such that arbitrary view mapping combinations (and thus covering sets) can be represented by three bit arrays where $i_{th}$ bit is 1 (0) iff $i_{th}$ view mapping is included (missing) or $i_{th}$ term (aggregated term or relational subgoal) is covered (not covered). For instance, $M_4$ is $1_{st}$ view mapping, which can thus be represented by $0100$ (leftmost bit is $0_{th}$ bit). Besides, it covers $0_{th}$ aggregate term $(COUNT(T))$ and $0_{th}$ \eat{$<==$why don't you start from 1} and $1_{st}$ relational subgoals, which are represented by bit array $100$ and $11$ respectively. The bit array representations for other view mappings are listed in Table \ref{Table: view mapping}. To compute covering sets, the view mapping combinations from the cross product of $\{S_1, S_2, S_3\}$ (denoted by $S_1 \times S_2 \times S_3$) are considered, which are constructed by applying bit OR operations over the bit arrays from those view mappings. For example, by referencing Table \ref{Table: view mapping}, the covering set $\{M_4, M_5\}$ can be constructed by unioning bit array $0100$ and $0010$ and the aggregate terms (relational subgoals resp.) jointly covered by them are computed by unioning $100$ and $011$ ($11$ and $11$). The pseudocode for computing covering sets (represented by bit array representations above) is presented in Algorithm \ref{compute_covering_sets}.
+\textbf{Bit array optimization.} The computation of covering sets involves merging valid view mappings and removing duplicates, which can be optimized using bit operations. For example, for $Q$, the aggregate term $COUNT(T)$, $MAX(L)$ and $COUNT(E)$ are covered by $\{M_3, M_4, M_6\}$ (denoted by $S_1$), $\{M_3, M_5\}$ (denoted by $S_2$) and $\{M_3, M_5\}$ (denoted by $S_3$) respectively (see Table \ref{Table: view mapping coverage}). We can encode the $0^{th}-3^{rd}$ view mappings $M_3-M_6$ as $\{0,1,2,3\}$, the $0^{th}-2^{nd}$ aggregate terms ($COUNT(T)$, $MAX(L)$ and $COUNT(E)$) as $\{0, 1, 2\}$, and the $0^{th}-1^{st}$ relational subgoals ($Exon$ and $Transcript$) as $\{0, 1\}$.  In this manner, arbitrary view mapping combinations (and thus covering sets) can be represented using three-bit arrays in which the $i^{th}$ bit is 1 (0) iff the $i^{th}$ view mapping is included (missing), or the $i^{th}$ aggregated term or relational subgoal is covered (not covered). 
+For example, $M_4$ is the $1^{st}$ view mapping, represented by $0100$ (the leftmost bit is the $0^{th}$ bit). $M_4$ covers the $0^{th}$ aggregate term $(COUNT(T))$ and the $0^{th}$ and $1^{st}$ relational subgoals, which are represented by bit arrays $100$ and $11$ respectively. The bit array representations for other view mappings are listed in Table \ref{Table: view mapping}. To compute covering sets, the view mapping combinations from the cross product of $\{S_1, S_2, S_3\}$ (denoted by $S_1 \times S_2 \times S_3$) are considered, which are constructed by applying bit OR operations over the bit arrays from those view mappings. For example, referencing Table \ref{Table: view mapping}, the covering set $\{M_4, M_5\}$ can be constructed by unioning bit arrays $0100$ and $0010$, and the aggregate terms (relational subgoals resp.) jointly covered by them are computed by unioning $100$ and $011$ ($11$ and $11$). The pseudocode for computing covering sets using bit array representations is presented in Algorithm \ref{compute_covering_sets}.
 
 % To compute covering sets, the cross product of $S_1$ and $S_2$ are computed first, which leads to some view mapping combinations (called {\em sub-covering sets thereafter}) that can cover both the aggregate terms. For instance, $\{M_3, M_5\}$ is one such sub-covering set. The construction of sub-covering sets (and covering sets ultimately) involves merging the view mappings and the aggregate terms and relational subgoals covered by them, which facilitate the following redundancy removal step. For example, $\{M_3,M_6\}$ (picked from $S_1$ and $S_2$ respectively) can jointly cover both the aggregate terms and relational subgoals of $Q$, which, however, is redundant with respect to $\{M_6\}$ (picked from $S_1$ and $S_2$ and one copy is retained) since $\{M_6\}$ is a {\em subset} of $\{M_3,M_6\}$ but still covers the same aggregate terms and relational subgoals as $\{M_3,M_6\}$. So it is safe to remove $\{M_3, M_6\}$ at this point. Then the resulting sub-covering sets are combined with the view mapping set in $S_3$ to compute the final covering sets.
 
@@ -390,24 +424,24 @@ As we observed in \cite{wu2018data}, it is time-consuming to compute {\em all} c
 
 
 % \subsubsection{Applying clustering algorithms}
-\textbf{Clustering algorithm optimization.} Since cross product operation ($\times$) is commutative and associative, different orders of operands result in the same output but may incur different overhead. For example, in terms of $S_1\times S_2 \times S_3$, if $S_2 \times S_3$ is computed first, the result is $\{M_3, M_5\}$, $\{M_5, M_5\}$, $\{M_3, M_3\}$, $\{M_5, M_3\}$. After removing obvious redundancy, the result is rewritten as $\{M_3, M_5\}$, $\{M_5\}$, $\{M_3\}$. Note that $\{M_3, M_5\}$ is a duplicate compared to $\{M_3\}$ since 1) $\{M_3, M_5\}$ and $\{M_3\}$ cover the same set of aggregate terms and relational subgoals (checked by comparing the corresponding bit arrays); 2) $\{M_3\}$ is a subset of $\{M_3, M_5\}$. It's safe to remove $\{M_3, M_5\}$ at this point since in the final result, any view mapping combinations including $\{M_3, M_5\}$ will be a duplicate compared to that including $\{M_3\}$ and thus won't be a covering set. So the the intermediate result will be $\{\{M_3\}, \{M_5\}\}$ after computing $S_2 \times S_3$, which is smaller than the result of the other orders. The reason is due to the high similarity between $S_2$ and $S_3$ (actually $S_2 = S_3$). To find better order of computing the cross product such that the intermediate result is minimized, clustering algorithms are applied such that the view mapping sets that are similar to each other can be clustered and merged first (e.g. $S_2$ and $S_3$). In ProCite, affinity propagation clustering algorithm \cite{dueck2007non} is used since it does not require pre-specified cluster number.
+\textbf{Clustering algorithm optimization.} Since cross product ($\times$) is commutative and associative, different orderings of operands result in the same output but may incur different overhead. For example, with $S_1\times S_2 \times S_3$, if $S_2 \times S_3$ is computed first, the result is $\{M_3, M_5\}$, $\{M_5, M_5\}$, $\{M_3, M_3\}$, $\{M_5, M_3\}$. After removing obvious redundancy, the result is  $\{M_3, M_5\}$, $\{M_5\}$, $\{M_3\}$. Note that $\{M_3, M_5\}$ is a duplicate compared to $\{M_3\}$ since 1) $\{M_3, M_5\}$ and $\{M_3\}$ cover the same set of aggregate terms and relational subgoals (checked by comparing the corresponding bit arrays); and 2) $\{M_3\}$ is a subset of $\{M_3, M_5\}$. It is therefore safe to remove $\{M_3, M_5\}$ since in the final result, any view mapping combinations which include $\{M_3, M_5\}$ will be a duplicate compared to one that includes $\{M_3\}$ and thus won't be a covering set. So the intermediate result of $S_2 \times S_3$ is $\{\{M_3\}, \{M_5\}\}$, which is smaller than the result of the other pairs. This is due to the high similarity between $S_2$ and $S_3$ (actually $S_2 = S_3$). To find good orderings for computing the cross product such that the intermediate result is minimized, clustering algorithms are applied so that view mapping sets which are similar to each other can be clustered and merged first (e.g. $S_2$ and $S_3$). In ProCite, the affinity propagation clustering algorithm \cite{dueck2007non} is used since it does not require a pre-specified number of clusters.
 
-\begin{table}[t]
-\centering
-\small
-\caption{$Q(D)$ with valid view mappings and covering sets (aggregate terms omitted)}\label{Instance of Q1 with view mappings}
-% \begin{tabular}[t]{c|c|c|c|c|c|c|} \hhline{~------}
-% &T1&N1&COUNT(E)&MAX(L)&valid view mappings&covering sets\\ \hhline{~------}
-% $t_{q_11}$&1&MB-203&1&1&$M_5$&$M_5$\\ \hhline{~------}
-% $t_{q_12}$&3&PC-203&2&3&$M_5$&$M_5$\\ \hhline{~------}
-% $t_{q_13}$&2&HP-218&1&2&$M_3, M_4, M_5$&$M_3 +^R M_4*M_5$\\ \hhline{~------}
-% $t_{q_14}$&3&GK-207&2&3&$M_3$&$M_3$\\ \hhline{~------}
+% \begin{table}[t]
+% \centering
+% \small
+% \caption{$Q(D)$ with valid view mappings and covering sets (aggregate terms omitted)}\label{Instance of Q1 with view mappings}
+% % \begin{tabular}[t]{c|c|c|c|c|c|c|} \hhline{~------}
+% % &T1&N1&COUNT(E)&MAX(L)&valid view mappings&covering sets\\ \hhline{~------}
+% % $t_{q_11}$&1&MB-203&1&1&$M_5$&$M_5$\\ \hhline{~------}
+% % $t_{q_12}$&3&PC-203&2&3&$M_5$&$M_5$\\ \hhline{~------}
+% % $t_{q_13}$&2&HP-218&1&2&$M_3, M_4, M_5$&$M_3 +^R M_4*M_5$\\ \hhline{~------}
+% % $t_{q_14}$&3&GK-207&2&3&$M_3$&$M_3$\\ \hhline{~------}
+% % \end{tabular}
+% \vspace*{-0.2cm}
+% \begin{tabular}[t]{c|c||c|c|} \hhline{~---}
+% &G&valid view mappings&covering sets\\ \hhline{~---}
+% $t_{q1}$&1&$M_3, M_4, M_5, M_6$&\makecell{$\{\{M_3\}, \{M_4, M_5\}, \{M_5, M_6\}\}$}\\ \hhline{~---}
+% $t_{q2}$&2&$M_4, M_6$&$\{\{M_4\}, \{M_6\}\}$\\ \hhline{~---}
+% % $t_{q3}$&3&$M_6$&$\{\{M_6\}\}$\\ \hhline{~---}
 % \end{tabular}
-\vspace*{-0.2cm}
-\begin{tabular}[t]{c|c||c|c|} \hhline{~---}
-&G&valid view mappings&covering sets\\ \hhline{~---}
-$t_{q1}$&1&$M_3, M_4, M_5, M_6$&\makecell{$\{\{M_3\}, \{M_4, M_5\}, \{M_5, M_6\}\}$}\\ \hhline{~---}
-$t_{q2}$&2&$M_4, M_6$&$\{\{M_4\}, \{M_6\}\}$\\ \hhline{~---}
-% $t_{q3}$&3&$M_6$&$\{\{M_6\}\}$\\ \hhline{~---}
-\end{tabular}
-\end{table}
+% \end{table}

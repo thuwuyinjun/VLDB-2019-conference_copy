@@ -99,16 +99,17 @@ $V6$ counts the number of transcripts for each gene whose ids are no more than 2
 
 \subsection{Query rewriting:  View mappings}
 %\scream{I think we need to cover more concepts here, e.g. the notion of mapping and covering}
-Given a (general) query $Q$ and a set of views $\mathcal{V}$, the \rba\ implementation in~\cite{wu2018data} starts by building a set of \textit{view mappings} $\mathcal{M}$ from $\mathcal{V}$ to $Q$. For each query tuple, \rba\ then reasons about the {\em validity} of each view mapping in $\mathcal{M}$ and constructs {\em covering sets}, which are converted to formatted citations later. Each covering set is a \textit{maximal}, \textit{non-redundant} set of {\em valid} view mappings,
+Given a (general) query $Q$ and a set of views $\mathcal{V}$, the \rba\ implementation in~\cite{wu2018data} starts by building a set of \textit{view mappings} $\mathcal{M}$ from $\mathcal{V}$ to $Q$. For each query tuple, \rba\ then reasons about the {\em validity} of each view mapping in $\mathcal{M}$ and constructs {\em covering sets}. Each covering set is a \textit{maximal}, \textit{non-redundant} set of {\em valid} view mappings,
 % Since there may be many such covering sets, only \textit{maximal}, \textit{non-redundant} covering sets are considered, 
-i.e. covering sets for which no other view mappings can be added to \textit{cover} more subgoals and head variables in $Q$, nor can any be removed and still \textit{cover} the same subgoals and head variables in $Q$.
+i.e. sets for which no other view mappings can be added to \textit{cover} more subgoals and head variables in $Q$, nor can any be removed and still {cover} the same subgoals and head variables in $Q$.  The citations associated with views in the covering sets are later used to construct the final citations.
 
 %According to \cite{wu2018data}, a
 \eat{here}
 A \textit{view mapping} $M$ consists of a {\em relation mapping}, $h$ and {\em variable mapping}, $\phi$ (denoted $M=(h, \phi)$). The former, $h$, maps relational subgoals in a view $V$ to relational subgoals with the same relation names in query $Q$, while the latter variable mapping $\phi$ is an induced mapping by $h$. 
 % We say that a head variable of $Q$, $x$ is {\em covered} under $M$ iff there exists a head variable $y$ of $V$ such that $\phi(y) = x$.
 
-Intuitively, for a query tuple $t$, view mapping $M$ is valid iff there exists a view tuple $t'$ in $V$ such that $t'$ is {\em visible} in $t$ under $M$, the reasoning of which depends on examining the lambda variables, the head variables and predicates of views by \rba\ in \cite{wu2018data}. We say that a head variable or a relational subgoal of $Q$ is {\em covered} by $M$ iff it is involved in $M$.
+Intuitively, for a query tuple $t$, view mapping $M$ is valid iff there exists a view tuple $t'$ in $V$ such that $t'$ is {\em visible} in $t$ under $M$. The reasoning depends on examining the lambda variables, the head variables and the predicates of views.  % by \rba\ in \cite{wu2018data}. 
+We say that a head variable or a relational subgoal of $Q$ is {\em covered} by $M$ iff it is involved in $M$.
 
 \eat{In the remainder of this paper, we will call the model in \cite{wu2018data} 
 the \textit{Rewriting-based Model}.} \eat{maybe we don't need it since we call the approach RBA}
@@ -120,7 +121,7 @@ Consider the following Conjunctive Query:
 \begin{tabbing}
 $Q_{\ref{eg: conjunctive_case}}(T, Gid) $\hspace{0.05em}$:- Gene(Gid, Name, T), Gid \leq 3$
 \end{tabbing}
-There is a view mapping $M_{1\ref{eg: conjunctive_case}} = (h_{1\ref{eg: conjunctive_case}}, \phi_{1\ref{eg: conjunctive_case}})$ from $V_1$ to $Q_{\ref{eg: conjunctive_case}}$, in which the relation mapping $h_{1\ref{eg: conjunctive_case}}$ is $\{Gene(G, N, Ty) \rightarrow Gene(Gid, Name, T)\}$ while the variable mapping $\phi_{1\ref{eg: conjunctive_case}}$ is $\{G\rightarrow Gid, N \rightarrow Name, Ty\rightarrow T\}$. $M_{1\ref{eg: conjunctive_case}}$ is only valid for query tuples with $Gid \leq 2$, since those query tuples can appear in the instance of   by satisfying predicate $G \leq 2$; and the head variables $G$ (also lambda variable) and $Ty$ in $V_1$ are mapped to head variables $Gid, T$ in $Q_{\ref{eg: conjunctive_case}}$. \rba\ determines validity by checking whether the portion of a query tuple $t$ ``exists'' under the view mapping in the view instance, which is achieved by evaluating the satisfiability of view predicates in the query instance.
+There is a view mapping $M_{1\ref{eg: conjunctive_case}} = (h_{1\ref{eg: conjunctive_case}}, \phi_{1\ref{eg: conjunctive_case}})$ from $V_1$ to $Q_{\ref{eg: conjunctive_case}}$, in which the relation mapping is $h_{1\ref{eg: conjunctive_case}}$ is $\{Gene(G, N, Ty) \rightarrow Gene(Gid, Name, T)\}$ while the variable mapping $\phi_{1\ref{eg: conjunctive_case}}$ is \\$\{G\rightarrow Gid, N \rightarrow Name, Ty\rightarrow T\}$. $M_{1\ref{eg: conjunctive_case}}$ is only valid for query tuples with $Gid \leq 2$, since those query tuples can appear in the instance of  $V_1(D)$ by satisfying predicate $(G \leq 2)$; the head variables $G$ (which is also a lambda variable) and $Ty$ in $V_1$ are mapped to head variables $Gid$ and $T$ in $Q_{\ref{eg: conjunctive_case}}$. \rba\ determines validity by checking whether the portion of a query tuple $t$ ``exists'' under the view mapping in the view instance, which is achieved by evaluating the satisfiability of view predicates in the query instance.
 \eat{ rewriting the query; in this example, $Q_{\ref{eg: conjunctive_case}}$ is rewritten as:
 
 
@@ -128,7 +129,7 @@ There is a view mapping $M_{1\ref{eg: conjunctive_case}} = (h_{1\ref{eg: conjunc
 $Q_{\ref{eg: conjunctive_case}}(T, Gid,(Gid \leq 2))$\hspace{0.1em}\=$:-Gene(Gid, Name, T),Gid <= 3$
 \end{tabbing}
 }
-In this example, the instance of $Q_{\ref{eg: conjunctive_case}}$ along with the evaluation of view predicate $(Gid \leq 2)$ (derived from the predicate of $V_1$) for each query tuple is shown in Table \ref{Table: Instance of Q1} (ignore the last column for now)\eat{, in which the boolean expression   is also evaluated}. The truth value indicates the {\em (in)existence} of the query tuple in the view instance under the view mapping. For instance, $t_{q_{\ref{eg: conjunctive_case}}1}$ satisfies all the predicates in $V_1$, i.e. $(Gid \leq 2)$ since $t_{q_{\ref{eg: conjunctive_case}}1}$ ``exists'' in the instance of $V_1(D)$ (i.e. $t_{v_11}$, under the mapping $M_{1\ref{eg: conjunctive_case}}$); in contrast, $t_{q_{\ref{eg: conjunctive_case}}3}$ is missing from $V_1(D)$.
+In this example, the instance of $Q_{\ref{eg: conjunctive_case}}$ along with the evaluation of the predicate $(Gid \leq 2)$ (derived from the predicate of $V_1$) for each query tuple is shown in Table \ref{Table: Instance of Q1} (ignore the last column for now)\eat{, in which the boolean expression   is also evaluated}. The truth value indicates whether or not the query tuple exists in the view instance under the view mapping. For instance, $t_{q_{\ref{eg: conjunctive_case}}1}$ satisfies all the predicates in $V_1$, i.e. $(Gid \leq 2)$ since $t_{q_{\ref{eg: conjunctive_case}}1}$ ``exists'' in the instance of $V_1(D)$ (i.e. $t_{v_11}$, under the mapping $M_{1\ref{eg: conjunctive_case}}$); in contrast, $t_{q_{\ref{eg: conjunctive_case}}3}$ is missing from $V_1(D)$.
 % its satisfiability for each $(T, Gid)$ pair. Under a view mapping $M$ (e.g. $M_{1\ref{eg: conjunctive_case}'}$), only if all the corresponding view predicates (e.g. $(Gid \leq 2)$ for $M_{1\ref{eg: conjunctive_case}'}$) are satisfied for a query tuple $t$, $M$ is determined as a valid view mapping for $t$.
 
 For query tuples such that $M_{1\ref{eg: conjunctive_case}}$ is a valid view mapping, a covering set can be constructed:  \{$M_{1\ref{eg: conjunctive_case}}$\}. After the user selects the query subset or the entire query result,  the \textit{citation queries} associated with $V_1$ are executed and the {\em citation function} is applied to construct formatted citations.
@@ -154,47 +155,9 @@ There is a view mapping $M_{\ref{eg: conjunctive_case}}' = (h_{\ref{eg: conjunct
 \label{ssec:need-provenance}
 
 
-\begin{table}[htp]
-\centering
-\small
-\caption{Instance of relation $Exon$ with provenance}\label{Instance of Exon}
-\vspace*{-0.2cm}
-\begin{tabular}[t]{c|c|c|c||b|} \hhline{~----}
-&EID&Level&TID&prov\\ \hhline{~----}
-$t_{e1}$&1&1&1&$e_1$\\ \hhline{~----}
-$t_{e2}$&2&3&2&$e_2$\\ \hhline{~----}
-$t_{e3}$&3&2&2&$e_3$\\ \hhline{~----}
-$t_{e4}$&4&2&2&$e_4$\\ \hhline{~----}
-% $t_{e5}$&5&3&5&$e_5$\\ \hhline{~----}
-% $t_{e6}$&6&2&5&$e_6$\\ \hhline{~----}
-% $t_{e7}$&7&2&5&$e_7$\\ \hhline{~----}
-\end{tabular}
-\bigskip
-\caption{Instance of relation $Gene$ with provenance}\label{Instance of Gene}
-\vspace*{-0.2cm}
-\begin{tabular}[t]{c|c|c|c||b|} \hhline{~----}
-&GID&Name&Type&prov\\ \hhline{~----}
-$t_{g1}$&1&TF&TEC&$g_1$\\ \hhline{~----}
-$t_{g2}$&2&FH&rRNA&$g_2$\\ \hhline{~----}
-$t_{g3}$&3&RP1&rRNA&$g_3$\\ \hhline{~----}
-$t_{g4}$&4&IYD&rRNA&$g_4$\\ \hhline{~----}
-$t_{g5}$&5&EPN&mRNA&$g_5$\\ \hhline{~----}
-\end{tabular}
-\bigskip
-\caption{Instance of relation $Transcript$ with provenance}\label{Instance of Transcript}
-\vspace*{-0.2cm}
-\begin{tabular}[t]{c|c|c|c|c||b|} \hhline{~-----}
-&TID&Name&Type&GID&prov\\ \hhline{~-----}
-$t_{t1}$&1&MB-203&TEC&1&$r_1$\\ \hhline{~-----}
-$t_{t2}$&2&PC-203&rRNA&2&$r_2$\\ \hhline{~-----}
-$t_{t3}$&4&HP-218&rRNA&2&$r_3$\\ \hhline{~-----}
-% $t_{t4}$&5&GK-207&rRNA&3&$r_4$\\ \hhline{~-----}
-\end{tabular}
-\end{table}
 
 
-
-We now show how to reason about the {\em validity} of view mappings for query tuples in the context of aggregate queries and  views via an example, and illustrate how \rba\ can be extended for conjunctive views and why \rba\ fails for aggregate views, motivating the need for {\em provenance}.
+We next illustrate why \rba\ fails for aggregate views, motivating the need for {\em provenance}.
 % illustrate how aggregate queries can be rewritten in terms of aggregate views, and discuss why the approach is limited in some cases for reasoning about fine-grained citations, necessitating the use of provenance.
 
 
@@ -262,15 +225,50 @@ Consider the following query which is constructed by adding one aggregate functi
 $Q_{\ref{eg: illustrative_eg3}}(T, COUNT(Gid)) :- Gene(Gid, Name, T), Gid <= 3$
 \end{tabbing}
 % \vspace{-0.5mm}
-Note that only $V_1$ and $V_2$ can provide candidate view mappings $M_{1{\ref{eg: illustrative_eg3}}}(=(h_{1{\ref{eg: illustrative_eg3}}}, \phi_{1{\ref{eg: illustrative_eg3}}}$)) and $M_{2{\ref{eg: illustrative_eg3}}}(=(h_{2{\ref{eg: illustrative_eg3}}}, \phi_{2{\ref{eg: illustrative_eg3}}}))$ for $Q_{\ref{eg: illustrative_eg3}}$ since they include the same relational subgoals in the body. $M_{1{\ref{eg: illustrative_eg3}}}$ and $M_{2{\ref{eg: illustrative_eg3}}}$ have the same form, i.e, $h_{1\ref{eg: illustrative_eg3}}(h_{2\ref{eg: illustrative_eg3}}) = Gene(G,$ $N, Ty) \rightarrow Gene(Gid, Name, T)$ and $\phi_{1\ref{eg: illustrative_eg3}} (\phi_{2\ref{eg: illustrative_eg3}}) = \{G\rightarrow Gid, N \rightarrow Name, Ty\rightarrow T\}$. Under the two mappings, neither $V_1$  nor $V_2$ can be used to rewrite $Q_{\ref{eg: illustrative_eg3}}$ for arbitrary database instance since $V_1$ has one logically stronger predicate than $Q_{\ref{eg: illustrative_eg3}}$ and we can find an instance $D$ for $V_2$ such that the first three genes are not `rRNA' and thus $V_2$ and $Q_{\ref{eg: illustrative_eg3}}$ aggregate over different set of tuples from $Gene$ relation. 
+Note that only $V_1$ and $V_2$ can provide candidate view mappings $M_{1{\ref{eg: illustrative_eg3}}}(=(h_{1{\ref{eg: illustrative_eg3}}}, \phi_{1{\ref{eg: illustrative_eg3}}}$)) and $M_{2{\ref{eg: illustrative_eg3}}}(=(h_{2{\ref{eg: illustrative_eg3}}}, \phi_{2{\ref{eg: illustrative_eg3}}}))$ for $Q_{\ref{eg: illustrative_eg3}}$ since they include the same relational subgoals in the body. $M_{1{\ref{eg: illustrative_eg3}}}$ and $M_{2{\ref{eg: illustrative_eg3}}}$ have the same form, i.e, \\
+$h_{1\ref{eg: illustrative_eg3}}(h_{2\ref{eg: illustrative_eg3}}) = Gene(G,$ $N, Ty) \rightarrow Gene(Gid, Name, T)$ and $\phi_{1\ref{eg: illustrative_eg3}} (\phi_{2\ref{eg: illustrative_eg3}}) = \{G\rightarrow Gid, N \rightarrow Name, Ty\rightarrow T\}$. Under the two mappings, neither $V_1$  nor $V_2$ can be used to rewrite $Q_{\ref{eg: illustrative_eg3}}$ for an arbitrary database instance since $V_1$ has one logically stronger predicate than $Q_{\ref{eg: illustrative_eg3}}$, and we can find an instance $D$ for $V_2$ such that the first three genes are not `rRNA'.  In this case, $V_2$ and $Q_{\ref{eg: illustrative_eg3}}$ aggregate over different set of tuples from the $Gene$ relation. 
 
 
+\begin{table}[htp]
+\centering
+\small
+\caption{Instance of relation $Exon$ with provenance}\label{Instance of Exon}
+\vspace*{-0.2cm}
+\begin{tabular}[t]{c|c|c|c||b|} \hhline{~----}
+&EID&Level&TID&prov\\ \hhline{~----}
+$t_{e1}$&1&1&1&$e_1$\\ \hhline{~----}
+$t_{e2}$&2&3&2&$e_2$\\ \hhline{~----}
+$t_{e3}$&3&2&2&$e_3$\\ \hhline{~----}
+$t_{e4}$&4&2&2&$e_4$\\ \hhline{~----}
+% $t_{e5}$&5&3&5&$e_5$\\ \hhline{~----}
+% $t_{e6}$&6&2&5&$e_6$\\ \hhline{~----}
+% $t_{e7}$&7&2&5&$e_7$\\ \hhline{~----}
+\end{tabular}
+\medskip
+\caption{Instance of relation $Gene$ with provenance}\label{Instance of Gene}
+\vspace*{-0.2cm}
+\begin{tabular}[t]{c|c|c|c||b|} \hhline{~----}
+&GID&Name&Type&prov\\ \hhline{~----}
+$t_{g1}$&1&TF&TEC&$g_1$\\ \hhline{~----}
+$t_{g2}$&2&FH&rRNA&$g_2$\\ \hhline{~----}
+$t_{g3}$&3&RP1&rRNA&$g_3$\\ \hhline{~----}
+$t_{g4}$&4&IYD&rRNA&$g_4$\\ \hhline{~----}
+$t_{g5}$&5&EPN&mRNA&$g_5$\\ \hhline{~----}
+\end{tabular}
+\medskip
+\caption{Instance of relation $Transcript$ with provenance}\label{Instance of Transcript}
+\vspace*{-0.2cm}
+\begin{tabular}[t]{c|c|c|c|c||b|} \hhline{~-----}
+&TID&Name&Type&GID&prov\\ \hhline{~-----}
+$t_{t1}$&1&MB-203&TEC&1&$r_1$\\ \hhline{~-----}
+$t_{t2}$&2&PC-203&rRNA&2&$r_2$\\ \hhline{~-----}
+$t_{t3}$&4&HP-218&rRNA&2&$r_3$\\ \hhline{~-----}
+% $t_{t4}$&5&GK-207&rRNA&3&$r_4$\\ \hhline{~-----}
+\end{tabular}
+\end{table}
 
 
-
-
-
-However, {\em some} query tuples may be still computed using view tuples of $V_1$ and $V_2$ given a database instance $D$ (as shown in Table \ref{Instance of Exon}-\ref{Instance of Transcript}, ignore the last column temporarily), which captures the concept of {\em fine-grained citation} proposed in \cite{wu2018data}. Given $D$, the instances of $V_1$, $V_2$ and $Q_{\ref{eg: illustrative_eg3}}$ are also presented in Table \ref{Table: Sample instance of V1 with provenance}, \ref{Table: Sample instance of V2 with provenance} and \ref{Table: Sample instance of Q with provenance} respectively (ignore the columns on the right side of double vertical lines for now). Note that the citations for each view tuple are also included in the view instances (See the column with green background).
+Still, {\em some} query tuples may be computed using view tuples of $V_1$ and $V_2$ given a database instance $D$, which captures the concept of {\em fine-grained citation} proposed in \cite{wu2018data}. To illustrate, an instance $D$ is given in Tables \ref{Instance of Exon}-\ref{Instance of Transcript}, and the resulting instances of $V_1$, $V_2$ and $Q_{\ref{eg: illustrative_eg3}}$ are shown in Tables \ref{Table: Sample instance of V1 with provenance}, \ref{Table: Sample instance of V2 with provenance} and \ref{Table: Sample instance of Q with provenance} respectively (ignore the columns on the right side of double vertical lines for now). Note that the citations for each view tuple are also included in the view instances (the column with the green background).
 
 
 \eat{Note that $V_{\ref{eg: illustrative_eg3}}'$ corresponds to an SQL query with a HAVING clause, since $COUNT(*) < 3$ appears as a subgoal in the body.  $V_{\ref{eg: illustrative_eg3}}'$ is parameterized by $T$, and is associated with a parameterized citation query $CV_{\ref{eg: illustrative_eg3}}'$ which retrieves the citation information for every transcript ID. First, we can derive a view mapping $M_{\ref{eg: illustrative_eg3}}' = (h_{\ref{eg: illustrative_eg3}}', \phi_{\ref{eg: illustrative_eg3}}')$ where $h_{\ref{eg: illustrative_eg3}}' =\{Exon(E, L, T) \rightarrow Exon(Eid, Level, Tid)\}$ and $\phi_{\ref{eg: illustrative_eg3}}' = \{E \rightarrow Eid, L \rightarrow Level, T \rightarrow Tid\}$.
@@ -389,15 +387,16 @@ $t_{q_{\ref{eg: illustrative_eg3}}2}$&5&$\{e_{15}, e_{18}, e_{21}\}$&$2.33$&$E_5
 
 % where $(Gid \leq 2)$ and $(T = `rRNA$'$)$ are boolean expression, which are evaluated as true or false to indicate their satisfiability for each $(T, Gid)$ pair. Under a view mapping $M$ (e.g. $M_{1\ref{eg: conjunctive_case}'}$), only if all the corresponding view predicates (e.g. $(Gid \leq 2)$ for $M_{1\ref{eg: conjunctive_case}'}$) are satisfied for a query tuple $t$, $M$ is determined as a valid view mapping for $t$.
 
-To follow the idea of checking the {\em existence} of query tuple in the view instance, \rba\ is extended for aggregate queries by employing a special built-in function $agg$ (``array\_agg'' function in Postgresql) to collect the evaluations of the view predicates for every query tuple before aggregation is applied. For example,\eat{$Q_{\ref{eg: illustrative_eg3}}$ can be extended as:
+To follow the idea of checking the {\em existence} of a query tuple in the view instance, a plausible approach is to extend \rba\ to aggregate queries by employing a special built-in function $agg$ (the ``array\_agg'' function in PostgreSQL) to collect the evaluations of the view predicates for every query tuple before aggregation is applied. For example,\eat{$Q_{\ref{eg: illustrative_eg3}}$ could be extended as:
 \begin{tabbing}
 $Q_{\ref{eg: illustrative_eg3}}(T, COUNT(Gid), $\hspace{0.1em}\=$ agg((Gid \leq 2)), agg((T = `rRNA$'$))):-$\\
 \>$Gene(Gid, Name, T),Gid <= 3$
-\end{tabbing}} the instance of $Q_{\ref{eg: illustrative_eg3}}$ is shown in Table \ref{Table: Sample instance of Q with provenance} (See the third and fourth column) along with the evaluation results of view predicates collected by $agg$. Note that, since two tuples are generated before aggregate function is applied for tuple $t_{q_{\ref{eg: illustrative_eg3}}2}$ (i.e. $t_{q_{\ref{eg: conjunctive_case}}2}$ and $t_{q_{\ref{eg: conjunctive_case}}3}$ from Table \ref{Table: Instance of Q1}), the evaluation of $agg((Gid\leq2))$ will result in a {\em set} of boolean values of size 2, which, intuitively, is derived by aggregating over $t_{q_{\ref{eg: conjunctive_case}}2}$ and $t_{q_{\ref{eg: conjunctive_case}}3}$ in Table \ref{Table: Instance of Q1} and collecting the evaluations for $(G\leq 2)$ (i.e. true and false) as one set. The existence of the false value indicates that before aggregation, one query tuple (i.e. $t_{q_{\ref{eg: conjunctive_case}}3}$) is missing from the view instance $V_1(D)$, which fails the reconstruction of the aggregate result of tuple $t_{q_{\ref{eg: illustrative_eg3}}2}$ from the view instance and thus $V_1$ cannot provide enough citation information for $t_{q_{\ref{eg: illustrative_eg3}}2}$. On contrast, for $t_{q_{\ref{eg: illustrative_eg3}}1}$, the evaluation of $agg((Gid\leq2))$ only includes one truth value, meaning that based on the view instance of $V_1(D)$ (especially $t_{{v_1}1}$), the aggregate result of $t_{q_{\ref{eg: illustrative_eg3}}1}$ can be computed.
+\end{tabbing}} the instance of $Q_{\ref{eg: illustrative_eg3}}$ is shown in Table \ref{Table: Sample instance of Q with provenance}  along with the evaluation results of view predicates collected by $agg$ (see the third and fourth columns). Note that, since two tuples are generated before the aggregate function is applied for tuple $t_{q_{\ref{eg: illustrative_eg3}}2}$ (i.e. $t_{q_{\ref{eg: conjunctive_case}}2}$ and $t_{q_{\ref{eg: conjunctive_case}}3}$ from Table \ref{Table: Instance of Q1}), the evaluation of $agg((Gid\leq2))$ will result in a {\em set} of boolean values of size 2, which, intuitively, is derived by aggregating over $t_{q_{\ref{eg: conjunctive_case}}2}$ and $t_{q_{\ref{eg: conjunctive_case}}3}$ in Table \ref{Table: Instance of Q1}. The existence of ``false" indicates that before aggregation, one query tuple (i.e. $t_{q_{\ref{eg: conjunctive_case}}3}$) was missing from the view instance $V_1(D)$, thus $V_1$ %cannot provide enough citation information 
+is not valid for $t_{q_{\ref{eg: illustrative_eg3}}2}$. In contrast, for $t_{q_{\ref{eg: illustrative_eg3}}1}$ the evaluation of $agg((Gid\leq2))$ is only ``true", meaning that $V_1$ is valid.
 
 % Given the result, for $V_1$, only $t_{q_{\ref{eg: illustrative_eg3}}'1}$ can make all the evaluations of the predicate ($G \leq 2$) true while there is a false value in the evaluation result of $t_{q_{\ref{eg: illustrative_eg3}}'2}$, which means that $M_{1{\ref{eg: illustrative_eg3}}'}$ is valid for $t_{q_{\ref{eg: illustrative_eg3}}'1}$ rather than $t_{q_{\ref{eg: illustrative_eg3}}'2}$. The reasoning result is reasonable since $V_1$ is a conjunctive view and each single pair of $(G, Ty)$ satisfying $G \leq 2$ is usable to construct the aggregate result of the query tuple.
 
-However, simply checking the {\em existence} of query tuples in the view instance for aggregate views is not enough. For example, for query tuple $t_{q_{\ref{eg: illustrative_eg3}}2}$, although the evaluations of the predicate $Ty=`rRNA$' (from $V_2$) do not include false value, indicating that all the query tuples before aggregation {\em exist} in the view instance (also before aggregation). But the aggregate result of $t_{q_{\ref{eg: illustrative_eg3}}2}$ (i.e. 2) does not match that of $t_{v_21}$ (i.e. 3). The reason behind it is that three tuples $t_{g2}-t_{g4}$ from relation $Gene$ are used to construct $t_{v_21}$ while $t_{q_{\ref{eg: illustrative_eg3}}2}$ is derived from two of them ($t_{g2}-t_{g3}$), which thus means that the reasoning should not only capture the {\em existence} of query tuples in the view instance but also the {\em exact matching} of the aggregate results between query tuples and view tuples.
+{\em However, simply checking the existence of query tuples in the view instance for aggregate views is not enough}. For example, for query tuple $t_{q_{\ref{eg: illustrative_eg3}}2}$, although the evaluations of the predicate $Ty=`rRNA$' (from $V_2$) does not include ''false'', indicating that all the query tuples before aggregation exist in the view instance, the aggregate result of $t_{q_{\ref{eg: illustrative_eg3}}2}$ (i.e. 2) does not match that of $t_{v_21}$ (i.e. 3). The reason is that three tuples $t_{g2}-t_{g4}$ from relation $Gene$ are used to construct $t_{v_21}$, while $t_{q_{\ref{eg: illustrative_eg3}}2}$ is derived from only two of them ($t_{g2}-t_{g3}$).  This means that the reasoning should not only capture the {\em existence} of query tuples in the view instance but also the {\em exact matching} of the aggregate results between query tuples and view tuples.
 %The Rewriting-based Model works well for determining the usability of every view tuple in every query tuple, but not for a group of them.
 We therefore adopt an alternative model, called the {\em \pbafull} ({\em \pba}), which uses {\em provenance}.
 
@@ -413,15 +412,12 @@ The core idea of \rba\ is to determine whether there exists \textit{a} view tupl
 We therefore adopt an alternative model, called the {\em \pbafull} ({\em \pba}).}
 %Doing such reasoning can be challenging without applying {\em provenance}.
 % Doing such reasoning requires {\em provenance}.
+\end{example}
+\vspace*{-0.3cm}
 \begin{table}[htp]
+\centering
 \small
 \caption{$V_1(D)$ with how-provenance and citation}\label{Table: Sample instance of V1 with provenance}
-% \begin{tabular}[t]{c|c|c|c|c|c|c|} \hhline{~------}
-% &Ty&&G&&TOP2(T)&\\ \hhline{~------}
-% $t_{v_{\ref{eg: illustrative_eg3}}1}$&TEC&$\{c_1\}$&1&$\{d_1\}$&$\{1\}$&$T_1$\\ \hhline{~------}
-% $t_{v_{\ref{eg: illustrative_eg3}}2}$&TEC&$\{c_4\}$&2&$\{d_4\}$&$\{4\}$&$T_4$\\ \hhline{~------}
-% $t_{v_{\ref{eg: illustrative_eg3}}3}$&rRNA&$\{c_2, c_3\}$&1&$\{d_2, d_3\}$&$\{2,3\}$&$T_2 + T_3$\\ \hhline{~------}
-% \end{tabular}
 \vspace*{-0.2cm}
 \begin{tabular}[t]{c|c|c||a|b|} \hhline{~----}
 &G&Ty&citation&prov\\ \hhline{~----}
@@ -430,7 +426,7 @@ $t_{v_12}$&2&rRNA&\{Group: [`Liu']\}&$g_2$\\ \hhline{~----}
 % $t_{v_{\ref{eg: illustrative_eg3}}'2}$&2&2&$6$&\{Group: [`Joe']\}&$e_2 + e_3$\\ \hhline{~-----}
 % $t_{v_{\ref{eg: illustrative_eg3}}'3}$&4&1&$2$&\{Group: [`Liu']\}&$e_4$\\ \hhline{~-----}
 \end{tabular}
-\bigskip
+\medskip
 \caption{$V_2(D)$ with how-provenance and citation}\label{Table: Sample instance of V2 with provenance}
 \vspace*{-0.2cm}
 % \begin{tabular}[t]{c|c|c|c|c|c|c|} \hhline{~------}
@@ -445,7 +441,7 @@ $t_{v_21}$&rRNA&3&\{Group: [`Lee']\}&$g_2 + g_3 + g_4$\\ \hhline{~----}
 % $t_{v_{\ref{eg: illustrative_eg3}}'2}$&2&2&$6$&\{Group: [`Joe']\}&$e_2 + e_3$\\ \hhline{~-----}
 % $t_{v_{\ref{eg: illustrative_eg3}}'3}$&4&1&$2$&\{Group: [`Liu']\}&$e_4$\\ \hhline{~-----}
 \end{tabular}
-\bigskip
+\medskip
 \caption{$Q_{\ref{eg: conjunctive_case}}(D)$ with how-provenance}\label{Table: Instance of Q1}
 \vspace*{-0.2cm}
 \begin{tabular}[t]{c|c|c||c|a|b|} \hhline{~-----}
@@ -455,7 +451,7 @@ $t_{q_{\ref{eg: conjunctive_case}}2}$&rRNA&2&T&{Group:['Liu']}&$g_2$\\ \hhline{~
 $t_{q_{\ref{eg: conjunctive_case}}3}$&rRNA&3&F&&$g_3$\\ \hhline{~-----}
 % $t_{q_{\ref{eg: conditions_conjunctive}}2}$&4&$a_4$&TEC&$c_4$&$T_4$\\ \hhline{~-------}
 \end{tabular}
-\bigskip
+\medskip
 \caption{$Q_{\ref{eg: illustrative_eg3}}(D)$ with how-provenance}\label{Table: Sample instance of Q with provenance}
 \vspace*{-0.2cm}
 \hspace*{-0.5cm}
@@ -465,7 +461,7 @@ $t_{q_{\ref{eg: illustrative_eg3}}1}$&TEC&1&\{T\}&\{F\}&$g_1$\\ \hhline{~-----}
 $t_{q_{\ref{eg: illustrative_eg3}}2}$&rRNA&2&\{T, F\}&\{T, T\}&$g_2 + g_3$\\ \hhline{~-----}
 % $t_{q_{\ref{eg: illustrative_eg3}}'2}$&5&$2.33$&$e_5 + e_6 + e_7$\\ \hhline{~---}
 \end{tabular}
-\bigskip
+\medskip
 \caption{$Q_{\ref{eg: assignment}}(D)$ with how-provenance}
 \vspace*{-0.2cm}
 \begin{tabular}[!h]{>{\centering\arraybackslash}p{0.5cm}|>{\centering\arraybackslash}p{0.5cm}|>{\centering\arraybackslash}p{0.5cm}||b|} \hhline{~---}
@@ -477,5 +473,3 @@ $t_{q_{\ref{eg: assignment}}1}$&2&2&\makecell{$r_2*r_2 + r_2*r_3+ r_3*r_2 + r_3*
 \end{tabular}
 \label{Table:Q7(D)}
 \end{table}
-
-\end{example}

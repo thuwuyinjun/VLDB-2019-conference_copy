@@ -113,13 +113,13 @@ In an S-Datalog query, the head terms without {\em aggregate function} belong to
 
 % \textbf{View mappings for aggregate queries} The concept of {\em view mapping} is still used but with some extension due to the existence of aggregate terms in the head of query. We say that an aggregate term $\alpha(\bar{X})$ ($\alpha$ is aggregate function while $\bar{X}$ is the aggregate variables) is {\em covered} by a view mapping $M$ iff all the variables in $\bar(X)$ are 
 
-We start by introducing some basic concepts that will be used in our model.
+We start by introducing the basic concepts that will be used in our model.
 
 %To determine the validity of view mappings, it is necessary to understand the relationship between the schema of the query and the schema of the views under the view mappings. Validity also relies on the notions of 1) how-provenance polynomials; and 2) an isomorphism between how-provenance monomials and subgoals, to pave the way to reasoning about {\em valid view mappings} at the tuple level.
 
 \textbf{Granularity of queries and views.} An essential step in determining the validity of a view mapping $M=(h,\phi)$ is to compare the schemas of $Q$ and $V$, and detect whether $V$ keeps all necessary variables in its head. In particular, 
 % for every grouping variable of $Q$, $x$, there should exist a grouping variable of $V$, $y$ such that $\phi(y) = x$. which implies that 
-if the aggregate view $V$ has the set of grouping variables $\{Y_1, Y_2,\dots, Y_m\}$, then $\{\phi(Y_1), \phi(Y_2), \dots, \phi(Y_m)\}$ should be a superset of the set of grouping variables of $Q$, $\{X_1, X_2,\dots, X_k\}$. If $\{\phi(Y_1), \phi(Y_2), \dots,$ $\phi(Y_m)\} = \{X_1, X_2,\dots, X_k\}$, we say $Q$ has the {\em same granularity} as $V$. \\ 
+if the aggregate view $V$ has the set of grouping variables $\{Y_1, Y_2,\dots, Y_m\}$, then $\{\phi(Y_1), \phi(Y_2), \dots, \phi(Y_m)\}$ should be a superset of the grouping variables of $Q$, $\{X_1, X_2,\dots, X_k\}$. If $\{\phi(Y_1), \phi(Y_2), \dots,$ $\phi(Y_m)\} = \{X_1, X_2,\dots, X_k\}$, we say $Q$ has the {\em same granularity} as $V$. \\ 
 Otherwise, if $\{\phi(Y_1), \phi(Y_2), \dots, \phi(Y_m)\} \supsetneq \{X_1, X_2,\dots, X_k\}$, we say $V$ has {\em finer granularity} than $Q$.
 
 \eat{If both have aggregation, %similar to query rewriting using views algorithms,
@@ -154,7 +154,7 @@ $V_{\ref{eg: illustrative_eg3}}'$ has {\em finer granularity} than $Q_{\ref{eg: 
 \end{example}}
 
 \eat{Introduce how-provenance monomials.  Refer to Tables 2-5}
-\textbf{How-provenance.} We use the notion of {\em how-provenance} introduced in~\cite{green2007provenance}. It starts by annotating each base relation tuple with a unique {\em provenance token}, and propagates those tokens along with the tuples to the query result.  Each tuple in the query result then has a {\em how-provenance polynomial} expressed using $+$ (alternate use) and $*$ (joint use) to indicate {\em how} base relation tuples contribute to the query result. Each {\em how-provenance polynomial} is composed of multiple {\em how-provenance monomials} which are joint-use terms expressed with $*$. For example, the provenance polynomial for tuple $t_{q_{\ref{eg: illustrative_eg3}}2}$ in $Q_{\ref{eg: illustrative_eg3}}(D)$ (see Table \ref{Table: Sample instance of Q with provenance}) is $g_2 + g_3$, which has two \textit{how-provenance monomials}. It means that two tuples from relation Gene with how-provenance tokens $g_2$ and $g_3$, respectively
+\textbf{How-provenance.} We use the notion of {\em how-provenance} introduced in~\cite{green2007provenance}. It starts by annotating each base relation tuple with a unique {\em provenance token}, and propagates those tokens along with the tuples to the query result.  Each tuple in the query result then has a {\em how-provenance polynomial} expressed using $+$ (alternate use) and $*$ (joint use) to indicate {\em how} base relation tuples contribute to the query result. Each {\em how-provenance polynomial} is composed of multiple {\em how-provenance monomials} which are joint-use terms expressed with $*$. For example, the provenance polynomial for tuple $t_{q_{\ref{eg: illustrative_eg3}}2}$ in $Q_{\ref{eg: illustrative_eg3}}(D)$  is $g_2 + g_3$, which has two \textit{how-provenance monomials} (see Table \ref{Table: Sample instance of Q with provenance}). It means that two tuples from relation {\em Gene} with how-provenance tokens $g_2$ and $g_3$, respectively
 % , share the same $Tid$ value and 
 were used to create $t_{q_{\ref{eg: illustrative_eg3}}2}$.  The $*$ operator is used if there are multiple relational subgoals in the query body, in which case base tuples are {\em jointly used} to create the result.
 % \subsection{How-provenance and where-provenance}\label{Sec: provenance intro}
@@ -162,7 +162,7 @@ were used to create $t_{q_{\ref{eg: illustrative_eg3}}2}$.  The $*$ operator is 
 
 %\textbf{Isomorphism of how-provenance monomials and subgoals.} %Since we need to reason about the \textit{validity} of view mappings using how-provenance, we need to build connections between them, which relies on the fact that how-provenance tokens in the query tuple can be traced back to the corresponding base relation tuples. When the query is evaluated, those base relation tuples are {\em assigned} to relational subgoals which may be involved in view mappings.
 %We therefore introduce the notion of {\em assignment}, before defining an {\em isomorphism} between how-provenance monomial and relational subgoals under an assignment.
-To simplify reasoning over how-provenance polynomials, \cite{amsterdamer2012provenance} defines a normal form, as follows: first, the provenance tokens in each how-provenance monomial preserves the same order as the relational subgoals in the query body. Second, the exponent of every provenance token is forced to be 1. Third, the coefficient of every monomial in a how-provenance polynomial is forced to be 1 by breaking the monomials with coefficient greater than 1 into multiple how-provenance monomials, each corresponding to an {\em assignment} of the query atoms to database tuples.
+To simplify reasoning over how-provenance polynomials, \cite{amsterdamer2012provenance} defines a normal form as follows: first, the provenance tokens in each how-provenance monomial preserves the same order as the relational subgoals in the query body. Second, the exponent of every provenance token is forced to be 1. Third, the coefficient of every monomial in a how-provenance polynomial is forced to be 1 by breaking the monomials with coefficient greater than 1 into multiple how-provenance monomials, each corresponding to an {\em assignment} of the query atoms to database tuples.
 % \textbf{Assignment} How- and where-provenance are applied to reason about valid view mappings for each individual tuples, which is closely related to the {\em assignment} of base relation tuples to the relational subgoals in the query body. 
 % The concept of {\em assignment} originates from \cite{amsterdamer2012provenance} for conjunctive queries and its definition is provided below: 
 %\begin{definition}{\bf Assignment. }\cite{amsterdamer2012provenance}
@@ -192,7 +192,7 @@ $Q_{\ref{eg: assignment}}(G, G') :- $\=$Transcript(T, N, Ty, G), T >= 2, Ty = Ty
 \>$Transcript(T', N', Ty', G'), T' >= 2$
 \end{tabbing}
 
-The provenance-aware query result is shown in Table \ref{Table:Q7(D)} using the instance of Transcript in Table \ref{Instance of Transcript}. Note that the second and the third monomials for the tuple $t_{q_{\ref{eg: assignment}}1}$ are equivalent but correspond to different assignments, hence written differently ($r_2*r_3$ vs $r_3*r_2$).
+The provenance-aware query result is shown in Table \ref{Table:Q7(D)} using the instance of {\em Transcript} in Table \ref{Instance of Transcript}. Note that the second and the third monomials for the tuple $t_{q_{\ref{eg: assignment}}1}$ are equivalent but correspond to different assignments, hence written differently ($r_2*r_3$ vs $r_3*r_2$).
 Further, the first how-provenance monomial of $t_{q_{\ref{eg: assignment}}1}$ is written as $r_2*r_2$ instead of the compact form ($r_2^2$).  Furthermore, the coefficient of all the monomials in the how-provenance polynomial of $t_{q_{\ref{eg: assignment}}1}$ is 1 rather than grouping them together.
 %(although in a more compact form, $r_3*r_4$ and $r_4*r_3$ can be combined into $2*r_3*r_4$ or $2*r_4*r_3$)
 
@@ -239,7 +239,7 @@ $t_{q_{\ref{eg: assignment}}4}$&2&$t_{16}$&2&$t_{16}$&$T_4*T_4$\\ \hhline{~-----
 
 \vspace*{-0.15cm}
 
-For a query and a result tuple, \cite{amsterdamer2012provenance} defines an \textit{isomorphism} between {\em assignments} and the how-provenance monomials in a query. Borrowing some ideas from there, we define an isomorphism between relational subgoals and how-provenance monomials under an assignment $\gamma$, which relies on the normal form of how-provenance monomials mentioned before.
+For a query and a result tuple, \cite{amsterdamer2012provenance} defines an \textit{isomorphism} between {\em assignments} and the how-provenance monomials in a query. Borrowing these ideas, we define an isomorphism between relational subgoals and how-provenance monomials under an assignment $\gamma$, which relies on the normal form of how-provenance monomials mentioned previously.
 
 \begin{definition}
 {\bf Isomorphism between how-provenance monomials and subgoals.}  Given a conjunctive or aggregate query $Q$ with relational subgoals $B_1, B_2, \dots, B_m$,
@@ -253,7 +253,7 @@ under an assignment $\gamma$, base relation tuples $t_{b1}, t_{b2}, \dots, t_{bm
 \end{definition}
 
 % \begin{example}
-Returning to Example \ref{eg: assignment}, consider the second how-provenance monomial $r_2*r_3$ and corresponding {\em assignment} $\gamma$ in query tuple $t_{q_{\ref{eg: assignment}}1}$ in Table \ref{Table:Q7(D)}. Since $t_{t2}$ and $t_{t3}$ are associated with how-provenance tokens $r_2$ and $r_3$ respectively, there should be an isomorphism $F$ under $\gamma$ such that $F(Transcript(T, N,$ $Ty, G)|\gamma)$ = $r_2$ while $F(Transcript(T', N', Ty', G')|\gamma) = r_3$.
+Returning to Example \ref{eg: assignment}, consider the second how-provenance monomial $r_2*r_3$ and corresponding {assignment} $\gamma$ in query tuple $t_{q_{\ref{eg: assignment}}1}$ of Table \ref{Table:Q7(D)}. Since $t_{t2}$ and $t_{t3}$ are associated with how-provenance tokens $r_2$ and $r_3$ respectively, there should be an isomorphism $F$ under $\gamma$ such that $F(Transcript(T, N,$ $Ty, G)|\gamma)$ = $r_2$ while $F(Transcript(T', N', Ty', G')|\gamma) = r_3$.
 % \end{example}
 
 

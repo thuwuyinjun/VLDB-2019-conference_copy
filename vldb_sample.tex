@@ -140,9 +140,11 @@ Susan B. Davidson\\
 \maketitle
 
 \begin{abstract}
-A computational challenge associated with data citation is how to automatically generate citations to arbitrary queries against a structured dataset.  
-Previous work has explored this problem in the context of \textit{conjunctive} queries and views %by associating citations to frequent queries, and using these citations to construct citations to general queries 
-using a \rbafull\ (\rba).  However, an increasing number of scientific queries are \textit{aggregate}, e.g. showing statistical summaries of the underlying data, for which the \rba\ cannot be easily extended.  In this paper, we show how a \pbafull\ (\pba) can be leveraged to 1) generate citations to conjunctive as well as aggregate queries and views;  2) associate citations with individual result tuples to enable arbitrary subsets of the result set to be cited (\textit{fine-grained citations}); and 3) be optimized to return citations in \textit{acceptable time}.  Our implementation of \pba\ in ProvCite shows that it not only handles a larger class of queries and views than \rba, but can outperform it when restricted to conjunctive views.
+As research products expand to include structured datasets, 
+the challenge arises of how to automatically generate citations to the results of arbitrary queries against such datasets.
+%a computational challenge associated with data citation is how to automatically generate citations to arbitrary queries against such datasets.  
+Previous work explored this problem in the context of \textit{conjunctive} queries and views %by associating citations to frequent queries, and using these citations to construct citations to general queries 
+using a \rbafull\ (\rba).  However, an increasing number of scientific queries are \textit{aggregate}, e.g. statistical summaries of the underlying data, for which the \rba\ cannot be easily extended.  In this paper, we show how a \pbafull\ (\pba) can be leveraged to 1) generate citations to conjunctive as well as aggregate queries and views;  2) associate citations with individual result tuples to enable arbitrary subsets of the result set to be cited (\textit{fine-grained citations}); and 3) be optimized to return citations in \textit{acceptable time}.  Our implementation of \pba\ in ProvCite shows that it not only handles a larger class of queries and views than \rba, but can outperform it when restricted to conjunctive views.
 
 \eat{
 Previous work addresses this challenge has been established by us to {\em automatically} construct citations for {\em general} user queries at \textit{various granularity}, which, however, fails to meet the demand of increasing number of aggregate queries with general aggregate functions to extract summary information from large databases. In this paper, we present a provenance-based model (\pba) to solve this problem by leveraging {\em how-provenance}. Despite its challenges to implementing this model at an interactive speed, some optimizations guarantee the feasibility of the implementation which even outperforms the approaches in previous work in some cases and thus indicates its practical use in real world.}
@@ -160,8 +162,8 @@ Previous work addresses this challenge has been established by us to {\em automa
 % \input{Sections/Appendix.tex}
 %ACKNOWLEDGMENTS are optional
 \section{Acknowledgments}
-This research was partially funded by NSF IIS 1302212 and NSF ACI 154736. The authors would like to thank Peter Buneman for conceiving the idea that data citation is a computational challenge and recognizing its connection to provenance; to Val Tannen for discussions on query rewriting and provenance; and
-Boris Glavic for his support in understanding details of GProM's source code.
+This research was partially funded by NSF IIS 1302212 and NSF ACI 154736. The authors would like to thank Peter Buneman for conceiving the idea that data citation is a computational challenge and recognizing its connection to provenance, and to Val Tannen for discussions on query rewriting and provenance.
+%; and Boris Glavic for his support in understanding details of GProM's source code.
 
 
 % The following two commands are all you need in the

@@ -3,8 +3,8 @@
 %We now discuss how to apply {\em provenance} to determine the validity of view mappings for conjunctive queries.
 %Note that aggregate views have previously been shown to be \textit{invalid} for rewriting conjunctive queries~\cite{srivastava1996answering}. We therefore only consider view mappings of conjunctive views.
 
-The validity conditions of view mappings include {\em schema-level conditions} and a {\em tuple-level condition}, which should be satisfied by a view mapping $M$ iff it is valid for a given query tuple. 
-The validity conditions here can guarantee the same result as the conditions in \cite{wu2018data} (proof omitted).% iff $M$ satisfies both {\em schema-level} and {\em tuple-level} conditions,
+The validity conditions of view mappings include {\em schema-level conditions} and a {\em tuple-level condition}, which are satisfied by a view mapping $M$ iff it is valid for a given query tuple. 
+The validity conditions guarantee the same result as the conditions in \cite{wu2018data} (proof omitted).% iff $M$ satisfies both {\em schema-level} and {\em tuple-level} conditions,
 
 \begin{definition}\label{definition:token mapping}
 %{\bf Validity of View Mappings - Schema-level conditions}
@@ -163,7 +163,7 @@ aggregate functions before formalizing this intuition.
 %\subsubsection{Intuition}
 
 \subsubsection{Aggregate function requirements} \label{Sec: aggregate functions}
-A view mapping $M$, which maps an aggregate view $V$ to an aggregate query $Q$, is valid for a query tuple only if the aggregate functions of $V$ and $Q$ satisfy certain requirements in particular, \cite{cohen2006user}  formalizes the notion of a \textit{well-formed aggregate function}. Loosely speaking, a well-formed aggregate function can be characterized by some initial ``mapper" function, followed by a ``reduce" function, followed by a ``finalize" function, which we will call a \textit{terminating function}.
+A view mapping $M$, which maps an aggregate view $V$ to an aggregate query $Q$, is valid for a query tuple only if the aggregate functions of $V$ and $Q$ satisfy certain requirements; in particular, \cite{cohen2006user}  formalizes the notion of a \textit{well-formed aggregate function}. Loosely speaking, a well-formed aggregate function can be characterized by some initial ``mapper" function, followed by a ``reduce" function, followed by a ``finalize" function, which we will call a \textit{terminating function}.
 It is easy to see that some common aggregate functions such as SUM,MIN, MAX, COUNT and AVG are well formed.
 
 For example, 
@@ -232,7 +232,7 @@ The authors in \cite{cohen2006user} and \cite{cohen2006rewriting} consider aggre
 
 \begin{definition}\label{Def: conditions_for_agg_functions}
 {\bf Aggregate function requirements}
-Suppose a query $Q$ has an aggregate function $\alpha$, which takes a set of variables $X$ as arguments, if $M$ is {\em valid} for some query tuples, the aggregate functions in $V$ should satisfy the following conditions under view mapping $M = (h, \phi)$:
+Suppose a query $Q$ has an aggregate function $\alpha$, which takes a set of variables $X$ as arguments.  If $M$ is {\em valid} for some query tuples, the aggregate functions in $V$ should satisfy the following conditions under view mapping $M = (h, \phi)$:
 \eat{it satisfies the following conditions for aggregate terms:
 % \begin{enumerate}
 % \item If $Q$ and $V$ have the same granularity, then either (a) or (b) must hold:
@@ -360,7 +360,7 @@ Suppose the schema-level conditions are satisfied for a view mapping $M$. $M$ is
 \eat{In the case of aggregate queries, the how-provenance expression of each tuple will include multiple monomials. Based on these observations, the tuple-level condition is:}
 
 \begin{definition}\label{Def: validity condition agg}
-{\bf Tuple-level condition for aggregate queries.}
+{\bf Tuple-level condition for aggregate \\queries.}
 Let $t \in Q(D)$ with how-provenance polynomial $W$.
 % and the where provenance set is $H_i$ for grouping variable $Y_i$. 
 Furthermore, given a multiset $\{t_1, t_2,\dots, t_p\} \in V(D)$, let $t_i (i=1,2,\dots,p)$ have a how-provenance polynomial $W_i'=W_{i_1}' + W_{i_2}' + \dots + W_{i_q}'$.
@@ -380,15 +380,18 @@ as a one-to-one function under $M$.
 \end{definition}
 
 \begin{example}
-Recall $Q_{\ref{eg: illustrative_eg3}}$, $V_2$, and view mapping $M_{2\ref{eg: illustrative_eg3}}=(h_{2\ref{eg: illustrative_eg3}},\phi_{2\ref{eg: illustrative_eg3}})$ from Example \ref{eg: illustrative_eg3}. In terms of {\em schema-level conditions}, $M_{2\ref{eg: illustrative_eg3}}$ is satisfied for all query tuples because 1) $V_2$ has the {\em same granularity} as $Q_{\ref{eg: illustrative_eg3}}$ under $M_{2\ref{eg: illustrative_eg3}}$; and 2) the aggregate term of $V_2$, $G$, can be mapped to the aggregate variable of $Q_{\ref{eg: illustrative_eg3}}$, $Gid$, which also share the same aggregate function $COUNT$ and thus satisfy the requirement in Def. \ref{Def: conditions_for_agg_functions}.
+Continuing Example \ref{eg: illustrative_eg3}, recall $Q_{\ref{eg: illustrative_eg3}}$, $V_2$, and view mapping $M_{2\ref{eg: illustrative_eg3}}=(h_{2\ref{eg: illustrative_eg3}},\phi_{2\ref{eg: illustrative_eg3}})$. % from Example \ref{eg: illustrative_eg3}. 
+In terms of {\em schema-level conditions}, $M_{2\ref{eg: illustrative_eg3}}$ is satisfied for all query tuples because 1) $V_2$ has the {\em same granularity} as $Q_{\ref{eg: illustrative_eg3}}$ under $M_{2\ref{eg: illustrative_eg3}}$; and 2) the aggregate term of $V_2$, $G$, can be mapped to the aggregate variable of $Q_{\ref{eg: illustrative_eg3}}$, $Gid$, which also shares the same aggregate function $COUNT$ and thus satisfies Def. \ref{Def: conditions_for_agg_functions}.
 
-However, the {\em tuple-level condition} does not hold for the query tuple $t_{q_{\ref{eg: illustrative_eg3}}2}$ if we compare its provenance (i.e. $W = g_2 + g_3$) to the provenance polynomial of the view tuple $t_{v_21}$, i.e.
+However, the {\em tuple-level condition} does not hold for the query tuple $t_{q_{\ref{eg: illustrative_eg3}}2}$.  If we compare its provenance (i.e. $W = g_2 + g_3$) to the provenance polynomial of the view tuple $t_{v_21}$ (i.e.
 % For where-provenance, since $\phi(T) = Tid$, the where-provenance of $T$ in view tuple $t_{v_{\ref{eg: illustrative_eg3}}'2}$ is same as the one of attribute $Tid$ in the query tuple $t_{q_{\ref{eg: illustrative_eg3}}'1}$. In terms of how-provenance, t
 % The how-provenance polynomial of $t_{v_{\ref{eg: illustrative_eg3}}'2}$ is 
-$W' = g_2 + g_3 + g_4$, and the monomial mapping between $W'$ and $W$ is not a one-to-one function since $g_4$ is missing from the mapping. If the predicate in $Q_{\ref{eg: illustrative_eg3}}$, $Gid \leq 3$ is relaxed to $Gid \leq 4$ such that the token $g_4$ can appear in $W$, then the monomial mapping between $W'$ and $W$ satisfies one-to-one function. But if we further modify the predicate to $Gid \leq 5$, $g_5$ will be included in $W$, which, however, is missing from $W'$ and thus results in violation of the tuple-level condition. As we can see, this reasoning is more complicated than that in Example \ref{eg: conditions_conjunctive}, since the validity of view mappings is determined by comparing entire how-provenance polynomials between the query tuple and view tuples instead of single how-provenance monomials.
+$W' = g_2 + g_3 + g_4$), the monomial mapping between $W'$ and $W$ is not a one-to-one function since $g_4$ is missing from the mapping. If the predicate in $Q_{\ref{eg: illustrative_eg3}}$, $Gid \leq 3$, is relaxed to $Gid \leq 4$ so that the token $g_4$ can appear in $W$, then the monomial mapping between $W'$ and $W$ is one-to-one. But if we further modify the predicate to $Gid \leq 5$, $g_5$ will be included in $W$, which is missing from $W'$ and thus violates the tuple-level condition. As we can see, this reasoning is more complicated than that in Example \ref{eg: conditions_conjunctive}, since the validity of view mappings is determined by comparing entire how-provenance polynomials between the query tuple and view tuples instead of single how-provenance monomials.
 % \qed
 
 \eat{The {\em tuple-level conditions} also hold for the query tuple $t_{q_{\ref{eg: illustrative_eg3}}1}$ if we compare its provenance to the provenance of the first two view tuples ($t_{v_{\ref{eg: illustrative_eg3}}1}$ and $t_{v_{\ref{eg: illustrative_eg3}}2}$). For where-provenance, since $\phi(Type) = Ty$, the union of the where-provenance of attribute $Type$ in  $t_{v\ref{eg: illustrative_eg3}1}$ and $t_{v_{\ref{eg: illustrative_eg3}}2}$ is $\{c_1, c_4\}$, which is same as the where-provenance of attribute $Ty$ in tuple $t_{q_{\ref{eg: illustrative_eg3}}1}$. For how-provenance, the sum of the how-provenance expression in the two view tuples is $W' = T_1 + T_4$ and the monomial mappings between $W'$ and the how-provenance polynomial of $t_{q_{\ref{eg: illustrative_eg3}}1}$ (i.e. $T_1 + T_4$) satisfy one-to-one function.}
+
+\scream{Yinjun, why do you go though changing the predicate?  Don't we just care about the one in the given query?}
 
 % which matches the how-provenance polynomial of $t_{q_{\ref{eg: illustrative_eg3}}1}$, i.e. $W = T_1 + T_4$. 
 
@@ -419,7 +422,7 @@ Finally, as in~\cite{wu2018data}, {\em covering sets} are computed %by combining
 which cover as many {\em aggregate terms} and {\em relational subgoals} in the query as possible using the fewest view mappings, i.e. that are \textit{maximal and non-redundant}.
 
 \begin{example}\label{eg: covering_sets}
-Let us revisit Example \ref{eg: illustrative_eg3}. If we would omit the predicates of $V_1$ and $V_2$ then $M_{1\ref{eg: illustrative_eg3}}$ and $M_{2\ref{eg: illustrative_eg3}}$ should be valid for both $t_{q_{\ref{eg: illustrative_eg3}}1}$ and $t_{q_{\ref{eg: illustrative_eg3}}2}$, which should have two covering sets $\{M_{1\ref{eg: illustrative_eg3}}\}$ and $\{M_{2\ref{eg: illustrative_eg3}}\}$ since both $M_{1\ref{eg: illustrative_eg3}}$ and $M_{2\ref{eg: illustrative_eg3}}$ cover the aggregate term $(COUNT(Gid))$ and the subgoal $Gene(Gid, $ $Name, T)$ of $Q_{\ref{eg: illustrative_eg3}}$. Other view mapping combination like $\{M_{1\ref{eg: illustrative_eg3}}, M_{2\ref{eg: illustrative_eg3}}\}$ is redundant since it covers the same terms of $Q_{\ref{eg: illustrative_eg3}}$ as its subset $\{M_{1\ref{eg: illustrative_eg3}}\}$ and $\{M_{2\ref{eg: illustrative_eg3}}\}$.
+Again revisiting Example \ref{eg: illustrative_eg3}, if we omit the predicates of $V_1$ and $V_2$ then $M_{1\ref{eg: illustrative_eg3}}$ and $M_{2\ref{eg: illustrative_eg3}}$ are valid for both $t_{q_{\ref{eg: illustrative_eg3}}1}$ and $t_{q_{\ref{eg: illustrative_eg3}}2}$.  There are two covering sets, $\{M_{1\ref{eg: illustrative_eg3}}\}$ and $\{M_{2\ref{eg: illustrative_eg3}}\}$, since both $M_{1\ref{eg: illustrative_eg3}}$ and $M_{2\ref{eg: illustrative_eg3}}$ cover the aggregate term $(COUNT(Gid))$ and the subgoal $Gene(Gid, $ $Name, T)$ of $Q_{\ref{eg: illustrative_eg3}}$. The view mapping combination $\{M_{1\ref{eg: illustrative_eg3}}, M_{2\ref{eg: illustrative_eg3}}\}$ is redundant since it covers the same terms of $Q_{\ref{eg: illustrative_eg3}}$ as its subset $\{M_{1\ref{eg: illustrative_eg3}}\}$ and $\{M_{2\ref{eg: illustrative_eg3}}\}$.
 \eat{Consider the following three views and query:
 \begin{tabbing}
 $V_{\ref{eg: covering_sets}}'(E, MAX(L)) :- Exon(E, L, T)$\\

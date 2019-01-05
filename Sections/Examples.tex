@@ -68,17 +68,6 @@ $V_1$ and $V_3$ are simple conjunctive queries. % and %belong to $\mathcal{CV}$
 %are simple conjunctive queries.  
 $V_1$ is \textit{parameterized} by the gene id $G$, meaning that it defines a family of views, one for each gene. Each view in this family consists of a single tuple.  In this way, each gene may have different citation, giving credit to the person or program who annotated that gene. 
 In contrast, $V_3$ is not parameterized, which indicates that the same citation is shared across all the view tuples.\eat{Maybe we don not need the figure, just point to SIGMOD paper}
-% Figure \ref{fig:lambda} shows the effect of the lambda term in $V_1$ versus the unparameterized view $V_2$ on a sample instance of Gene.
-% is parameterized by the transcript id $T$,
-%and includes the id ($T$), name ($N$) and type ($Ty$) of the transcript, 
-% enabling each transcript to have a different citation. 
-% The view for each gene and transcript includes information about the 
-\eat{\begin{figure}[t!]
-    \centering
-    \includegraphics[width=0.45\textwidth,height=0.11\textwidth]{Figures/GIDsExample.pdf}
-    \caption{Effect of parameters on views}
-    \small \label{fig:lambda}
-\end{figure}}
 The other four views are aggregate views. Their meaning is: for each binding of variables in the body, group over the variables  in the head (called {\em grouping variables}) and apply the aggregate(s) to each group. Each {aggregate function} along with its arguments is called an {\em aggregate term}, in which the arguments are called {\em aggregate variables}.
 Thus $V_2$ could be translated into SQL as:
 \begin{tabbing}
@@ -95,7 +84,7 @@ GROUP BY G.Type
 % \end{tabbing}
 which counts the number of `rRNA' genes. Similarly, $V_4$ counts the number of transcripts per gene which are associated with one exon whose level is no more than 2.
 $V_5$ returns the maximal level of exons and the count of exons for each gene.
-$V6$ counts the number of transcripts for each gene whose ids are no more than 2.
+$V6$ counts the number of transcripts for each gene whose transcript ids are no more than 2.
 
 \subsection{Query rewriting:  View mappings}
 %\scream{I think we need to cover more concepts here, e.g. the notion of mapping and covering}
@@ -108,8 +97,10 @@ i.e. sets for which no other view mappings can be added to \textit{cover} more s
 A \textit{view mapping} $M$ consists of a {\em relation mapping}, $h$ and {\em variable mapping}, $\phi$ (denoted $M=(h, \phi)$). The former, $h$, maps relational subgoals in a view $V$ to relational subgoals with the same relation names in query $Q$, while the latter variable mapping $\phi$ is an induced mapping by $h$. 
 % We say that a head variable of $Q$, $x$ is {\em covered} under $M$ iff there exists a head variable $y$ of $V$ such that $\phi(y) = x$.
 
-Intuitively, for a query tuple $t$, view mapping $M$ is valid iff there exists a view tuple $t'$ in $V$ such that $t'$ is {\em visible} in $t$ under $M$. The reasoning depends on examining the lambda variables, the head variables and the predicates of views.  % by \rba\ in \cite{wu2018data}. 
-We say that a head variable or a relational subgoal of $Q$ is {\em covered} by $M$ iff it is involved in $M$.
+Intuitively, for a query tuple $t$, view mapping $M$ is valid iff 
+% there exists a view tuple $t'$ in $V$ such that 
+some portion of $t$ {\em appear} in the instance of $V$ under $M$. The reasoning depends on examining the lambda variables, the head variables and the predicates of views.  % by \rba\ in \cite{wu2018data}. 
+% We say that a head variable or a relational subgoal of $Q$ is {\em covered} by $M$ iff it is involved in $M$.
 
 \eat{In the remainder of this paper, we will call the model in \cite{wu2018data} 
 the \textit{Rewriting-based Model}.} \eat{maybe we don't need it since we call the approach RBA}
@@ -121,18 +112,11 @@ Consider the following Conjunctive Query:
 \begin{tabbing}
 $Q_{\ref{eg: conjunctive_case}}(T, Gid) $\hspace{0.05em}$:- Gene(Gid, Name, T), Gid \leq 3$
 \end{tabbing}
-There is a view mapping $M_{1\ref{eg: conjunctive_case}} = (h_{1\ref{eg: conjunctive_case}}, \phi_{1\ref{eg: conjunctive_case}})$ from $V_1$ to $Q_{\ref{eg: conjunctive_case}}$, in which the relation mapping is $h_{1\ref{eg: conjunctive_case}}$ is $\{Gene(G, N, Ty) \rightarrow Gene(Gid, Name, T)\}$ while the variable mapping $\phi_{1\ref{eg: conjunctive_case}}$ is \\$\{G\rightarrow Gid, N \rightarrow Name, Ty\rightarrow T\}$. $M_{1\ref{eg: conjunctive_case}}$ is only valid for query tuples with $Gid \leq 2$, since those query tuples can appear in the instance of  $V_1(D)$ by satisfying predicate $(G \leq 2)$; the head variables $G$ (which is also a lambda variable) and $Ty$ in $V_1$ are mapped to head variables $Gid$ and $T$ in $Q_{\ref{eg: conjunctive_case}}$. \rba\ determines validity by checking whether the portion of a query tuple $t$ ``exists'' under the view mapping in the view instance, which is achieved by evaluating the satisfiability of view predicates in the query instance.
-\eat{ rewriting the query; in this example, $Q_{\ref{eg: conjunctive_case}}$ is rewritten as:
-
-
-\begin{tabbing}
-$Q_{\ref{eg: conjunctive_case}}(T, Gid,(Gid \leq 2))$\hspace{0.1em}\=$:-Gene(Gid, Name, T),Gid <= 3$
-\end{tabbing}
-}
-In this example, the instance of $Q_{\ref{eg: conjunctive_case}}$ along with the evaluation of the predicate $(Gid \leq 2)$ (derived from the predicate of $V_1$) for each query tuple is shown in Table \ref{Table: Instance of Q1} (ignore the last column for now)\eat{, in which the boolean expression   is also evaluated}. The truth value indicates whether or not the query tuple exists in the view instance under the view mapping. For instance, $t_{q_{\ref{eg: conjunctive_case}}1}$ satisfies all the predicates in $V_1$, i.e. $(Gid \leq 2)$ since $t_{q_{\ref{eg: conjunctive_case}}1}$ ``exists'' in the instance of $V_1(D)$ (i.e. $t_{v_11}$, under the mapping $M_{1\ref{eg: conjunctive_case}}$); in contrast, $t_{q_{\ref{eg: conjunctive_case}}3}$ is missing from $V_1(D)$.
+There is a view mapping $M_{1\ref{eg: conjunctive_case}} = (h_{1\ref{eg: conjunctive_case}}, \phi_{1\ref{eg: conjunctive_case}})$ from $V_1$ to $Q_{\ref{eg: conjunctive_case}}$, in which the relation mapping is $h_{1\ref{eg: conjunctive_case}}$ is $\{Gene(G, N, Ty) \rightarrow Gene(Gid, Name, T)\}$ while the variable mapping $\phi_{1\ref{eg: conjunctive_case}}$ is \\$\{G\rightarrow Gid, N \rightarrow Name, Ty\rightarrow T\}$. $M_{1\ref{eg: conjunctive_case}}$ is only valid for query tuples with $Gid \leq 2$, since those query tuples can appear in the instance of  $V_1(D)$ by satisfying predicate $(G \leq 2)$; the head variables $G$ (which is also a lambda variable) and $Ty$ in $V_1$ are mapped to head variables $Gid$ and $T$ in $Q_{\ref{eg: conjunctive_case}}$. \rba\ determines validity by checking whether the portion of a query tuple $t$ ``exists'' under the view mapping in the view instance, which is achieved by evaluating the satisfiability of view predicates in the query instance. In this example, the instance of $Q_{\ref{eg: conjunctive_case}}$ along with the evaluation of the predicate $(Gid \leq 2)$ (derived from the predicate of $V_1$) for each query tuple is shown in Table \ref{Table: Instance of Q1} (ignore the last column for now)\eat{, in which the boolean expression   is also evaluated}. The truth value indicates whether or not the query tuple exists in the view instance under the view mapping. For instance, $t_{q_{\ref{eg: conjunctive_case}}1}$ satisfies all the predicates in $V_1$, i.e. $(Gid \leq 2)$ since $t_{q_{\ref{eg: conjunctive_case}}1}$ ``exists'' in the instance of $V_1(D)$ (i.e. $t_{v_11}$, under the mapping $M_{1\ref{eg: conjunctive_case}}$); in contrast, $t_{q_{\ref{eg: conjunctive_case}}3}$ is missing from $V_1(D)$.
 % its satisfiability for each $(T, Gid)$ pair. Under a view mapping $M$ (e.g. $M_{1\ref{eg: conjunctive_case}'}$), only if all the corresponding view predicates (e.g. $(Gid \leq 2)$ for $M_{1\ref{eg: conjunctive_case}'}$) are satisfied for a query tuple $t$, $M$ is determined as a valid view mapping for $t$.
 
-For query tuples such that $M_{1\ref{eg: conjunctive_case}}$ is a valid view mapping, a covering set can be constructed:  \{$M_{1\ref{eg: conjunctive_case}}$\}. After the user selects the query subset or the entire query result,  the \textit{citation queries} associated with $V_1$ are executed and the {\em citation function} is applied to construct formatted citations.
+For query tuples such that $M_{1\ref{eg: conjunctive_case}}$ is a valid view mapping, a covering set can be constructed:  \{$M_{1\ref{eg: conjunctive_case}}$\}. After the user selects the query tuples of interest, the \textit{citation queries} associated with $V_1$ are executed and the {\em citation function} is applied to construct formatted citations. 
+(see the last but one column in Table \ref{Table: Instance of Q1} for the citations for every query tuple.)
 \end{example}
 \eat{
 \begin{example}\label{eg: conjunctive_case}
@@ -268,7 +252,7 @@ $t_{t3}$&4&HP-218&rRNA&2&$r_3$\\ \hhline{~-----}
 \end{table}
 
 
-Still, {\em some} query tuples may be computed using view tuples of $V_1$ and $V_2$ given a database instance $D$, which captures the concept of {\em fine-grained citation} proposed in \cite{wu2018data}. To illustrate, an instance $D$ is given in Tables \ref{Instance of Exon}-\ref{Instance of Transcript}, and the resulting instances of $V_1$, $V_2$ and $Q_{\ref{eg: illustrative_eg3}}$ are shown in Tables \ref{Table: Sample instance of V1 with provenance}, \ref{Table: Sample instance of V2 with provenance} and \ref{Table: Sample instance of Q with provenance} respectively (ignore the columns on the right side of double vertical lines for now). Note that the citations for each view tuple are also included in the view instances (the column with the green background).
+Still, {\em some} query tuples may be computed using view tuples of $V_1$ and $V_2$ given a database instance $D$, which captures the concept of {\em fine-grained citation} proposed in \cite{wu2018data}. To illustrate, an instance $D$ is given in Tables \ref{Instance of Exon}-\ref{Instance of Transcript}, and the resulting instances of $V_1$, $V_2$ and $Q_{\ref{eg: illustrative_eg3}}$ are shown in Tables \ref{Table: Sample instance of V1 with provenance}, \ref{Table: Sample instance of V2 with provenance} and \ref{Table: Sample instance of Q with provenance} respectively (ignore the last column for now). Note that the citations for each view tuple are also included in the view instances (the column with the green background).
 
 
 \eat{Note that $V_{\ref{eg: illustrative_eg3}}'$ corresponds to an SQL query with a HAVING clause, since $COUNT(*) < 3$ appears as a subgoal in the body.  $V_{\ref{eg: illustrative_eg3}}'$ is parameterized by $T$, and is associated with a parameterized citation query $CV_{\ref{eg: illustrative_eg3}}'$ which retrieves the citation information for every transcript ID. First, we can derive a view mapping $M_{\ref{eg: illustrative_eg3}}' = (h_{\ref{eg: illustrative_eg3}}', \phi_{\ref{eg: illustrative_eg3}}')$ where $h_{\ref{eg: illustrative_eg3}}' =\{Exon(E, L, T) \rightarrow Exon(Eid, Level, Tid)\}$ and $\phi_{\ref{eg: illustrative_eg3}}' = \{E \rightarrow Eid, L \rightarrow Level, T \rightarrow Tid\}$.

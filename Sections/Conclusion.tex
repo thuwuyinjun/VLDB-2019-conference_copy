@@ -1,5 +1,12 @@
 \section{Conclusions}\label{sec: conclusion}
-We build on the connection to {\em data provenance} to develop a model for  data citation which is able to handle aggregate queries and views. The model reasons about citations at the level of tuples in the query result using provenance to enable citations to arbitrary subsets of the query result (fine-grained citation).  The \pbafull\ was implemented in \provalg, and extensive experiments conducted under both {\em synthetic} and {\em realistic workloads}.  The results show that \provalg\ can not only handle a larger class of queries than the Rewriting-Based Model~\cite{wu2018data} which assumes conjunctive queries and views, but is much faster in some cases.   The approach assumes a \textit{provenance-enabled DBMS}, and trade-offs between an {\em eager} versus {\em lazy} strategy for generating view provenance was explored. 
+We build on the connection to {\em data provenance} to develop a model for  data citation which is able to handle aggregate queries and views. The model reasons about citations at the level of tuples in the query result using provenance to enable citations to arbitrary subsets of the query result (fine-grained citation).  The \pbafull\ was implemented in \provalg, which runs on top of a provenance-enabled RDBMS.  Extensive experiments were conducted under both {\em synthetic} and {\em realistic workloads}, and show that \provalg\ can not only handle a {larger class of queries} than the Rewriting-Based Model~\cite{wu2018data} (which assumes conjunctive queries and views), but is much faster in some cases.   
+
+Optimizations used in \provalg\ include materializing view provenance, 
+%(the {\em eager} versus {\em lazy} strategy), 
+building an index %over query provenance 
+to speed up comparisons between the query and view provenance, using bit arrays, and using clustering to determine the best order of combining view mappings.
+Several of these are applicable in other scenarios where the provenance from different queries or views needs to be compared, such as fine-grained access control \cite{goyal2006attribute} and linked brushing in data visualization \cite{psallidas2018smoke}.
+%to represent covering set and the subgoals and aggregate terms it covers
 
 In future work, we would like to explore how to insert data citation into the larger citation ecosystem involving bibliometrics. We would also like to explore how to combine data citation with black-box computations, including Machine Learning models. 
 

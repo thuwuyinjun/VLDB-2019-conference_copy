@@ -17,7 +17,7 @@ A view mapping $M$ from a conjunctive view $V$ to a conjunctive query $Q$ should
 \end{enumerate}
 \end{definition}
 
-Now suppose that head variables $Y_1, Y_2, \dots, Y_r$ from $V$ are mapped to head variables $X_1, X_2, \dots, X_r$ from $Q$, which implies that $\phi(Y_i) = X_i \;(i=1,2,\dots, r)$. Then we say that the head variables $X_i (i=1,2,\dots, r)$ are {\em covered} under $M$.
+Now suppose that head variables $Y_1, Y_2, \dots, Y_r$ from $V$ are mapped to head variables $X_1, X_2, \dots, X_r$ from $Q$, which implies that $\phi(Y_i) = X_i \;(i=1,2,\dots, r)$. Then we say that the head variables $X_i (i=1,2,\dots, r)$ are {\em covered} under $M$. Plus, a relational subgoal of $Q$ is {\em covered} by $M$ iff it is involved in $M$.
 
 \eat{We have not discussed where-provenance.Did you mean how?}
 %The {\em tuple-level condition} is defined in terms of provenance. We assume that duplicates are not removed in the query and view instances during the citation generation process, in which case the how-provenance expression of every view or query tuple has only one monomial. 
@@ -384,14 +384,9 @@ Continuing Example \ref{eg: illustrative_eg3}, recall $Q_{\ref{eg: illustrative_
 In terms of {\em schema-level conditions}, $M_{2\ref{eg: illustrative_eg3}}$ is satisfied for all query tuples because 1) $V_2$ has the {\em same granularity} as $Q_{\ref{eg: illustrative_eg3}}$ under $M_{2\ref{eg: illustrative_eg3}}$; and 2) the aggregate term of $V_2$, $G$, can be mapped to the aggregate variable of $Q_{\ref{eg: illustrative_eg3}}$, $Gid$, which also shares the same aggregate function $COUNT$ and thus satisfies Def. \ref{Def: conditions_for_agg_functions}.
 
 However, the {\em tuple-level condition} does not hold for the query tuple $t_{q_{\ref{eg: illustrative_eg3}}2}$.  If we compare its provenance (i.e. $W = g_2 + g_3$) to the provenance polynomial of the view tuple $t_{v_21}$ (i.e.
-% For where-provenance, since $\phi(T) = Tid$, the where-provenance of $T$ in view tuple $t_{v_{\ref{eg: illustrative_eg3}}'2}$ is same as the one of attribute $Tid$ in the query tuple $t_{q_{\ref{eg: illustrative_eg3}}'1}$. In terms of how-provenance, t
-% The how-provenance polynomial of $t_{v_{\ref{eg: illustrative_eg3}}'2}$ is 
-$W' = g_2 + g_3 + g_4$), the monomial mapping between $W'$ and $W$ is not a one-to-one function since $g_4$ is missing from the mapping. If the predicate in $Q_{\ref{eg: illustrative_eg3}}$, $Gid \leq 3$, is relaxed to $Gid \leq 4$ so that the token $g_4$ can appear in $W$, then the monomial mapping between $W'$ and $W$ is one-to-one. But if we further modify the predicate to $Gid \leq 5$, $g_5$ will be included in $W$, which is missing from $W'$ and thus violates the tuple-level condition. As we can see, this reasoning is more complicated than that in Example \ref{eg: conditions_conjunctive}, since the validity of view mappings is determined by comparing entire how-provenance polynomials between the query tuple and view tuples instead of single how-provenance monomials.
-% \qed
+$W' = g_2 + g_3 + g_4$), the monomial mapping between $W'$ and $W$ is not a one-to-one function since $g_4$ is missing from the mapping. Note that if the predicate in $Q_{\ref{eg: illustrative_eg3}}$, $Gid \leq 3$, is relaxed to $Gid \leq 4$ then the token $g_4$ appears in $W$ and the monomial mapping between $W'$ and $W$ is one-to-one. However, if the predicate is further relaxed to $Gid \leq 5$, then $g_5$ is included in $W$ and the tuple-level condition is again violated since $g_5$ is not in $W'$. This reasoning is significantly more complicated than that in Example \ref{eg: conditions_conjunctive} since the validity of view mappings is determined by comparing entire how-provenance polynomials between the query tuple and view tuples instead of single how-provenance monomials.
 
 \eat{The {\em tuple-level conditions} also hold for the query tuple $t_{q_{\ref{eg: illustrative_eg3}}1}$ if we compare its provenance to the provenance of the first two view tuples ($t_{v_{\ref{eg: illustrative_eg3}}1}$ and $t_{v_{\ref{eg: illustrative_eg3}}2}$). For where-provenance, since $\phi(Type) = Ty$, the union of the where-provenance of attribute $Type$ in  $t_{v\ref{eg: illustrative_eg3}1}$ and $t_{v_{\ref{eg: illustrative_eg3}}2}$ is $\{c_1, c_4\}$, which is same as the where-provenance of attribute $Ty$ in tuple $t_{q_{\ref{eg: illustrative_eg3}}1}$. For how-provenance, the sum of the how-provenance expression in the two view tuples is $W' = T_1 + T_4$ and the monomial mappings between $W'$ and the how-provenance polynomial of $t_{q_{\ref{eg: illustrative_eg3}}1}$ (i.e. $T_1 + T_4$) satisfy one-to-one function.}
-
-\scream{Yinjun, why do you go though changing the predicate?  Don't we just care about the one in the given query?}
 
 % which matches the how-provenance polynomial of $t_{q_{\ref{eg: illustrative_eg3}}1}$, i.e. $W = T_1 + T_4$. 
 

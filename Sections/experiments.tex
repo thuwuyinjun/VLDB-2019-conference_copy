@@ -4,9 +4,14 @@ We start by describing the datasets and workloads used before presenting the exp
 
 \subsection{Experimental set-up}
 \provalg\ was implemented in Java 8 using PostgreSQL 9.6.3 as the underlying DBMS. All experiments were conducted
-on a Linux server \eat{Distribution? (Gianmaria)}with an Intel(R) Xeon(R) CPU E5-2630 v4 @ 2.20GHz and 64GB of main memory. \eat{claim the use of code from CoreCover algorithm and provide the link to our own code}
+on a Linux server \eat{Distribution? (Gianmaria)}with an Intel(R) Xeon(R) CPU E5-2630 v4 @ 2.20GHz and 64GB of main memory. 
+Although there are provenance tools which support aggregate queries for relational database systems, e.g. GProM \cite{arab2018gprom}, they are overly complex for our purposes, and become a bottleneck for interactive computation. We therefore implemented a provenance layer from scratch, which simply collects how-provenance for each query tuple.
 
-\scream{You should say somewhere how provenance is captured, since you are no longer using Boris's system.}
+\eat{
+{\bf Provenance.} Provenance tools which support aggregate queries exist for relational systems, e.g. GProM \cite{arab2018gprom}. 
+\eat{In GProM, each query tuple is associated with a set of tensors, which consists of how-provenance and aggregate values~\cite{amsterdamer2011provenance}. However, the aggregate values are not necessary for our purposes and become a bottleneck for interactive computation.}
+However, they are overly complex for our purposes, and become a bottleneck for interactive computation. We therefore implemented a provenance layer from the scratch, which simply collects how-provenance for each query tuple.
+}
 
 {\bf Datasets.} %Three datasets were used in the experiments.
 Two realistic datasets were used in addition to GENCODE: 
@@ -153,8 +158,9 @@ increases slowly for \provalg. In contrast, TLA and SSLA are twice as slow as \p
 
 \subsubsection{Realistic workloads}
 \label{ssec: realistic}
-The experimental results for realistic workloads are presented in Table \ref{Table: realistic_performance}, which includes the total execution time ($t_{total}$) for three cases (lazy, lazy + index and eager + index), as well as the metrics that can potentially affect the performance: the total number of how-provenance monomials in the query instance ($N_{pq}$), the total number of view mappings ($N_v$), the total number of predicates in the views under all the view mappings ($N_p$) and the time to query the provenance along with the instance. Except for $q1$, $t_{total}$ is less than 10 seconds for all queries. Although $N_{pq}$ is more than one million in $q1$, $t_{total}$ is only about 11-13 seconds for the three strategies, which is acceptable considering the large query instance. Note that the index does not always help since 1) it takes significant time to build the index for query provenance (e.g. up to 3 seconds for $q1$); and 2) when indexes are not used, the small number of view mappings leads to weak effect of multiple scans over the entire query provenance. 
-\scream{I didn't understand 2.}
+The experimental results for realistic workloads are presented in Table \ref{Table: realistic_performance}, which includes the total execution time ($t_{total}$) for three cases (lazy, lazy + index and eager + index), as well as the metrics that can potentially affect the performance: the total number of how-provenance monomials in the query instance ($N_{pq}$), the total number of view mappings ($N_v$), the total number of predicates in the views under all the view mappings ($N_p$) and the time to query the provenance along with the instance. Except for $q1$, $t_{total}$ is less than 10 seconds for all queries. Although $N_{pq}$ is more than one million in $q1$, $t_{total}$ is only about 11-13 seconds for the three strategies, which is acceptable considering the large query instance. Note that the index does not always help since it may take significant time to build the index for query provenance (e.g. up to 3 seconds for $q1$) and its performance gain is not significant in the case of small number of view mappings.
+% leads to weak effect of multiple scans over the entire query provenance.
+
 However, as shown in Section \ref{sec: synthetic_exp}, the index provides  scalability especially in the extreme cases. We also list the query time over the provenance-enabled database in the last column, which indicates that the reasoning time ($t_{cs} = t_{total} - t_{q}$) is almost the same as $t_{q}$. Thus, while users are browsing the query result, the system can generate covering sets for all query tuples in the background, and instantly construct formatted citations upon tuple selection.
 
 \eat{Comparing to time to simply generate query instance (See last column), $t_{cs}$ is still reasonable considering the large instance. When users are browsing the query result, the system can generate covering sets for all query tuple in the back-end, ready to construct formatted citations when users select tuples of interest.}

@@ -171,7 +171,7 @@ Next, all possible {\em view mappings} are constructed. We can find four view ma
 %while other views either miss grouping attributes (such as $V3$ and $V1$) or cannot provide necessary attributes to compute the statistics that are needed for $Q_1$ (such as $V2$).
 
 %view mapping validity checking for conjunctive views and point out its difference to RBA
-In the {\em Reasoning} step, since $V_3$ is a {conjunctive view}, the validity of $M_3$ for a query tuple $t_q$ only depends on the {existence} of $t_q$ in $V_3(D)$ under mapping $M_3$ (Section \ref{Sec: prelim}). So we can simply retrieve the base relation tuple for each provenance token appearing in the query to evaluate the view {predicates}. For example, the validity of $M_3$ can be checked simply by examining the predicates of $V_3$. Since the first predicate in $V_3$, $T = T'$, is also in $Q$, every tuple in the query instance must satisfy it. However, the second predicate, $E \leq 2$, can affect the {existence} of query tuples in $V_3$. Table \ref{Instance of Exon} shows that only the tuples with how-provenance tokens $e_1$ and $e_2$ satisfy $E \leq 2$. Thus $M_3$ is only valid for $t_{{q}1}$, whose how-provenance polynomial only includes $e_1$. %without any other how-provenance tokens from Exon.
+In the {\em Reasoning} step, since $V_3$ is a {conjunctive view}, the validity of $M_3$ for a query tuple $t_q$ only depends on the {\em existence} of $t_q$ in $V_3(D)$ under mapping $M_3$ (Section \ref{sec: conjunctive_example}). So we can simply retrieve the base relation tuple for each provenance token appearing in the query to evaluate the view {predicates}. For example, the validity of $M_3$ can be checked simply by examining the predicates of $V_3$. Since the first predicate in $V_3$, $T = T'$, is also in $Q$, every tuple in the query instance must satisfy it. However, the second predicate, $E \leq 2$, can affect the {existence} of query tuples in $V_3$. Table \ref{Instance of Exon} shows that only the tuples with how-provenance tokens $e_1$ and $e_2$ satisfy $E \leq 2$. Thus $M_3$ is only valid for $t_{{q}1}$, whose how-provenance polynomial only includes $e_1$. %without any other how-provenance tokens from Exon.
 {Note that the implementation used here is different from \rba\ since evaluating view predicates is achieved by {referencing the base relation tuples with the query provenance} rather than computing extra predicates in the query evaluation.}  
 %This difference in performance will be discussed in Section \ref{sec:experiments}.
 
@@ -308,7 +308,7 @@ We can further optimize the intersection operation by representing the monomial 
     Retrieve the provenance monomial set $\Bar{P}$ of $t_v$
     Retrieve the grouping variable values ($Gv$) of $Q$ under mapping $M$
 
-    \For{each every provenance monomial $P \in \Bar{P}$}
+    \For{each provenance monomial $P \in \Bar{P}$}
     {
         \For{each provenance token $p \in P$}
         {
@@ -353,7 +353,7 @@ We can further optimize the intersection operation by representing the monomial 
 
  \Output{a set of covering sets $C$}
  
- For each aggregate term of $Q$, derive a set of view mappings covering it, which forms an array of view mapping set $S$. 
+ For each aggregate term of $Q$, derive a set of view mappings covering it, which forms an array of view mapping sets $S$. 
  
 %  Constructing an array of view mapping set $S$ where each view mapping set covers the same aggregate attribute
  
@@ -398,12 +398,11 @@ However, since fully parallel computation in a single machine can incur large me
 
 Using the instances and provenance expressions of $V_4-V_6$ presented in Tables \ref{Instance of V4}-\ref{Instance of V6}, the valid view mappings for every query tuple are presented in Table \ref{Instance of Q1 with view mappings}. Note that for tuple $t_{q2}$, although all of its how-provenance monomials exist in the view tuple $t_{v_52}$, it does not include $e_4*r_2$ which is used to construct $t_{v_52}$, violating the {tuple-level condition}.  Intuitively, since the value of the aggregate term may come from this component of the monomial ($e_4*r_2$), $t_{v_52}$ should not provide citation information for $t_{q2}$.
 
-
 Finally, valid view mappings are shown in Table \ref{Instance of Q1 with view mappings} along with the query instance, which are then used to compute covering sets for each query tuple in the {\em Covering sets step}. 
 \eat{Note that for tuple $t_{{q}3}$, there are two covering sets, $\{M_3\}$ and $\{M_4, M_5\}$;  
 % both of these sets cover the aggregate terms in $Q_1$ and are combined using $*$ and $+^R$. % as Table \ref{Instance of Q1 with view mappings} shows. covers both the aggregate terms in $Q1$. 
 other combinations of view mappings either {redundantly} or {non-maximally} cover the query's aggregate terms, and therefore are not valid.}
-\end{example}
+
 
 As we observed in \cite{wu2018data}, it is time-consuming to compute {\em all} covering sets. We therefore use two new strategies to achieve speed-up: 1) representing coverings sets using bit arrays; and 2) applying clustering algorithms to avoid an explosion of intermediate results.  These lead to an order of magnitude performance gain (see Section \ref{sec:experiments}).
 
@@ -419,3 +418,4 @@ For example, $M_4$ is the $1^{st}$ view mapping, represented by $0100$ (the left
 
 % \subsubsection{Applying clustering algorithms}
 \textbf{Clustering algorithm optimization.} Since cross product ($\times$) is commutative and associative, different orderings of operands result in the same output but may incur different overhead. For example, with $S_1\times S_2 \times S_3$, if $S_2 \times S_3$ is computed first, the result is $\{M_3, M_5\}$, $\{M_5, M_5\}$, $\{M_3, M_3\}$, $\{M_5, M_3\}$. After removing obvious redundancy, the result is  $\{M_3, M_5\}$, $\{M_5\}$, $\{M_3\}$. Note that $\{M_3, M_5\}$ is a duplicate compared to $\{M_3\}$ since 1) $\{M_3, M_5\}$ and $\{M_3\}$ cover the same set of aggregate terms and relational subgoals (checked by comparing the corresponding bit arrays); and 2) $\{M_3\}$ is a subset of $\{M_3, M_5\}$. It is therefore safe to remove $\{M_3, M_5\}$ since in the final result, any view mapping combinations which include $\{M_3, M_5\}$ will be a duplicate compared to one that includes $\{M_3\}$ and thus won't be a covering set. So the intermediate result of $S_2 \times S_3$ is $\{\{M_3\}, \{M_5\}\}$, which is smaller than the result of the other pairs. This is due to the high similarity between $S_2$ and $S_3$ (actually $S_2 = S_3$). To find good orderings for computing the cross product such that the intermediate result is minimized, clustering algorithms are applied so that view mapping sets which are similar to each other can be clustered and merged first (e.g. $S_2$ and $S_3$). In ProCite, the affinity propagation clustering algorithm \cite{dueck2007non} is used since it does not require a pre-specified number of clusters.
+\end{example}

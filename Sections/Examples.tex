@@ -39,7 +39,7 @@ Relations Gene2tag, Transcript2tag and Exon2tag capture the annotations ({\em an
 \eat{
 research groups involved in Havana project\footnote{https://www.sanger.ac.uk/science/groups}), which implies citations. Such citation information is also stored in GENECODE and ready for generating formated citations when the corresponding data are cited.}
 
-\textit{Citation views}~\cite{davidson2017model} define views of the database to which citations have been specified.  A citation view consists of a \textit{view query}, defining the subset of the data to which the citation is attached; a \textit{citation query}, which retrieves required citation information; and 3) a \textit{citation function}, which formats the information retrieved by the citation query to provide the final citation, e.g. in JSON, BibTex or RIS format. %View queries can be considered to be the \textit{frequent queries} over the database; all other queries will be called \textit{general} queries.
+\textit{Citation views}~\cite{davidson2017model} define views of the database to which citations have been specified.  A citation view consists of a \textit{view query}, defining the subset of the data to which the citation is attached; a \textit{citation query}, which retrieves required citation information; and a \textit{citation function}, which formats the information retrieved by the citation query to provide the final citation, e.g. in JSON, BibTex or RIS format. %View queries can be considered to be the \textit{frequent queries} over the database; all other queries will be called \textit{general} queries.
 \eat{
 Since the reasoning involved in generating a citation to a general query involves reasoning over the view queries, we focus on view queries.}
 
@@ -87,6 +87,7 @@ $V_5$ returns the maximal level of exons and the count of exons for each gene.
 $V6$ counts the number of transcripts for each gene whose transcript ids are no more than 2.
 
 \subsection{Query rewriting:  View mappings}
+\label{sec: conjunctive_example}
 %\scream{I think we need to cover more concepts here, e.g. the notion of mapping and covering}
 Given a (general) query $Q$ and a set of views $\mathcal{V}$, the \rba\ implementation in~\cite{wu2018data} starts by building a set of \textit{view mappings} $\mathcal{M}$ from $\mathcal{V}$ to $Q$. For each query tuple, \rba\ then reasons about the {\em validity} of each view mapping in $\mathcal{M}$ and constructs {\em covering sets}. Each covering set is a \textit{maximal}, \textit{non-redundant} set of {\em valid} view mappings,
 % Since there may be many such covering sets, only \textit{maximal}, \textit{non-redundant} covering sets are considered, 

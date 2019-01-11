@@ -5,7 +5,7 @@ We start by describing the datasets and workloads used before presenting the exp
 \subsection{Experimental set-up}
 \provalg\ was implemented in Java 8 using PostgreSQL 9.6.3 as the underlying DBMS. All experiments were conducted
 on a Linux server \eat{Distribution? (Gianmaria)}with an Intel(R) Xeon(R) CPU E5-2630 v4 @ 2.20GHz and 64GB of main memory. 
-Although there are provenance tools which support aggregate queries for relational database systems, e.g. GProM \cite{arab2018gprom}, they are overly complex for our purposes, and become a bottleneck for interactive computation. We therefore implemented a provenance layer from scratch, which simply collects how-provenance for each query tuple.
+Although there are provenance tools which support aggregate queries for relational database systems, e.g. GProM \cite{arab2018gprom}, they are overly complex for our purposes, and become a bottleneck for interactive computation. We therefore implemented a provenance layer from scratch, which simply collects how-provenance \cite{green2007provenance, amsterdamer2011provenance} for each query tuple.
 
 \eat{
 {\bf Provenance.} Provenance tools which support aggregate queries exist for relational systems, e.g. GProM \cite{arab2018gprom}. 
@@ -141,7 +141,7 @@ The results are shown using 3D surfaces in Figure \ref{fig:stress_test_instance_
 
 % We also measured the extra space needed for the eager strategy, where the provenance of views is precomputed and stored in the database; it takes about 180 MB in the database to store the provenance for each view when the instance of the view includes up to 1 million how-provenance monomials. 
 
-\textbf{Exp2.} The goal of this experiment is to compare the relative performance of \provalg, TLA and SSLA while varying the number of view mappings ($N_v$). Since TLA and SSLA cannot handle aggregate views, only conjunctive views are used. In this case, the provenance of views is not necessary; there is no difference between the {eager} and {\lazy} strategy and the query provenance index is not useful. 
+\textbf{Exp2.} The goal of this experiment is to compare the relative performance of \provalg, TLA and SSLA while varying the number of view mappings ($N_v$). Since TLA and SSLA cannot handle aggregate views, only conjunctive views are used. In this case, the provenance of views is not necessary; there is no difference between the eager and lazy strategy and the query provenance index is not useful. 
 However, the two optimization strategies on covering set computation, i.e. applying bit arrays and clustering algorithms, are useful and are measured here.\eat{ We observe that \provalg\ have almost the same performance with TLA and SSLA no matter whether to use optimization or not and thus TLA and SSLA are not presented here.} The query is a fixed aggregate query with 1 million how-provenance monomials in its instance. $N_v$ is varied from 1 to 50 and there are no predicates or lambda variables for each individual view. 
 
 \textbf{Results.}

@@ -1,149 +1,202 @@
 \begin{appendix}
-You can use an appendix for optional proofs or details of your evaluation which are not absolutely necessary to the core understanding of your paper. 
+Subject: Submission of revised paper 360
 
-\section{Details of approaches}
-
-In this section, the details of provenance approach is presented step by step and the corresponding pseudo-code is provided. One key step is to derive the valid view mappings, which depends on checking the satisfiability of {\em schema-level approach} and {\em tuple-level approach} for each candidate view mapping. So we present the details of 
-determining view mappings satisfying {\em schema-level approach} in Algorithm \ref{view_mapping_schema_level} and the details of continuing filtering out view mappings violating {\em tuple-level approach} for each individual query tuple in Algorithm \ref{view_mapping_tuple_level}.
-
-\begin{algorithm}[h!] 
-\footnotesize
- \SetKwInOut{Input}{Input}
- \SetKwInOut{Output}{Output}
- \Input{a set of views: $\mathcal{V} = \{V_1, V_2,...,V_k\}$, user query: $Q$, a Database instance $D$}
-
- \Output{the set of all covering sets for each tuple in $Q(D)$}
-
-{\em Preprocessing step}: Return a set of view mappings $\mathcal{M}$ and the provenance of $Q$ and each $V$
-
-{\em Reasoning valid view mapping step}: For each query tuple $t$, determine valid view mappings by comparing the provenance of  $Q$ and the provenance of $V$
-
-{\em Covering sets calculation step}: Calculate covering sets based on derived valid view mappings for each query tuple, which will be the output of the algorithm.
-%  }
-%  \For{each view mapping $M \in \mathcal{M}$}{
+Dear VLDB Program Committee:
+Thank you for the decision requesting a revised version of our paper for a second evaluation. We have carefully reviewed the feedback and comments, and have revised the manuscript as detailed below. The reviewers mainly criticized the problem motivation (Section 1 and Section 3), implementation and optimization (Section 5) and experiments (Section 6), which we addressed by 1) improving the motivation on why we should care about aggregation in data citation, 2) adding a detailed comparison between the algorithms proposed in this paper and our previous work to highlight the need to use provenance; 3) adding implementation and optimization details; and 4) refining the experiments to show the effect of the optimizations.
  
-%     Derive lambda terms $L(M)$ and the predicates $condition(M)$ under $M$
-    
-%     Add all lambda terms in $L(M)$ to $\bar{X}'$
-    
-%     Add boolean expressions of all the global conditions in $condition(M)$ to $\bar{X}''$
-%  } 
-%  \For{each relation $B_i$ in the body of $Q$}
-%  {
-%     Add the view vectors $Vec(B_i)$ to $\bar{X}'$.
-%  }
+% We look forward to hearing from you!
+% Sincerely,
+% Authors of Paper 360
 
-%  Construct the extended query $Q_{ext1}$ with the following form:
+\section{Response to Reviewer 1}
+% \textbf{W1}. 
+% It is a rather incremental paper, compared to \cite{alawini2018data} and \cite{wu2018data}. The underlying ideas were already known and previous systems showed feasibility (to some extent).
 
-%  $Q_{ext1}(\bar{X}') :- B_1(\bar{X_1}), B_2(\bar{X_2}), \dots, B_m(\bar{X_m}), condition(Q)$
+\textbf{Response to W1}: Thanks for your concerns about the novelty of this paper. We agree with you that some of the underlying ideas were discussed in our previous work. However, this work is new compared to those papers since 1) we develop a new model for data citation based on provenance. Compared to \cite{alawini2018data} and \cite{wu2018data}, the novelty of this paper is that it can support aggregate queries and aggregate views, which was not addressed in \cite{alawini2018data} and \cite{wu2018data}. To motivate the use of provenance In Section 3.3, we compare \pba\ and \rba\ from \cite{wu2018data} via an example to show why the previous solutions and their extension fail in the context of aggregate queries with aggregate views, thus motivating the need for provenance. 2) the implementation, which is presented in Section 5.2 along with optimizations for performance improvement,  is totally different from our previous system. The optimization strategies include the use of indexes over query provenance and materialized view provenance for reasoning about valid view mappings, and the use of bit arrays and clustering algorithms for computing covering sets. These optimizations are new to this work, and have not been published in our prior work. Some optimization ideas can also be used in other applications, as discussed in the conclusions.
 
- \Return $\mathcal{M}$
+% \textbf{W2}
+% . Some optimizations are mentioned that are claimed to "result in orders of magnitude in speed-up". This is not substantiated in the experimental section.
+\textbf{Response to W2}:
+We agree, and thanks for pointing this out. We have reorganized the paper so that there is room to present both details of the optimizations and the related experimental results (see Sections 5.2 and 6.2 respectively). The optimization strategies include two parts: The first one is for the reasoning step, which includes building indexes over the query provenance and materializing the view provenance.  The second is for the covering set step, which includes representing covering sets with bit arrays and applying a clustering algorithm to minimize the size of intermediate results during the computation. More details can be found in Exp2 of Section 6.2, where the optimization strategies for the covering sets step are shown to result in an order of magnitude speed-up (see Figure 2(b)).
 
- \caption{Derive all possible view mappings in the schema level}
- \label{view_mapping_schema_level}
- \end{algorithm}
+% W3. It seems "early" to start looking at extensions of the prov+rewriting approach while the non-aggregate case is in its infancy. It is unclear how the proposed techniques help to speed up the simpler case. 
+\textbf{Response to W3}: 
+As we now better explain in the paper, the primary motivation for using provenance is not to speed-up the process, but rather to support aggregate queries and views for which provenance is necessary. We explain why aggregate queries and views are increasingly important in Section 1 by discussing two datasets, Hetionet and GENCODE.  In Section 3 we explain why provenance is necessary to deal with aggregate queries and views.  Since dealing with provenance is known to be costly, the optimization efforts described in Section 5 are necessary to obtain ``acceptable'' performance, i.e. performance that is comparable to the previous solution for the non-aggregate case. As Section 6.2 shows, in some cases (Exp3), PBM can even outperform RBM since the query in RBM used for evaluating the view predicates when retrieving the query instance is more expensive than the query in PBM used for retrieving the query instance along with the provenance.
+While we agree there is certainly more to be done for the non-aggregate case, looking at the aggregate case significantly increases the applicability of the solution to realistic cases. 
 
+% W4. Some comparisons are made with two competitors (from [35]), but insufficient details are provided to understand the experiments.
 
-\begin{algorithm}[h!] 
-\footnotesize
- \SetKwInOut{Input}{Input}
- \SetKwInOut{Output}{Output}
- \Input{a set of views: $\mathcal{V} = \{V_1, V_2,...,V_k\}$, user query:
- $Q(\bar{X}, Agg_1(\bar{X'_{1}}), \dots, Agg_s(\bar{X'_{s}})) :- B_1, B_2, \dots, B_m, condition(Q)$, a set of possible view mappings $\mathcal{M}$, a query tuple $t \in Q(D)$}
+\textbf{Response to W4}:
+We agree that in the first version of our paper, we failed to elaborate on the differences between PBM and RBM. In order to remedy this, we rewrote Section 3 to present some important details of RBM using a running example, show the key differences between RBM and PBM and explain why RBM fails for aggregate queries with aggregate views. We also highlight in Section 5.2 (in the first paragraph of the right column of page 8) the fact that PBM and RBM have different mechanisms for the case of conjunctive views. We believe that these details on the implementation differences between RBM and PBM are necessary to understand the effect of the experiments.
 
- \Output{the set of valid view mapping $\mathcal{M}_t$}
+In the experimental section (Section 6), we also present more details to show the effect of the optimization strategies introduced in Section 5 (Exp1, Exp2) and show how PBM can outperform RBM in some cases (Exp3). In Exp1, we show experiments in the case of aggregate queries and aggregate views, which cannot be handled by RBM. So there is no comparison between them in Exp 1. In Exp2, the goal is to compare PBM and RBM by the increasing number of conjunctive views and showing the effect of the optimization strategies for the covering set computation. We observe that the time to compute covering sets becomes the major overhead for both PBM and RBM and thus the differences between them become insignificant; thus only the experimental results for PBM are shown in Figure 2(b). In Exp3, the number of predicates varies in the case of conjunctive views, in which case PBM can outperform RBM. As indicated in Section 6.2, the reason behind this is that the query for retrieving the provenance and query instance in PBM incurs less overhead than the query for evaluating the view predicates explicitly in RBM.
 
- Initialize $\mathcal{M}_t = \{\}$
- 
- Suppose the assignment to tuple $t$ is $\Gamma$ and the isomorphism between each subgoal and how-provenance under the assignment $\Gamma$ is $F$.
+% C1. Originality is low, however: the validity conditions are what one would expect and are obtained by inspecting whether sufficient information is present in views to deduce information for the query result tuples.
+\textbf{Response to C1}:
+It is true that we take a lot of effort to formalize the (intuitively reasonable) validity conditions for view mappings in the context of aggregate queries and possible aggregate views, which is the main contribution in this paper. However, implementing the model to perform in an acceptable time is also a major contribution, and one which we were not initially convinced could be done.  To that end, significant engineering efforts were required and optimizations developed to speed up the reasoning process.  We now expand on these optimizations in the revised paper.  Note that several of these techniques can be used in other applications, although we do not have space to expand on this idea and mention it only in the conclusions. For example, the index over query provenance is applicable to speed up the computation where we need to compare the provenance of two queries, such as linked brushing in interactive data visualizations \cite{psallidas2018smoke}, which is highlighted in the conclusions of the paper.
 
-Suppose the how-provenance polynomial of $t$ is $W = \sum_{i=1}^rW_i$
-
-% Create a multiset $\bar{W}$ to store all the monomials in $W$
+% C2. Section 5.2 in the paper is a bit strange; its title contains the word "optimization" but apart from a short paragraph listing optimization strategies no details are given. It is also not reported in the experimental section what impact these optimizations have on performance.
+% Nevertheless, it is claimed that these optimizations "can result in orders of magnitude speed-up". This claim should be experimentally substantiated a more in-depth discussion of the optimization techniques should be present.
 
 
- \For{each view mapping $M \in \mathcal{M}$ which maps view $V$ to $Q$}
- {
+\textbf{Response to C2}:
+Good point. To deal with this issue, we provide more details on the optimizations strategies in both the reasoning  and covering set steps in Section 5. In order to optimize the reasoning step, we build an index over query provenance to speed up comparisons between the query provenance and view provenance. The view provenance can also be materialized to avoid repeated re-computation. As shown in Exp1 in Section 6.2, these optimizations can lead to up to 2x speed-up. 
 
-	\For{each how-provenance monomial $W_i$}
- 	{
-    	\For{each how-provenance token $w_{ij}$ in $W_i$}
-        {
-        	Subgoal $R=F^{-1}(w_{ij}|\Gamma)$
-            
-            \If{a subgoal $R'$ in the body of $V$ can be mapped to $R$ under $M$}
-            {
-      			Assign the base relation tuple $t'$ which is associated with how-provenance token $w_{ij}$ to $R'$      		
-            }
-        }
-        \If{any predicate of $V$ is evaluated to be false}
-        {
-        	\textbf{break}
-        }
-    }
-    \eIf{$V$ is a conjunctive view}
-    {
-		add $M$ to $\mathcal{M}_t$
-    }
-    {
+For the covering set step, we use bit arrays to represent each covering set and the subgoals and aggregate terms it covers. We also observe that in the process of producing covering sets, different orders of combining valid view mapping sets have different performance due to the size of intermediate results. A clustering algorithm called Affinity propagation is therefore applied to compute the best order. The two optimization strategies can result in 5x and 2x improvements, respectively, and their combination can lead to an order-of-magnitude speed-up as shown in Exp2 in Section 6.2. 
 
-		Initialize potential valid view tuple sets $\mathcal{T}_v$
-    	
-        Suppose grouping variable set $\bar{Y}$ in the head of $V$ is mapped to $\bar{X}$, i.e. $\phi(\bar{Y}) = \bar{X}$
-        
-        Initialize $W' = 0$
-        
-        
-		\For{every view tuple $t_v \in V(D)$}
-        {
-        
-        	Suppose that the corresponding value assignment in $t_v$ is $\Gamma'$
-            
-			\If{$\Gamma'(\bar{Y}) = \Gamma(\bar{X})$ }
-            {
-            	\tcc{$t_v$ has the same values on attributes $\bar{Y}$ as $t$ has on attributes $\bar{X}$}
-                
-                Suppose the how-provenance polynomial of $t_v$ is $W'$
-                
-                \If{every monomial in $W'$ can be mapped to some monomial in $\bar{W}$}
-                {
-                	$W := W + W'$
-                }
-            }
-        }
-        
-        \If{W == W'}
-        {
-        	add $M$ to $\mathcal{M}_t$
-        }
-        
-%         \While{$\bar{W}$ shrinks}
-%         {
-% 			\For{every view tuple $t_v \in \mathcal{T}_v$}
-%             {
-% 				\If{every monomial in $W'$ can be mapped to some monomial in $\bar{W}$}
-%                 {
-%                 	Remove the monomials in $W'$ from $\bar{W}$
-%                 }
-%             }        
-%         }
-        
-%         \If{$\bar{W}$ is empty}
-%         {
-%         	Add $M$ to $M_t$
-%         }
-    }
- }
- \Return $\mathcal{M}$
- \caption{Derive valid view mappings for each tuple}
- \label{view_mapping_tuple_level}
- \end{algorithm}
+% C3. In addition, a comparison with two previous approach TLA and SSLA (from \cite{wu2018data}) is included. Since no details are provided about these two competitors, it is difficult to assess with what is compared here. These comparisons are a bit "internal", meaning that they are perhaps more of interest to the authors (since the competitors originated from same research groups as the authors), rather than of interest to a wider audience.
+\textbf{Response to C3}:
+Thanks for your comments. To solve this issue, we modified Section 3 to use a running example to illustrate briefly how to use TLA and SSLA for citation reasoning, highlighted the implementation differences between RBM and PBM when dealing with conjunctive views in Section 5.2 (in the first paragraph of the right column of page 8) and showed how such implementation differences lead to different overhead in Section 6.  
+
+We agree that those comparison seems a bit ``internal'', however there are no other approaches to include in the comparison at this point. The comparison between PBM proposed in this paper and RBM proposed in our previous paper is still necessary since it gives reader a sense of the trade-offs between PBM and RBM, and thus provides some insight on which one should be used in different scenarios or workloads. 
+
+% D1 sect 3.1. Use initial capital letters for transcript2tag and exon2tag.
+\textbf{Response to D1}:
+Thanks, it has been revised.
+
+% \textbf{Response to D2} sect 3.2. you define valid in terms of visibility; it is unclear, however, what being visible means, until much later. Similarly, for being ``involved''. The explanation given here could be improved.
+\textbf{Response to D2}: Thanks for your comments, we modified the terminology in that paragraph. Instead of talking about ``visibility'',  we say ``for a query tuple $t$, view mapping $M$ is valid iff some portion of $t$ appears in the instance of $V$ under $M$'', which is determined by examining the lambda variables, the head variables and the predicates of views in the query. To illustrate this point, we use a modified example in Section 3.2 to show what kinds of query tuples can appear in the view instance under certain view mapping $M$, and thus when $M$ is valid for such query tuples. In the same example, we also briefly introduce how RBM determines the validity of view mappings in the implementation, which is mainly achieved by evaluating the view predicates along with query evaluation. 
+Also we removed the sentence with the word ``involved'', which is used for illustrating the concept of ``covered''. We delay the discussion about this point until Section 4.
+
+% D3 sect 3.3. What happens if Tid <=5 in the query. It would be instructive to have an example in which the view does not hold all necessary information.
+\textbf{Response to D3}:
+We have modified the example in Section 3.3 to illustrate this, where the view mapping of $V_2$, $M_{22}$ is not valid for query tuple $t_{{q_2}2}$; this is also justified in Section 4.3.2. The invalidity is because tuple $t_{q_{\ref{eg: illustrative_eg3}}2}$ does not include the how-provenance token $g_4$ as the view tuple $t_{v_21}$ does, which is filtered out by the predicate $Gid \leq 3$. As a comparison, in Section 4.3.2, we also show that if the predicate is relaxed to $Gid \leq 4$, then the token $g_4$ is included in tuple $t_{q_{\ref{eg: illustrative_eg3}}2}$, thus satisfying the tuple level conditions in Def. \ref{Def: validity condition agg}. However, if tuple $t_{q_{\ref{eg: illustrative_eg3}}2}$ includes a token that is not in view tuple $t_{{v_2}1}$, then then tuple level condition still does not hold. This is the idea of ``exact match'' between query provenance and view provenance.
+
+% D4 sect 3.3. Table 5: How are Lee, Joe and Liu?
+\textbf{Response to D4}:
+It should be \{Group: [`Lee', `Joe', `Liu']\} after applying the citation construction policies, which simply aggregates all the values of the same key (i.e. Group) from different view tuples. In Section 3.3, we changed the example for the purpose of clarifying the mechanism of RBM and to show why we need provenance for aggregate queries in the case of aggregate views. However,  citations for the query tuples are still presented. 
+% D5 sect 6.1., last sentence: notation "used" in
+
+\textbf{Response to D5}: Done
+
+% D6 sect 6.2.1. exp 3. The explanation of the discrepancy between Provcite and TLA/SSLA is not clear enough.
+
+\textbf{Response to D6}: 
+In order to clarify the mechanism of TLA and SSLA, we rewrote Sections 3.1 and 3.2 to show how TLA/SSLA deal with simple conjunctive queries and how they can be extended to deal with aggregate queries for conjunctive views. We also explain how ProvCite deals with simple conjunctive queries and conjunctive views with provenance in Section 5.2 (in the first paragraph of the right column of page 8), and highlight the implementation differences between TLA/SSLA and ProvCite.
 
 
-Please use readable font sizes in the figures and graphs. Avoid tempering with the correct border values, and the spacing (and format) of both text and captions of the PVLDB format (e.g. captions are bold).
+\section{Response to Reviewer 2}
 
-At the end, please check for an overall pleasant layout, e.g. by ensuring a readable and logical positioning of any floating figures and tables. Please also check for any line overflows, which are only allowed in extraordinary circumstances (such as wide formulas or URLs where a line wrap would be counterintuitive).
+% W1 Novelty and technical contribution might be considered a bit narrow in terms of improvements over the authors' previous work and over existing solutions for data citation
+\textbf{Response to W1}:
+As we now better explain, the novelty of our paper has two aspects: 1) we formalize the connections between provenance and data citation, and apply this connection to address data citation for aggregate queries and views, which has not been completely studied; 2) we apply various optimizations to gain performance.  These techniques may be applicable in other areas.  For example, due to the close connection between data citation and fine-grained access control, our techniques are applicable in the fine-grained access control. In addition, as we mention in the paper, the key step in determining the validity of view mappings is to compare the provenance of the input query and the views, which indicates that our techniques and optimization ideas (especially the query provenance index idea) are usable for any application where the reasoning needs to compare provenance between different queries or views. For example, as mentioned in the conclusions of our paper, in linked brushing from interactive data visualization problem \cite{psallidas2018smoke}, two database views are used to visualize patterns. Users may highlight parts of the visualized result and want to see the corresponding part in the other visualized result, which requires lineage/provenance for reasoning. So we believe that the optimization ideas proposed in this paper can be adapted to this area.
 
-Use the \texttt{balance} package together with a \texttt{\char'134 balance} command at the end of your document to ensure that the last page has balanced (i.e. same length) columns.
+% W2 The experimental evaluation is superficial and not thoroughly convincing
+\textbf{Response to W2}:
+To improve the experiment section, we add evaluations to show the effect of the optimization strategies mentioned in the implementation section (Section 5), which includes the optimizations on Reasoning step (Exp1) and Covering sets step (Exp2). In Exp1, we enlarged the scale of $N_{pq}$ and $N_{pv}$ (from 50k to 5 million) and increased the number of views $N_v$ to 20, resulting in an updated figure (Figure 2(a)) to show the effect of each optimization strategy separately. As introduced in Section 6.2.1, the use of query provenance index can lead to about 1.0x-1.8x speed-ups in most cases while materializing view provenance results in about 1.1x-1.5x speed-ups. So the overall speed-up is up to 2x. 
+In Exp2, we observe that with the increase of the number of views ($N_v$), the covering set computation becomes the major overhead for both PBM and RBM and thus they do not have performance differences in this case. So only the experimental results of PBM are presented in Figure 2(b) along with the effect of the optimization strategies for the Covering sets step. As described in Section 6.2.1, using a bit array representation and clustering leads to about a 5x and 2x speed-up, respectively, and an order of magnitude performance gain when both are combined. 
+
+We also include the time to query the provenance from the underlying provenance-enable database as requested (particularly in Figure 2(a), 2(c) and Table 17), which shows that the reasoning time is still comparable to the query time. It is also helpful for explaining Exp3 where PBM outperforms RBM due to the different query against the database. For PBM, the query is used for retrieving the query instance along with provenance. In contrast, for RBM, the query is used for retrieving the query instance and for evaluating the view predicates. As introduced in Exp3 in Section 6.2, when there are a large number of view predicates, the query used in RBM takes much more time than that in PBM and thus slows down the computation of RBM. 
+
+% W3 Formalization and technical depth shall be improved in some parts of the paper
+\textbf{Response to W3}:
+Thanks for your comments. 
+In terms of the formalization, we improve it by 1) modifying the running example in Section 3 to motivate the use of provenance; 2) simplifying some content and examples in Section 4. 
+
+In terms of the technical depth, compared to the previous version, we added more details in the implementation section (Section 5) to show how we can optimize the Reasoning step and Covering set step rather than implement naively. The optimization strategies in the Reasoning step include indexing over query provenance and materialization over view provenance while the optimization strategies in the Covering set step include bit array representations and optimizing the order of view mapping set combination by clustering algorithm. Those strategies have been shown in Section 6 to achieve significant performance gains.
+
+% W4 Presentation of the paper can be improved
+\textbf{Response to W4}:
+We agree. In the previous version of our paper, we spent a lot of space describing unnecessary details of the PBM model, and did not elaborate the difference between RBM and PBM; we also did not elaborate optimizations of PBM. To improve that, we first modified Section 3 where we used a new motivating example to show how RBM works, how it can be extended to handle aggregate queries with conjunctive views and why the ideas of RBM fail in reasoning for aggregate queries with aggregate views, which thus motivates the use of provenance. Second, in Section 5.2 (in the first paragraph of the right column of page 8) we highlight the differences between RBM and PBM in the case of conjunctive views. Third, in Section 5.2 we elaborate the optimizations that are not presented in the previous version, which includes building an index over query provenance, representing covering sets with bit arrays and speeding up covering set computation by applying a clustering algorithm. We also update the experiment section (especially the figures) to show the effect of these optimization strategies. 
+
+% D1) A major concern of this paper is the contribution, which might be considered a bit narrow. First, parts of this work have been published by the authors in previous papers ([5,21]). Second, the improvement wrt to RBM solutions is to cover also aggregate views and queries. Third, provenance is a well-known technique for tracing query results back to the input tuples, hence there no much novelty in using provenance for data citation.
+
+\textbf{Response to D1}:
+Although the basic concepts used in the data citation problem, such as the definition of view mappings and the idea of covering sets, have been published before, the problem of dealing with aggregation is new and raises new challenges that have not been addressed in any previous work. To this end, the model proposed and the algorithm used for this problem are also more powerful than the ones in our SIGMOD paper since they can deal with aggregate queries in the context of aggregate views. As we clarify in this version of our paper, RBM can be extended to handle aggregate queries and conjunctive views but cannot deal with aggregate queries and aggregate views.  We illustrate this point with an example in Section 3.3, and justify the use of provenance for reasoning in the case of aggregate queries and aggregate views. 
+We agree that data provenance is a well-known technique, however it has not been previously used in the context of data citation. In this paper, one of the major contribution is that we formalize the connections between data citation and data provenance and justify how data provenance can help us deal with data citation with aggregate queries and aggregate views, which cannot be solved using our previous solutions.  Interestingly, while the use of provenance is necessary for aggregates, we also show that it may result in performance gains in the case of conjunctive views. 
+
+Various optimization strategies are also presented in the paper, which are another major contribution. Some of the optimizations lead to an order of magnitude speed-up, such as the ones for covering sets computation.  Other optimizations, like the ones used for deriving valid view mappings, have potential use in other scenarios such fine-grained access control and linked brushing in data visualization. To our knowledge, our optimization strategies over provenance have not been proposed previously, and are therefore another important contribution.
+
+\textbf{D2} \textit{The experimental evaluation is not convincing and leaves a number of open question. 
+First, in the experiment for synthetic workloads (sec. 6.2.1), it is not clear which queries are used and on which datasets. Moreover, ProvCite is not always clearly better than its competitors, e.g., Fig. 4(b). Also, for large values of the parameters $N_{pv}$, $N_{pq}$ and $N_v$, the reasoning time is quite large for interactive, real-time applications.}
+
+
+\textbf{Response}: We have now significantly revised the experimental study. For the synthetic workloads, the queries and the views used are generated randomly. We add some sentences in Section 6.1 to show that we use a random query generator and a view generator to generate synthetic queries and synthetic views with given $N_{pv}$, $N_{pq}$ and $N_v$ values.  The query generator can generate a random aggregate query Q over GENECODE with a given $N_{pq}$ value. Given such a synthetic aggregate query Q and the value of $N_{pv}$ and $N_v$, synthetic views can be generated with the view generator. The high-level idea of the query and view generator is that the query/view body is generated by randomly picking relations from the database, and generating appropriate predicates to make sure that the total number of provenance monomials is $N_{pq}$ or $N_{pv}$, which follows by randomly picking up variables from the relations in the query/view body as the grouping variables and aggregate variables
+
+To make sure that our experiments can be replicated, we uploaded the synthetic queries and synthetic views into our Github repository where readers can access them.
+
+In terms of the performance, we admit that ProvCite is not always better than RBM since processing provenance is very expensive in the case of conjunctive views. However, as we claimed before, ProvCite is more powerful since it can handle aggregate views, which can not be dealt by RBM. Besides, we have improved the performance (particularly for Exp1 in Section 6.2) by applying some optimization strategies for the reasoning and covering sets steps. For example, for Exp1 in Section 6.2, we use 20 views (instead of 10 in the previous version) for a single synthetic query and the maximal $N_{pv}$ and $N_{pq}$ become 5 million (instead of 1 million in the previous version). When both  $N_{pv}$ and $N_{pq}$ are 1 million, the total time is 20 seconds when using the optimization, which is more efficient that the one (about 2 mins) in the previous version.   Considering the fact that ProvCite is only slightly worse than RBM in most cases and can be even significantly better than RBM, ProvCite has a lot of potential in practice (although it requires a provenance-enable database).
+
+
+\textit{Second, in the experiments in Tab. 15 (sec. 6.2.2), the parameters $N_v$ and $N_p$ are very small, and I doubt whether this are realistic assumptions in many real use cases. }
+
+\textbf{Response}: $N_v$ is the number of view mappings and $N_p$ is the total number of predicates under the view mappings.  Note that $N_v$ is not the total number of views defined in the database but is the total number of views that can be mapped to the query. Views which cannot be mapped to the query (e.g. the query is defined over relation A while the view is defined over relation B) will not be considered, which is mentioned in Section 6.2 for Exp1.  Typically, $N_v$ will be proportional to the number of relations in the query -- most views ``partition'' the relations \cite{wu2018data}, i.e. are select-project queries that do not overlap.   We can also give the DBA guidance on how to define views so as to avoid too many overlaps between views. Similarly $N_p$ in practice will be proportional to the size of the query.  
+
+
+\textit{Third, in Sec. 5.1 it is mentioned that $N_{pv}$ and $N_{pq}$ are usually no more than 1 million. I think that this is not a realistic assumption in many modern applications, especially for aggregate queries over large datasets.}
+
+\textbf{Response}: In terms of the reasoning time for synthetic workloads (especially for Exp1), we now give experimental results for much larger $N_{pv}$ (0-5 million), $N_{pq}$ (0-5 million) and $N_v$ (20). However, these extreme cases rarely happen in practice.  In particular, $N_{pq}$ and $N_{pv}$ are typically less than 1.5 million,  as shown in the experiments for realistic workloads. Even if $N_{pq}$ and $N_{pv}$ are large, it is possible to parallelize the Reasoning step as mentioned in Section 5.2 for performance gains.
+
+\textit{Fourth, sec. 5 mentions several optimizations, which are not evaluated at all.}
+
+
+\textbf{Response}: We present more details in Section 5.2 to show the optimization strategies used in the Reasoning and Covering sets steps, and their effect is presented in Section 6.2. For the optimization strategies for Covering sets, an order of magnitude speed-up can be achieved, which is shown in Exp2 in Section 6.2.
+
+
+\textit{Overall, I think that more detailed experiments should be provided to get deeper insights in the performance of the proposed method. It would also be helpful to see some experiments that show the overall total query time and not only the reasoning time, instead of providing only a reference to experiments in previous work.}
+
+
+\textbf{Response}:
+Thanks for your suggestion to include the query time against the provenance-enabled database in the result, which has been done for both synthetic workload and realistic workload (see Section 6.2). As the result suggests, the reasoning time is comparable to the query time.
+
+
+% D3) In sec. 4, I miss some crisp results that show/proof that the proposed framework computes the correct data citations for all kind of conjunctive and aggregation queries. There are definitions that specify requirements, but it is not shown that these requirements are sufficient to obtain the intended result.
+
+\textbf{Response to D3}:
+Good point. Actually RBM and PBM generate the same covering sets and thus citations in the case of conjunctive views and (conjunctive or aggregate) queries.  This is  stated in Section 6.1 and can be also proved. Due to space limitations, the proof is not included in the paper.  
+
+
+% D4) Although considered a important contributions, the lazy and eager strategies are not elaborated.
+\textbf{Response to D4}:
+Thanks for your concerns. Actually the only difference between the lazy and eager strategies is whether or not the view provenance is materialized in the provenance-enabled database. More implementation details about the two strategies are given in Section 5.2. 
+
+% D5) In sec. 5, the optimization strategies are not elaborated at all.
+
+
+\textbf{Response to D5}:
+Thanks for your comments, we now elaborate the optimization strategies in Section 5.2 and their effect in Section 6.2. The optimizations are used in the Reasoning and Covering sets steps. For the Reasoning step, we build an index over the query provenance on the fly to speed up the comparison between query provenance and view provenance and can materialize the view provenance beforehand (eager strategy). For the Covering sets step, bit arrays and a clustering algorithm are applied, which can achieve up to an order of magnitude speed-up.
+
+
+% D6) It is not very clear to the reader whether it is impossible to extend RBM to aggregate queries/views or whether it is only complicated to do so: At the bottom of page one it is written ".. cannot be used in applications in which the queries and views involve aggregate ...", at the end of sec. 3 it says "... it is not trivial to extend RBM to handle such cases", and in sec. 6.1 it says "... RBM can be extended to handle aggregate queries when views are conjunctive views (but not aggregate views)". It would be good to have a crisp statement about this issue to better understand the context and the positioning of this paper.
+
+
+\textbf{Response to D6}:
+We clarified in the new version of our paper that RBM can be extended to handle aggregate queries when views are conjunctive but cannot be further extended to handle the case when the views have aggregation. We use a new running example in Sections 3.2 and 3.3 to show why RBM does not work for aggregate views and thus motivate the use of provenance.
+
+
+% D7) In sec. 5.2, it would be helpful to show the mappings $M_3$, $M_4$ and $M_5$.
+
+
+\textbf{Response to D7}: Done.
+
+
+% D8) Sec. 1 is rather long and too abstract. I suggest to provide a concrete minimal example that shows at least one query and one view, instead of the system overview in Fig. 1, which is not that helpful and anyway shown in previous work of the authors.
+
+
+\textbf{Response to D8}: Thanks for your input, we have removed Fig. 1 and shortened the text in Sec. 1.
+
+
+% D9) The presentation of the paper can be improved to facilitate the reading and the understanding. Perhaps it is possible to make the running example a bit shorter and to focus more on the crucial aspects in the description of the examples.
+
+\textbf{Response to D9}: We have removed unnecessary content from the running example in Sections 3.1-3.3 and highlighted why RBM fails in the case of aggregate queries with aggregate views with the running example in Section 3.3
+
+
+\section{Response to Reviewer 4}
+
+
+% W1. How big was the synthetic dataset? I did not see where you provided for the synthetic dataset the same statistics as in table 13 for the realistic datasets. How was the synthetic data generated?
+\textbf{Response to W1}:
+The synthetic workloads are based on GENECODE whose statistics are shown in Table 15. As illustrated in Section 6.1, to generate synthetic queries, we implemented a query generator which can generate a random aggregate query Q over GENECODE with a given $N_{pq}$ value. Given such a synthetic aggregate query Q, synthetic views can be generated with a view generator given the value of $N_{pv}$ and $N_v$. The high-level idea of the query and view generator is that the query/view body is generated by randomly picking relations from the database, and generating appropriate predicates to make sure that the total number of provenance monomials is $N_{pq}$ or $N_{pv}$, which follows by randomly picking up variables from the relations in the query/view body as the grouping variables and aggregate variables
+
+To make sure that the experiments are repeatable, the synthetic queries and views used have been uploaded to a Github repository.
+
+% W2. In the conclusion, you mention incorporating PBM into machine learning algorithms without much context or explanation. Can you elaborate on that? 
+\textbf{Response to W2}:
+Thanks for your suggestions. The reason why PBM can be incorporated with machine learning algorithms is that PBM can deal with arbitrary aggregate functions, which means that the test phase of a machine learning model can be viewed as an aggregate function which predicts the labels of a set of test samples and outputs the accuracy as the aggregate value. Due to space, we only briefly mention this point in the conclusions.
+
+
+% W3. Minor typo on page 2: 'for every type of genes.'
+\textbf{Response to W3}: Corrected.
+
 
 \end{appendix}

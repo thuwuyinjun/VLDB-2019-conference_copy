@@ -157,6 +157,69 @@ $V_{\ref{eg: illustrative_eg3}}'$ has {\em finer granularity} than $Q_{\ref{eg: 
 \textbf{How-provenance.} We use the notion of {\em how-provenance} introduced in~\cite{green2007provenance}. It starts by annotating each base relation tuple with a unique {\em provenance token}, and propagates those tokens along with the tuples to the query result.  Each tuple in the query result then has a {\em how-provenance polynomial} expressed using $+$ (alternate use) and $*$ (joint use) to indicate {\em how} base relation tuples contribute to the query result. Each {\em how-provenance polynomial} is composed of multiple {\em how-provenance monomials} which are joint-use terms expressed with $*$. For example, the provenance polynomial for tuple $t_{q_{\ref{eg: illustrative_eg3}}2}$ in $Q_{\ref{eg: illustrative_eg3}}(D)$  is $g_2 + g_3$, which has two \textit{how-provenance monomials} (see Table \ref{Table: Sample instance of Q with provenance}). It means that two tuples from relation {\em Gene} with how-provenance tokens $g_2$ and $g_3$, respectively
 % , share the same $Tid$ value and 
 were used to create $t_{q_{\ref{eg: illustrative_eg3}}2}$.  The $*$ operator is used if there are multiple relational subgoals in the query body, in which case base tuples are {\em jointly used} to create the result.
+
+\begin{table}[htp]
+\centering
+\small
+\caption{$V_1(D)$ with how-provenance and citation}\label{Table: Sample instance of V1 with provenance}
+\vspace*{-0.2cm}
+\begin{tabular}[t]{c|c|c||a|b|} \hhline{~----}
+&G&Ty&citation&prov\\ \hhline{~----}
+$t_{v_11}$&1&TEC&\{Group: [`Joe']\}&$g_1$\\ \hhline{~----}
+$t_{v_12}$&2&rRNA&\{Group: [`Liu']\}&$g_2$\\ \hhline{~----}
+% $t_{v_{\ref{eg: illustrative_eg3}}'2}$&2&2&$6$&\{Group: [`Joe']\}&$e_2 + e_3$\\ \hhline{~-----}
+% $t_{v_{\ref{eg: illustrative_eg3}}'3}$&4&1&$2$&\{Group: [`Liu']\}&$e_4$\\ \hhline{~-----}
+\end{tabular}
+\medskip
+\caption{$V_2(D)$ with how-provenance and citation}\label{Table: Sample instance of V2 with provenance}
+\vspace*{-0.2cm}
+% \begin{tabular}[t]{c|c|c|c|c|c|c|} \hhline{~------}
+% &Ty&&G&&TOP2(T)&\\ \hhline{~------}
+% $t_{v_{\ref{eg: illustrative_eg3}}1}$&TEC&$\{c_1\}$&1&$\{d_1\}$&$\{1\}$&$T_1$\\ \hhline{~------}
+% $t_{v_{\ref{eg: illustrative_eg3}}2}$&TEC&$\{c_4\}$&2&$\{d_4\}$&$\{4\}$&$T_4$\\ \hhline{~------}
+% $t_{v_{\ref{eg: illustrative_eg3}}3}$&rRNA&$\{c_2, c_3\}$&1&$\{d_2, d_3\}$&$\{2,3\}$&$T_2 + T_3$\\ \hhline{~------}
+% \end{tabular}
+\begin{tabular}[t]{c|c|c||a|b|} \hhline{~----}
+&Ty&COUNT(G)&citation&prov\\ \hhline{~----}
+$t_{v_21}$&rRNA&3&\{Group: [`Lee']\}&$g_2 + g_3 + g_4$\\ \hhline{~----}
+% $t_{v_{\ref{eg: illustrative_eg3}}'2}$&2&2&$6$&\{Group: [`Joe']\}&$e_2 + e_3$\\ \hhline{~-----}
+% $t_{v_{\ref{eg: illustrative_eg3}}'3}$&4&1&$2$&\{Group: [`Liu']\}&$e_4$\\ \hhline{~-----}
+\end{tabular}
+\medskip
+\caption{$Q_{\ref{eg: conjunctive_case}}(D)$ with how-provenance}\label{Table: Instance of Q1}
+\vspace*{-0.2cm}
+\begin{tabular}[t]{c|c|c||c|a|b|} \hhline{~-----}
+&T&Gid&($G\leq 2$)&citation&prov\\ \hhline{~-----}
+$t_{q_{\ref{eg: conjunctive_case}}1}$&TEC&1&T&{Group:[`Joe']}&$g_1$\\ \hhline{~-----}
+$t_{q_{\ref{eg: conjunctive_case}}2}$&rRNA&2&T&{Group:[`Liu']}&$g_2$\\ \hhline{~-----}
+$t_{q_{\ref{eg: conjunctive_case}}3}$&rRNA&3&F&&$g_3$\\ \hhline{~-----}
+% $t_{q_{\ref{eg: conditions_conjunctive}}2}$&4&$a_4$&TEC&$c_4$&$T_4$\\ \hhline{~-------}
+\end{tabular}
+\medskip
+\caption{$Q_{\ref{eg: illustrative_eg3}}(D)$ with how-provenance}\label{Table: Sample instance of Q with provenance}
+\vspace*{-0.2cm}
+\hspace*{-0.5cm}
+\begin{tabular}[t]{c|c|c||c|c|b|} \hhline{~-----}
+&T&\makecell{COUNT\\(Gid)}&\makecell{$agg$\\$((G\leq2))$}&\makecell{$agg$\\$((Ty=`rRNA'))$}&prov\\ \hhline{~-----}
+$t_{q_{\ref{eg: illustrative_eg3}}1}$&TEC&1&\{T\}&\{F\}&$g_1$\\ \hhline{~-----}
+$t_{q_{\ref{eg: illustrative_eg3}}2}$&rRNA&2&\{T, F\}&\{T, T\}&$g_2 + g_3$\\ \hhline{~-----}
+% $t_{q_{\ref{eg: illustrative_eg3}}'2}$&5&$2.33$&$e_5 + e_6 + e_7$\\ \hhline{~---}
+\end{tabular}
+\medskip
+\caption{$Q_{\ref{eg: assignment}}(D)$ with how-provenance}
+\vspace*{-0.2cm}
+\begin{tabular}[!h]{>{\centering\arraybackslash}p{0.5cm}|>{\centering\arraybackslash}p{0.5cm}|>{\centering\arraybackslash}p{0.5cm}||b|} \hhline{~---}
+&G&G'&prov\\ \hhline{~---}
+$t_{q_{\ref{eg: assignment}}1}$&2&2&\makecell{$r_2*r_2 + r_2*r_3+ r_3*r_2 + r_3*r_3$}\\ \hhline{~---}
+% $t_{q_{\ref{eg: assignment}}'2}$&2&2&$r_3*r_4$\\ \hhline{~---}
+% $t_{q_{\ref{eg: assignment}}'3}$&2&2&$r_4*r_3$\\ \hhline{~---}
+% $t_{q_{\ref{eg: assignment}}'4}$&2&2&$r_4*r_4$\\ \hhline{~---}
+\end{tabular}
+\label{Table:Q7(D)}
+\end{table}
+
+
+
 % \subsection{How-provenance and where-provenance}\label{Sec: provenance intro}
 
 

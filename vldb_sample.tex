@@ -9,7 +9,7 @@
 \usepackage{balance}  % for  \balance command ON LAST PAGE  (only there!)
 \usepackage{supertabular,booktabs}
 \usepackage{subcaption}
-\usepackage[justification=centering]{caption}
+\usepackage[justification=centering,font={bf}]{caption}
 \usepackage{hhline}
 \usepackage{makecell}
 \usepackage{multirow}
@@ -169,6 +169,7 @@ This research was partially funded by NSF IIS 1302212 and NSF ACI 154736. The au
 % initial runs of your .tex file to
 % produce the bibliography for the citations in your paper.
 \newpage
+\balance
 \bibliographystyle{abbrv}
 \bibliography{vldb_sample}  % vldb_sample.bib is the name of the Bibliography in this case
 % You must have a proper ".bib" file

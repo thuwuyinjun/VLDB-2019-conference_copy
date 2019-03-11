@@ -17,7 +17,7 @@ The approach is based on a model of {\em citation views}~\cite{BunemanEtAl2016,d
 A shortcoming of {\rba}, however, is that it addresses a limited class of queries -- (non-recursive) conjunctive queries and conjunctive views -- and cannot be used in applications in which the queries and views involve aggregates (such as SUM, MIN, AVG) or user-defined functions.  However, there is a growing number of biomedical applications which extract \textit{summaries} from data\-bases by issuing aggregate queries, in which views involve aggregation. In these cases, the techniques of \cite{wu2018data} cannot be used.
 
 
-One such example is Hetionet, a database that ``encodes'' biology by integrating various types of biological information from different publicly available resources~\cite{himmelstein2017systematic}.
+One such example is Hetionet, a database that ``encodes'' biology by integrating various types of biological information from different publicly available resources~\cite{himmelstein2015heterogeneous, himmelstein2017systematic}.
 As data is copied from these source datasets, citation information (generally in the form of traditional publication IDs) is also copied and should be propagated to the results of queries.
 The majority of queries against this database involve aggregation to retrieve statistical information.
 \eat{However, the majority of queries involve aggregation over the integrated dataset so the techniques of \cite{wu2018data} cannot be used.}

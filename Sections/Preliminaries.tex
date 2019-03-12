@@ -173,6 +173,7 @@ $t_{v_12}$&2&rRNA&\{Group: [`Liu']\}&$g_2$\\ \hhline{~----}
 \medskip
 \caption{$V_2(D)$ with how-provenance and citation}\label{Table: Sample instance of V2 with provenance}
 \vspace*{-0.2cm}
+\hspace*{-0.4cm}
 % \begin{tabular}[t]{c|c|c|c|c|c|c|} \hhline{~------}
 % &Ty&&G&&TOP2(T)&\\ \hhline{~------}
 % $t_{v_{\ref{eg: illustrative_eg3}}1}$&TEC&$\{c_1\}$&1&$\{d_1\}$&$\{1\}$&$T_1$\\ \hhline{~------}
@@ -180,7 +181,7 @@ $t_{v_12}$&2&rRNA&\{Group: [`Liu']\}&$g_2$\\ \hhline{~----}
 % $t_{v_{\ref{eg: illustrative_eg3}}3}$&rRNA&$\{c_2, c_3\}$&1&$\{d_2, d_3\}$&$\{2,3\}$&$T_2 + T_3$\\ \hhline{~------}
 % \end{tabular}
 \begin{tabular}[t]{c|c|c||a|b|} \hhline{~----}
-&Ty&COUNT(G)&citation&prov\\ \hhline{~----}
+&Ty&\makecell{COUNT(G)}&citation&prov\\ \hhline{~----}
 $t_{v_21}$&rRNA&3&\{Group: [`Lee']\}&$g_2 + g_3 + g_4$\\ \hhline{~----}
 % $t_{v_{\ref{eg: illustrative_eg3}}'2}$&2&2&$6$&\{Group: [`Joe']\}&$e_2 + e_3$\\ \hhline{~-----}
 % $t_{v_{\ref{eg: illustrative_eg3}}'3}$&4&1&$2$&\{Group: [`Liu']\}&$e_4$\\ \hhline{~-----}
@@ -200,7 +201,7 @@ $t_{q_{\ref{eg: conjunctive_case}}3}$&rRNA&3&F&&$g_3$\\ \hhline{~-----}
 \vspace*{-0.2cm}
 \hspace*{-0.5cm}
 \begin{tabular}[t]{c|c|c||c|c|b|} \hhline{~-----}
-&T&\makecell{COUNT\\(Gid)}&\makecell{$agg$\\$((G\leq2))$}&\makecell{$agg$\\$((Ty=`rRNA'))$}&prov\\ \hhline{~-----}
+&T&\makecell{COUNT\\(Gid)}&\makecell{$agg$\\$((G\leq2))$}&\makecell{$agg((Ty=$\\$`rRNA$'$))$}&prov\\ \hhline{~-----}
 $t_{q_{\ref{eg: illustrative_eg3}}1}$&TEC&1&\{T\}&\{F\}&$g_1$\\ \hhline{~-----}
 $t_{q_{\ref{eg: illustrative_eg3}}2}$&rRNA&2&\{T, F\}&\{T, T\}&$g_2 + g_3$\\ \hhline{~-----}
 % $t_{q_{\ref{eg: illustrative_eg3}}'2}$&5&$2.33$&$e_5 + e_6 + e_7$\\ \hhline{~---}
@@ -316,7 +317,7 @@ under an assignment $\gamma$, base relation tuples $t_{b1}, t_{b2}, \dots, t_{bm
 \end{definition}
 
 % \begin{example}
-Returning to Example \ref{eg: assignment}, consider the second how-provenance monomial $r_2*r_3$ and corresponding {assignment} $\gamma$ in query tuple $t_{q_{\ref{eg: assignment}}1}$ of Table \ref{Table:Q7(D)}. Since $t_{t2}$ and $t_{t3}$ are associated with how-provenance tokens $r_2$ and $r_3$ respectively, there should be an isomorphism $F$ under $\gamma$ such that $F(Transcript(T, N,$ $Ty, G)|\gamma)$ = $r_2$ while $F(Transcript(T', N', Ty', G')|\gamma) = r_3$.
+Returning to Example \ref{eg: assignment}, consider the second provenance monomial $r_2*r_3$ and corresponding {assignment} $\gamma$ in query tuple $t_{q_{\ref{eg: assignment}}1}$ of Table \ref{Table:Q7(D)}. Since $t_{t2}$ and $t_{t3}$ are associated with how-provenance tokens $r_2$ and $r_3$ respectively, there should be an isomorphism $F$ under $\gamma$ such that $F(Transcript(T, N,$ $Ty, G)|\gamma)$ = $r_2$ while $F(Transcript(T', N', Ty', G')|\gamma) = r_3$.
 % \end{example}
 
 

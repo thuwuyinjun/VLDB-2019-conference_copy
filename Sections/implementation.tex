@@ -151,7 +151,7 @@ In the {\em pre-processing} step,  the provenance of the query is retrieved. \ea
 \begin{tabular}[t]{c|>{\centering\arraybackslash}p{0.15cm}|>{\centering\arraybackslash}p{1.5cm}|c|c||b|} \hhline{~-----}
 &G&COUNT(T)&MAX(L)&COUNT(E)&prov\\ \hhline{~-----}
 $t_{q1}$&1&1&1&1&$e_1*r_1$\\ \hhline{~-----}
-$t_{q2}$&2&2&3&2&$e_2*r_2 + e_3*r_2$\\ \hhline{~-----}
+$t_{q2}$&2&2&3&2&\makecell{$e_2*r_2$\\$ + e_3*r_2$}\\ \hhline{~-----}
 % $t_{q3}$&3&2&3&2&$e_4*r_3$ \\\hhline{~-----}
 \end{tabular}
 \medskip
@@ -171,6 +171,13 @@ Next, all possible {\em view mappings} are constructed. We can find four view ma
 %while other views either miss grouping attributes (such as $V3$ and $V1$) or cannot provide necessary attributes to compute the statistics that are needed for $Q_1$ (such as $V2$).
 
 %view mapping validity checking for conjunctive views and point out its difference to RBA
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.4\textwidth,height=0.2\textwidth]{Figures/intersection.jpg}
+    \caption{Query provenance index for $Q$ and how to compute coordinate for $e_3*r_2$ from $V_4(D)$}
+    \small \label{fig:query prov index}
+\end{figure}
+
 In the {\em Reasoning} step, since $V_3$ is a {conjunctive view}, the validity of $M_3$ for a query tuple $t_q$ only depends on the {\em existence} of $t_q$ in $V_3(D)$ under mapping $M_3$ (Section \ref{sec: conjunctive_example}). So we can simply retrieve the base relation tuple for each provenance token appearing in the query to evaluate the view {predicates}. For example, the validity of $M_3$ can be checked simply by examining the predicates of $V_3$. Since the first predicate in $V_3$, $T = T'$, is also in $Q$, every tuple in the query instance must satisfy it. However, the second predicate, $E \leq 2$, can affect the {existence} of query tuples in $V_3$. Table \ref{Instance of Exon} shows that only the tuples with how-provenance tokens $e_1$ and $e_2$ satisfy $E \leq 2$. Thus $M_3$ is only valid for $t_{{q}1}$, whose how-provenance polynomial only includes $e_1$. %without any other how-provenance tokens from Exon.
 {Note that the implementation used here is different from \rba\ since evaluating view predicates is achieved by {referencing the base relation tuples with the query provenance} rather than computing extra predicates in the query evaluation.}  
 %This difference in performance will be discussed in Section \ref{sec:experiments}.
@@ -203,7 +210,7 @@ $t_{v_42}$&3&1&\makecell{$e_3*r_2 + e_4*r_2$}\\ \hhline{~---}
 \begin{tabular}[t]{c|c|c|c||b|} \hhline{~----}
 &G1&MAX(L)&COUNT(E)&prov\\ \hhline{~----}
 $t_{v_51}$&1&1&1&$e_1*r_1$\\ \hhline{~----}
-$t_{v_52}$&2&3&2&$e_2*r_2 + e_3*r_2 + e_4*r_2$\\ \hhline{~----}
+$t_{v_52}$&2&3&2&\makecell{$e_2*r_2 + e_3*r_2$\\$ + e_4*r_2$}\\ \hhline{~----}
 % $t_{v_53}$&3&3&2&\makecell{$e_4*r_3 + e_5*r_4$}\\ \hhline{~----}
 \end{tabular}
 \medskip
@@ -218,20 +225,15 @@ $t_{v_62}$&2&1&$r_2$\\ \hhline{~---}
 \medskip
 \caption{$Q(D)$ with valid view mappings and covering sets (aggregate terms omitted)}\label{Instance of Q1 with view mappings}
 \vspace*{-0.2cm}
+\hspace*{-0.2cm}
 \begin{tabular}[t]{c|c||c|c|} \hhline{~---}
 &G&valid view mappings&covering sets\\ \hhline{~---}
-$t_{q1}$&1&$M_3, M_4, M_5, M_6$&\makecell{$\{\{M_3\}, \{M_4, M_5\}, \{M_5, M_6\}\}$}\\ \hhline{~---}
+$t_{q1}$&1&$M_3, M_4, M_5, M_6$&\makecell{$\{\{M_3\}, \{M_4, M_5\}$\\$, \{M_5, M_6\}\}$}\\ \hhline{~---}
 $t_{q2}$&2&$M_6$&$\{\{M_6\}\}$\\ \hhline{~---}
 % $t_{q3}$&3&$M_6$&$\{\{M_6\}\}$\\ \hhline{~---}
 \end{tabular}
 \end{table}
 
-\begin{figure}[t]
-    \centering
-    \includegraphics[width=0.4\textwidth,height=0.2\textwidth]{Figures/intersection.jpg}
-    \caption{Query provenance index for $Q$ and how to compute coordinate for $e_3*r_2$ from $V_4(D)$}
-    \small \label{fig:query prov index}
-\end{figure}
 % \begin{figure}
 % % \captionsetup[subfigure]{width=1\textwidth}
 %      \centering

@@ -64,8 +64,8 @@ Hetionet integrates information from various resources, and includes information
 \small
 \caption{Summary of datasets}
 \vspace*{-0.2cm}
-\begin{tabular}[!h]{|>{\centering\arraybackslash}p{2cm}|>{\centering\arraybackslash}p{1.5cm}|>{\centering\arraybackslash}p{2cm}|>{\centering\arraybackslash}p{2cm}|} \hline
-Dataset name& relation \# &average tuple \# per relation& tuple \# of largest relation \\ \hline
+\begin{tabular}[!h]{|>{\centering\arraybackslash}p{2cm}|>{\centering\arraybackslash}p{1cm}|>{\centering\arraybackslash}p{2cm}|>{\centering\arraybackslash}p{2cm}|} \hline
+Dataset name& \makecell{relation\\ \#} &average tuple \# per relation& tuple \# of largest relation \\ \hline
 GENECODE&7&600k&2000k \\ \hline
 Hetionet&38&60k&500k \\ \hline
 DBLP-NSF&17&600k&6000k \\ \hline
@@ -74,15 +74,15 @@ DBLP-NSF&17&600k&6000k \\ \hline
 \label{Table: datasets_summary}
 \caption{Notation used in the experiments}
 \vspace*{-0.2cm}
-\begin{tabular}[!h]{|c|>{\centering\arraybackslash}p{6.8cm}|} \hline
+\begin{tabular}[!h]{|c|>{\centering\arraybackslash}p{6cm}|} \hline
 Notation & Meaning \\ \hline
-$t_{cs}$&total reasoning time to generate the covering sets for all query tuples \\ \hline
+$t_{cs}$&\makecell{total reasoning time to generate\\ the covering sets for all query tuples} \\ \hline
 $t_{q}$&query time over the database \\ \hline
 $t_{total}$&total execution time \\ \hline
 $N_v$&total number of view mappings \\ \hline
-$N_p$&total number of predicates under the view mappings \\ \hline
-$N_{pq}$&total number of how-provenance monomials in the query instance \\ \hline
-$N_{pv}$&total number of how-provenance monomials in the view instance on average\\ \hline
+$N_p$&\makecell{total number of predicates \\ under the view mappings} \\ \hline
+$N_{pq}$&\makecell{total number of how-provenance\\ monomials in the query instance} \\ \hline
+$N_{pv}$&\makecell{total number of how-provenance monomials \\in the view instance on average}\\ \hline
 \end{tabular}
 \medskip
 \label{Table: notation_summary}

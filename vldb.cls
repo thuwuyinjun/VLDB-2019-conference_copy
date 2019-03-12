@@ -256,7 +256,7 @@
 \newtoks\subtitletext
 \gdef\subtitle#1{\subtitletext={#1}}
 
-\gdef\additionalauthors#1{\addauthors={#1}}
+% \gdef\additionalauthors#1{\addauthors={#1}}
 
 \gdef\numberofauthors#1{\global\aucount=#1
 \ifnum\aucount>3\global\originalaucount=\aucount \global\aucount=3\fi %g}
@@ -1258,7 +1258,7 @@
 \setcounter{enumi}{1}
 \bibindent=0em
 \def\thebibliography#1{%
-% \ifnum\addauflag=0\addauthorsection\global\addauflag=1\fi
+\ifnum\addauflag=0\addauthorsection\global\addauflag=1\fi
      \section[References]{%    <=== OPTIONAL ARGUMENT ADDED HERE
         {References} % was uppercased but this affects pdf bookmarks (SP/GM October 2004)
           \vskip -9pt  % GM July 2000 (for tighter spacing)
@@ -1389,7 +1389,8 @@
 
 % Future proceedings chair, please update the following: 1) conference sequence number, 2) date,
 % 3) location, 4) volume number, 5) Copyright year.
-\global\boilerplate={Permission to make digital or hard copies of all or part of this work for personal or classroom use is granted without fee provided that copies are not made or distributed for profit or commercial advantage and that copies bear this notice and the full citation on the first page. To copy otherwise, to republish, to post on servers or to redistribute to lists, requires prior specific permission and/or a fee.  Articles from this volume were invited to present their results at The 45th International Conference on Very Large Data Bases, August 2019, Los Angeles, California.}
+%\global\boilerplate={Permission to make digital or hard copies of all or part of this work for personal or classroom use is granted without fee provided that copies are not made or distributed for profit or commercial advantage and that copies bear this notice and the full citation on the first page. To copy otherwise, to republish, to post on servers or to redistribute to lists, requires prior specific permission and/or a fee.  Articles from this volume were invited to present their results at The 45th International Conference on Very Large Data Bases, August 2019, Los Angeles, California.}
+\global\boilerplate={This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.  To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-nd/4.0/.  For any use beyond those covered by this license, obtain permission by emailing info@vldb.org. Copyright is held by the owner/author(s). Publication rights licensed to the VLDB Endowment.}
 
 
 \def\vldbAuthors#1{\def\@vldbAuthors{#1}}
@@ -1414,7 +1415,7 @@
 \global\conf{Proceedings of the VLDB Endowment,}
 \global\confinfo{Vol. \@vldbVolume, No. \@vldbNumber}
 \newtoks\copyrightetc
-\global\copyrightetc{Copyright 2018 VLDB Endowment 2150-8097/18/10... \$ 10.00}
+\global\copyrightetc{ISSN 2150-8097}
 
 
 \toappear{\the\boilerplate\par

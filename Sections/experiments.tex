@@ -58,6 +58,56 @@ For DBLP-NSF we use the realistic views defined in \cite{wu2018data}. We also ad
 
 Hetionet integrates information from various resources, and includes information about genes, biological process, drugs, etc.  This information is stored in different relations in the database. Of these, the biological process relation is associated with citation information (i.e. related publication IDs). After consulting with the authors of Hetionet, two views were defined. The first one is a parameterized view showing the  biological processes that a particular gene is involved in. The second counts the total number of connections between each biological process and corresponding genes by joining several relations, such as the biological process and gene relations.  A typical query ($q5$) counts the total number of connections between each biological process and a certain drug via some genes.
 
+\begin{figure*}
+\captionsetup[subfigure]{width=1\textwidth}
+     \centering
+    \begin{subfigure}{0.30\textwidth}
+    \hspace*{-0.8cm}
+        \raisebox{-\height}{\includegraphics[height = 0.8\textwidth, width=1.2\textwidth]{Figures/synthetic_instance_size.eps}}
+        \caption{$t_{total}$ with varied $N_{pq}$ and $N_{pv}$}     \label{fig:stress_test_instance_size}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.30\textwidth}
+    \hspace*{-0.8cm}
+        \raisebox{-\height}{\includegraphics[height = 0.8\textwidth, width=1.2\textwidth]{Figures/synthetic_view_num.eps}}
+        \caption{$t_{total}$ with varied $N_v$}
+        \label{fig:stress_test_view_num}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.30\textwidth}
+    \hspace*{-0.8cm}
+        \raisebox{-\height}{\includegraphics[height = 0.8\textwidth, width=1.2\textwidth]{Figures/synthetic_predicate_num.eps}}
+        \caption{$t_{total}$ with varied $N_p$}
+        \label{fig:stress_test_predicate_num_time}
+    \end{subfigure}
+    \caption{Experimental results for synthetic workloads}
+\end{figure*}
+
+Table \ref{Table: notation_summary} provides a summary of the notation mentioned in this subsection.% which will be used in the remainder of this section.
+
+\subsection{Experimental results}
+We now report on results from the synthetic and realistic workloads.
+
+\subsubsection{Synthetic workloads} \label{sec: synthetic_exp}
+We measured the impact of the provenance size of the query and view instances on time performance (Exp1), and the relative performance of \provalg\ and two implementations of \rba, TLA and SSLA,  while varying the view mapping number (Exp2) and the view predicate number (Exp3).
+
+\textbf{Exp1.}  This experiment measures how the total execution time ($t_{total}$) is influenced by the total number of how-provenance monomials in the query instance ($N_{pq}$) as well as 
+%the total number of how-provenance monomials 
+in the view instance ($N_{pv}$). We randomly generate an aggregate query, and vary $N_{pq}$ by adding appropriate predicates. A fixed number of aggregate views are also generated such that there is exact one view mapping from each of them to the query and the total number of view mappings is fixed at 20.  In practice, the number of views that touch the query is usually far smaller than the total number of views, so 20 is a pretty large number. Both $N_{pq}$ and $N_{pv}$ are varied from 50K to 5M. The total time is measured for different ($N_{pq}$, $N_{pv}$) pairs under the {\em eager} and {\em lazy} strategy with the query provenance index, and the {\em lazy} strategy without the index. 
+
+\textbf{Results.} 
+The results are shown using 3D surfaces in Figure \ref{fig:stress_test_instance_size}, with the eager strategy with index, lazy strategy with index and pure lazy strategy shown in red, green and yellow respectively. The query time $t_q$ is also recorded in black. It shows that the query provenance index leads to about 1.0x-1.8x speed-ups in most cases by comparing lazy strategy with index and pure lazy strategy, while materializing view provenance results in about 1.1x-1.5x speed-ups by comparing eager strategy and lazy strategy with index. The combination of the index and eager strategy leads to up to 2x performance gains. The result also shows the {\em scalability} of our approach since it takes less than 2 mins to process a query instance with up to 5 million how-provenance monomials and 20 views with up to 5 million how-provenance monomials, which rarely happens in practice. \eat{We also observe that reasoning about valid view mappings is highly parallelizable, which means that further improvement can be achieved by implementing in distributed systems. }
+
+% We also measured the extra space needed for the eager strategy, where the provenance of views is precomputed and stored in the database; it takes about 180 MB in the database to store the provenance for each view when the instance of the view includes up to 1 million how-provenance monomials. 
+
+\textbf{Exp2.} The goal of this experiment is to compare the relative performance of \provalg, TLA and SSLA while varying the number of view mappings ($N_v$). Since TLA and SSLA cannot handle aggregate views, only conjunctive views are used. In this case, the provenance of views is not necessary; there is no difference between the eager and lazy strategy and the query provenance index is not useful. 
+However, the two optimization strategies on covering set computation, i.e. applying bit arrays and clustering algorithms, are useful and are measured here.\eat{ We observe that \provalg\ have almost the same performance with TLA and SSLA no matter whether to use optimization or not and thus TLA and SSLA are not presented here.} The query is a fixed aggregate query with 1 million how-provenance monomials in its instance. $N_v$ is varied from 1 to 50 and there are no predicates or lambda variables for each individual view. 
+
+\textbf{Results.}
+The experimental results are presented in Figure \ref{fig:stress_test_view_num}, which shows the change of $t_{total}$ for ProvCide and the number of covering sets ($N_{cs}$) as the number of view mappings ($N_v$) increases, with and without using bit arrays and clustering algorithm. TLA and SSLA have almost the same performance as ProvCite, and are not shown. Figure \ref{fig:stress_test_view_num} shows that when $N_v$ is large, an exponential number of covering sets are generated, leading to bad performance (see blue line). Bit array computations and the use of clustering leads to about a 5x and 2x speed-up respectively; an order of magnitude performance gain is achieved by combining both.
+
+
+\textbf{Exp3.} In this experiment, \provalg\ is compared with TLA and SSLA while varying the total number of predicates ($N_p$) in views. Similar to Exp2, the query is an aggregate query which can generate about 1 million tuples. The number of view mappings is fixed at 10 and there are initially no predicates. In each run, one more local predicate is added. As shown in \cite{wu2018data}, increasing $N_p$  significantly influences the query time and hence performance of TLA and SSLA since the query is extended to evaluate the view predicates. \eat{; 2) increasing the number of {\em reasoning groups} since we need to compute covering sets for each group and thus more {\em reasoning groups} in the query instance means more reasoning time. In theory, \provalg\ will also suffer from a large number of groups but will save on query time.}
 
 \begin{table}
 \centering
@@ -99,62 +149,14 @@ $q5$&4.65&5.10&4.81&243k&3&0&2.32 \\ \hline
 \label{Table: realistic_performance}
 \end{table}
 
-\begin{figure*}
-\captionsetup[subfigure]{width=1\textwidth}
-     \centering
-    \begin{subfigure}{0.30\textwidth}
-    \hspace*{-0.8cm}
-        \raisebox{-\height}{\includegraphics[height = 0.8\textwidth, width=1.2\textwidth]{Figures/synthetic_instance_size.eps}}
-        \caption{$t_{total}$ with varied $N_{pq}$ and $N_{pv}$}     \label{fig:stress_test_instance_size}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}{0.30\textwidth}
-    \hspace*{-0.8cm}
-        \raisebox{-\height}{\includegraphics[height = 0.8\textwidth, width=1.2\textwidth]{Figures/synthetic_view_num.eps}}
-        \caption{$t_{total}$ with varied $N_v$}
-        \label{fig:stress_test_view_num}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}{0.30\textwidth}
-    \hspace*{-0.8cm}
-        \raisebox{-\height}{\includegraphics[height = 0.8\textwidth, width=1.2\textwidth]{Figures/synthetic_predicate_num.eps}}
-        \caption{$t_{total}$ with varied $N_p$}
-        \label{fig:stress_test_predicate_num_time}
-    \end{subfigure}
-    \caption{Experimental results for synthetic workloads}
-\end{figure*}
-
-Table \ref{Table: notation_summary} provides a summary of the notation mentioned in this subsection.% which will be used in the remainder of this section.
-
-\subsection{Experimental results}
-We now report on results from the synthetic and realistic workloads.
-
-\subsubsection{Synthetic workloads} \label{sec: synthetic_exp}
-We measured the impact of the size of provenance in both the query and view instances on time performance (Exp1), and the relative performance of \provalg\ and two implementations of \rba, TLA and SSLA,  while varying the number of view mappings (Exp2) and number of view predicates (Exp3).
-
-\textbf{Exp1.}  This experiment measures how the total execution time ($t_{total}$) is influenced by the total number of how-provenance monomials in the query instance ($N_{pq}$) as well as 
-%the total number of how-provenance monomials 
-in the view instance ($N_{pv}$). We randomly generate an aggregate query, and vary $N_{pq}$ by adding appropriate predicates. A fixed number of aggregate views are also generated such that there is exact one view mapping from each of them to the query and the total number of view mappings is fixed at 20.  In practice, the number of views that touch the query is usually far smaller than the total number of views, so 20 is a pretty large number. Both $N_{pq}$ and $N_{pv}$ are varied from 50K to 5M. The total time is measured for different ($N_{pq}$, $N_{pv}$) pairs under the {\em eager} and {\em lazy} strategy with the query provenance index, and the {\em lazy} strategy without the index. 
-
-\textbf{Results.} 
-The results are shown using 3D surfaces in Figure \ref{fig:stress_test_instance_size}, with the eager strategy with index, lazy strategy with index and pure lazy strategy shown in red, green and yellow respectively. The query time $t_q$ is also recorded in black. It shows that the query provenance index leads to about 1.0x-1.8x speed-ups in most cases by comparing lazy strategy with index and pure lazy strategy, while materializing view provenance results in about 1.1x-1.5x speed-ups by comparing eager strategy and lazy strategy with index. The combination of the index and eager strategy leads to up to 2x performance gains. The result also shows the {\em scalability} of our approach since it takes less than 2 mins to process a query instance with up to 5 million how-provenance monomials and 20 views with up to 5 million how-provenance monomials, which rarely happens in practice. \eat{We also observe that reasoning about valid view mappings is highly parallelizable, which means that further improvement can be achieved by implementing in distributed systems. }
-
-% We also measured the extra space needed for the eager strategy, where the provenance of views is precomputed and stored in the database; it takes about 180 MB in the database to store the provenance for each view when the instance of the view includes up to 1 million how-provenance monomials. 
-
-\textbf{Exp2.} The goal of this experiment is to compare the relative performance of \provalg, TLA and SSLA while varying the number of view mappings ($N_v$). Since TLA and SSLA cannot handle aggregate views, only conjunctive views are used. In this case, the provenance of views is not necessary; there is no difference between the eager and lazy strategy and the query provenance index is not useful. 
-However, the two optimization strategies on covering set computation, i.e. applying bit arrays and clustering algorithms, are useful and are measured here.\eat{ We observe that \provalg\ have almost the same performance with TLA and SSLA no matter whether to use optimization or not and thus TLA and SSLA are not presented here.} The query is a fixed aggregate query with 1 million how-provenance monomials in its instance. $N_v$ is varied from 1 to 50 and there are no predicates or lambda variables for each individual view. 
-
-\textbf{Results.}
-The experimental results are presented in Figure \ref{fig:stress_test_view_num}, which shows the change of $t_{total}$ for ProvCide and the number of covering sets ($N_{cs}$) as the number of view mappings ($N_v$) increases, with and without using bit arrays and clustering algorithm. TLA and SSLA have almost the same performance as ProvCite, and are not shown. Figure \ref{fig:stress_test_view_num} shows that when $N_v$ is large, an exponential number of covering sets are generated, leading to bad performance (see blue line). Bit array computations and the use of clustering leads to about a 5x and 2x speed-up respectively; an order of magnitude performance gain is achieved by combining both.
-
-
-\textbf{Exp3.} In this experiment, \provalg\ is compared with TLA and SSLA while varying the total number of predicates ($N_p$) in views. Similar to Exp2, the query is an aggregate query which can generate about 1 million tuples. The number of view mappings is fixed at 10 and there are initially no predicates. In each run, one more local predicate is added. As shown in \cite{wu2018data}, increasing $N_p$  significantly influences the query time and hence performance of TLA and SSLA since the query is extended to evaluate the view predicates. \eat{; 2) increasing the number of {\em reasoning groups} since we need to compute covering sets for each group and thus more {\em reasoning groups} in the query instance means more reasoning time. In theory, \provalg\ will also suffer from a large number of groups but will save on query time.}
 
 \textbf{Results.} The results are shown in Figure \ref{fig:stress_test_predicate_num_time}\eat{, which matches the analysis above}. As the number of predicates increases, $t_{total}=t_{cs} + t_q$
 increases slowly for \provalg. In contrast, TLA and SSLA are twice as slow as \provalg\ for large $N_p$. To understand the reason for this, the query time for TLA, SSLA and ProvCite is also presented in this figure, showing that the increasing query time becomes the major overhead for both TLA and SSLA. %, thus slowing down the computation.
 
 {\bf Discussion.} The experiments reveal that all four metrics, $N_{pq}$ (the total number of how-provenance monomials in the query instance), $N_{pv}$ (the total number of how-provenance monomials in the view instance on average), $N_v$ (the total number of view mappings), and $N_p$ (the total number of predicates under the view mappings) can affect the total reasoning time $t_{cs}$. In extreme cases, where the value of the metric is very large, the performance of ProvCite is bad especially if implemented naively. However, the performance can be substantially improved using the bit array and clustering optimization strategies. We therefore expect ProvCite to have acceptable time performance for realistic workloads, where the extreme cases \eat{value of those metrics }rarely arise. 
 % In the case of aggregate views where how-provenance is necessary, the  eager strategy beats the lazy strategy in terms of time.  The speedup is small (10\%-40\%), however, extra space is needed (up to 180 MB per view). So in practice, the choice between the eager or lazy strategy depends on whether speed or space is more important. In comparison to the previous approaches, TLA and SSLA, \provalg\ is not only more powerful in that it supports aggregate views but is also (surprisingly) frequently more efficient.  
+
+\vspace*{-0.3cm}
 
 \subsubsection{Realistic workloads}
 \label{ssec: realistic}

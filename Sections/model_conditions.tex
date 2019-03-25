@@ -12,7 +12,7 @@ The validity conditions guarantee the same result as the conditions in \cite{wu2
 A view mapping $M$ from a conjunctive view $V$ to a conjunctive query $Q$ should satisfy the following conditions at the schema level if it is valid for some query tuples:
 %The {\em schema-level conditions} are defined as follows:
 \begin{enumerate}
-\item There exists at least one head variable $y \in \bar{Y}$ such that $\phi(y)$ is a head variable; and
+\item There exists at least one head variable $y \in \bar{Y}$ in $V$ such that $\phi(y)$ is a head variable in $Q$; and
 \item All lambda variables in $V$ are mapped to variables in the body of $Q$.
 \end{enumerate}
 \end{definition}
